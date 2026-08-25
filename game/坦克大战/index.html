@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>破阵·浪尖学城：FYL堡垒战 - 终极破阵版</title>
+<style>
+  :root {
+    --color-pink: #FF527C;
+    --color-cyan: #00F0FF;
+    --color-lime: #B5F800;
+    --color-blue: #0036FF;
+    --color-dark: #070814;
+    --color-hud-green: #00FF66;
+    --color-hud-red: #FF2A55;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body {
+    background-color: var(--color-dark);
+    color: #ffffff;
+    font-family: 'Impact', 'Arial Black', -apple-system, sans-serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 1920px;
+    max-height: 1080px;
+    background: #070814;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .btn-acid {
+    background: var(--color-blue);
+    border: 2px solid var(--color-lime);
+    color: var(--color-lime);
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0px var(--color-lime);
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    pointer-events: auto !important;
+    z-index: 100;
+  }
+  .btn-acid:hover {
+    background: var(--color-lime);
+    color: var(--color-blue);
+    box-shadow: 0 0 15px var(--color-lime);
+    transform: translate(-2px, -2px);
+  }
+  .btn-acid:active {
+    transform: translate(2px, 2px);
+  }
+
+  .btn-pink {
+    background: var(--color-pink);
+    border: 2px solid var(--color-cyan);
+    color: #ffffff;
+    box-shadow: 3px 3px 0px var(--color-cyan);
+  }
+  .btn-pink:hover {
+    background: var(--color-cyan);
+    color: var(--color-dark);
+    box-shadow: 0 0 15px var(--color-cyan);
+  }
+
+  .btn-red {
+    background: #4a000f;
+    border: 2px solid var(--color-hud-red);
+    color: #ffffff;
+    box-shadow: 3px 3px 0px var(--color-hud-red);
+  }
+  .btn-red:hover {
+    background: var(--color-hud-red);
+    color: #ffffff;
+    box-shadow: 0 0 20px var(--color-hud-red);
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border: 2px solid #FFF;
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    font-size: 16px;
+    animation: pulseGold 1.5s infinite alternate;
+  }
+  @keyframes pulseGold {
+    from { transform: scale(1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+    to { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 1); }
+  }
+
+  .view-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+    transition: opacity 0.3s ease;
+  }
+  .view-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
+  }
+
+  /* 大厅视图 */
+  #lobby-view {
+    background: radial-gradient(circle at center, rgba(0, 54, 255, 0.25) 0%, rgba(7, 8, 20, 0.96) 100%),
+                repeating-linear-gradient(0deg, rgba(255,82,124,0.03) 0px, rgba(255,82,124,0.03) 2px, transparent 2px, transparent 8px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 40px;
+    z-index: 10;
+  }
+
+  .lobby-header, .npc-court, .lobby-bottom-bar {
+    position: relative;
+    z-index: 10;
+  }
+
+  .lobby-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--color-pink);
+    padding-bottom: 16px;
+  }
+  .lobby-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--color-lime);
+    text-shadow: 0 0 15px rgba(181, 248, 0, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-style: italic;
+    letter-spacing: 2px;
+  }
+  .lobby-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    align-items: center;
+  }
+  .stat-badge {
+    color: var(--color-cyan);
+    font-weight: 900;
+  }
+  .music-toggle-btn {
+    background: #000;
+    border: 2px solid var(--color-pink);
+    color: var(--color-pink);
+    border-radius: 20px;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    pointer-events: auto !important;
+  }
+  .music-toggle-btn:hover {
+    box-shadow: 0 0 15px var(--color-pink);
+    background: var(--color-pink);
+    color: #fff;
+  }
+
+  /* NPC 展台 */
+  .npc-court {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    flex: 1;
+  }
+  .npc-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    position: relative;
+    padding: 10px;
+  }
+  .npc-card:hover {
+    transform: translateY(-8px) scale(1.04);
+  }
+  .npc-avatar-wrap {
+    width: 140px;
+    height: 180px;
+    border: 3px solid var(--color-cyan);
+    border-radius: 8px;
+    background: #0d1124;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.8), 0 0 20px rgba(0, 240, 255, 0.3);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .npc-name-tag {
+    margin-top: 10px;
+    background: var(--color-blue);
+    border: 1px solid var(--color-lime);
+    padding: 4px 14px;
+    border-radius: 4px;
+    font-size: 15px;
+    color: var(--color-lime);
+    font-weight: 900;
+  }
+  .npc-role {
+    font-size: 12px;
+    color: var(--color-pink);
+    margin-top: 4px;
+    font-weight: bold;
+  }
+
+  .dialogue-bubble {
+    position: absolute;
+    bottom: 220px;
+    width: 320px;
+    background: rgba(7, 8, 20, 0.96);
+    border: 2px solid var(--color-lime);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.6;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px rgba(181, 248, 0, 0.4);
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    z-index: 30;
+    font-family: -apple-system, sans-serif;
+  }
+  .dialogue-bubble.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .dialogue-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: var(--color-lime) transparent;
+    display: block;
+    width: 0;
+  }
+
+  .lobby-bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 54, 255, 0.15);
+    border: 2px solid var(--color-lime);
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(181, 248, 0, 0.2);
+  }
+  .level-picker {
+    display: flex;
+    gap: 12px;
+  }
+  .level-btn {
+    padding: 12px 20px;
+    background: #0d1124;
+    border: 2px solid #202b4d;
+    color: #8c9ec7;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 900;
+    transition: all 0.2s;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .level-btn.active {
+    background: var(--color-blue);
+    border-color: var(--color-lime);
+    color: var(--color-lime);
+    box-shadow: 0 0 15px rgba(181, 248, 0, 0.4);
+  }
+
+  /* ------------------- 视觉点缀 CSS ------------------- */
+  .lobby-decor {
+    position: absolute;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .pixel-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    color: #FFF;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-top: 8px;
+    text-shadow: 2px 2px 0px #000;
+  }
+  .decor-fire {
+    left: 6%;
+    bottom: 22%;
+    animation: floatFire 3s ease-in-out infinite alternate;
+  }
+  .decor-bubbles {
+    right: 8%;
+    top: 15%;
+    animation: floatBubbles 4s ease-in-out infinite alternate;
+  }
+  .decor-butterfly {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+    z-index: 1;
+  }
+  .scattered-text {
+    position: absolute;
+    font-family: 'Courier New', Courier, monospace;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px #000;
+  }
+  .rot90 {
+    transform: rotate(90deg);
+    transform-origin: left top;
+  }
+  @keyframes floatFire {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-15px); }
+  }
+  @keyframes floatBubbles {
+    0% { transform: translateY(0px) translateX(0px); }
+    100% { transform: translateY(-20px) translateX(10px); }
+  }
+
+  /* 游戏 HUD */
+  #game-hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 20px;
+  }
+  .hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+  }
+  .player-status-card {
+    background: rgba(7, 8, 20, 0.9);
+    border: 2px solid var(--color-cyan);
+    padding: 12px 18px;
+    border-radius: 6px;
+    min-width: 280px;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    pointer-events: auto;
+  }
+  .hud-top-actions {
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+    z-index: 100;
+  }
+  .bar-container {
+    height: 12px;
+    background: #151a30;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 6px 0;
+    border: 1px solid #303d6e;
+  }
+  .bar-fill {
+    height: 100%;
+    transition: width 0.2s ease;
+  }
+  .hp-fill { background: linear-gradient(90deg, var(--color-pink), var(--color-lime)); width: 100%; }
+  .exp-fill { background: linear-gradient(90deg, var(--color-blue), var(--color-cyan)); width: 0%; }
+
+  .shield-hud-tag {
+    font-size: 12px;
+    color: var(--color-cyan);
+    font-weight: 900;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-shadow: 0 0 8px var(--color-cyan);
+  }
+  .maze-suppress-tag {
+    font-size: 11px;
+    color: var(--color-lime);
+    font-weight: 900;
+    margin-top: 3px;
+    display: none;
+    text-shadow: 0 0 8px var(--color-lime);
+  }
+
+  .boss-health-bar-wrap {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    max-width: 80%;
+    background: rgba(7, 8, 20, 0.95);
+    border: 2px solid var(--color-pink);
+    padding: 8px 14px;
+    border-radius: 6px;
+    box-shadow: 0 0 25px rgba(255, 82, 124, 0.6);
+    text-align: center;
+    pointer-events: none;
+  }
+  .boss-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--color-pink);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .skills-hud {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 16px;
+    pointer-events: auto;
+  }
+  .skill-slot {
+    width: 68px;
+    height: 68px;
+    background: #0a0d1e;
+    border: 2px solid var(--color-lime);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--color-blue);
+  }
+  .skill-slot:hover {
+    box-shadow: 0 0 20px var(--color-lime);
+  }
+  .skill-icon { font-size: 24px; }
+  .skill-key {
+    font-size: 10px;
+    color: var(--color-lime);
+    font-weight: 900;
+    margin-top: 2px;
+  }
+  .skill-cd-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--color-pink);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .skill-cd-mask.active { opacity: 1; }
+
+  /* 弹窗基类 */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 8, 20, 0.88);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 60;
+    backdrop-filter: blur(6px);
+  }
+
+  .acid-dialog-box {
+    width: 620px;
+    max-width: 90%;
+    background: #0a0d1e;
+    color: #ffffff;
+    border: 4px solid var(--color-pink);
+    border-radius: 10px;
+    padding: 30px 36px;
+    box-shadow: 0 0 35px rgba(255, 82, 124, 0.5);
+    position: relative;
+    font-family: -apple-system, sans-serif;
+  }
+  .acid-dialog-box::before {
+    content: "⚡ 浪尖儿大学生社区 · 战令 ⚡";
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-pink);
+    color: #ffffff;
+    padding: 2px 20px;
+    font-size: 13px;
+    font-weight: 900;
+    border-radius: 12px;
+  }
+  .vn-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--color-lime);
+    margin-bottom: 16px;
+    text-align: center;
+    border-bottom: 2px dashed rgba(181, 248, 0, 0.3);
+    padding-bottom: 10px;
+  }
+  .vn-content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #e6e6e6;
+    margin-bottom: 24px;
+  }
+  .vn-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+  }
+
+  /* 战术监控 MVP 与 失败提示板 */
+  .mvp-surveillance-container, .defeat-surveillance-container {
+    width: 820px;
+    max-width: 94%;
+    padding: 28px;
+    position: relative;
+    font-family: 'Courier New', Courier, monospace, sans-serif;
+    animation: zoomIn 0.3s ease-out;
+  }
+  .mvp-surveillance-container {
+    background: #0d1017;
+    border: 2px solid var(--color-hud-green);
+    box-shadow: 0 0 50px rgba(0, 255, 102, 0.4), inset 0 0 40px rgba(0, 54, 255, 0.25);
+    color: var(--color-hud-green);
+  }
+  .defeat-surveillance-container {
+    background: #14070a;
+    border: 2px solid var(--color-hud-red);
+    box-shadow: 0 0 50px rgba(255, 42, 85, 0.5), inset 0 0 40px rgba(255, 0, 50, 0.25);
+    color: var(--color-hud-red);
+  }
+  @keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .surv-corner { position: absolute; width: 24px; height: 24px; border: 3px solid currentColor; }
+  .sc-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .sc-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+  .sc-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+  .sc-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+  .surv-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px dashed currentColor;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+
+  .surv-body {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .surv-target-frame {
+    width: 230px;
+    height: 270px;
+    border: 2px solid currentColor;
+    position: relative;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .surv-target-box-head { width: 90px; height: 90px; border: 2px solid currentColor; position: absolute; top: 30px; }
+  .surv-target-box-body { width: 140px; height: 100px; border: 2px solid currentColor; position: absolute; bottom: 30px; }
+
+  .surv-info-panel-win {
+    background: var(--color-hud-green); color: #000; padding: 16px; font-weight: 900; border-radius: 2px; box-shadow: 0 0 20px rgba(0, 255, 102, 0.6);
+  }
+  .surv-info-panel-defeat {
+    background: var(--color-hud-red); color: #fff; padding: 16px; font-weight: 900; border-radius: 2px; box-shadow: 0 0 20px rgba(255, 42, 85, 0.6);
+  }
+  .surv-info-title {
+    font-size: 20px; border-bottom: 2px solid currentColor; padding-bottom: 6px; margin-bottom: 8px; letter-spacing: 1px;
+  }
+  .surv-progress-bar { width: 100%; height: 12px; background: #000; margin-top: 6px; display: flex; }
+  .surv-callout-lines { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .surv-callout-item {
+    background: rgba(255, 255, 255, 0.05); border-left: 4px solid currentColor; padding: 6px 12px; font-size: 13px; color: currentColor; font-weight: bold;
+  }
+
+  .surv-footer {
+    display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 12px; border-top: 1px dashed currentColor;
+  }
+</style>
+</head>
+<body>
+
+<div id="game-container">
+  <audio id="bgm-audio" src="彩蛋音乐.mp3" loop></audio>
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- 大厅视图 -->
+  <div id="lobby-view" class="view-layer">
+    <!-- 图三环境暗纹点缀：蝴蝶蓝点迷宫词句 -->
+    <div class="lobby-decor decor-butterfly">
+      <svg viewBox="0 0 300 300" width="500" height="500">
+        <path d="M150,150 C 100,50 20,80 30,180 C 40,260 120,280 150,150 Z" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="2"/>
+        <path d="M150,150 C 200,50 280,80 270,180 C 260,260 180,280 150,150 Z" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="2"/>
+        <path d="M150,150 C 120,80 60,100 70,170 C 80,220 130,230 150,150 Z" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1"/>
+        <path d="M150,150 C 180,80 240,100 230,170 C 220,220 170,230 150,150 Z" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1"/>
+        <circle cx="170" cy="140" r="12" fill="#0036FF" />
+      </svg>
+      <div class="scattered-text" style="top: 15%; left: 20%;">You plant white roses in the labyrinth's throat—</div>
+      <div class="scattered-text rot90" style="top: 30%; left: 15%;">Butterflies hatch from gunpowder sacs</div>
+      <div class="scattered-text" style="top: 50%; left: 35%;">sugar cubes in blue</div>
+      <div class="scattered-text rot90" style="top: 60%; left: 45%;">The maze grows its</div>
+      <div class="scattered-text" style="top: 85%; left: 25%;">each petal a clock hand sheared mid-rotation.</div>
+      <div class="scattered-text rot90" style="top: 40%; left: 75%;">for cities that dissolved</div>
+      <div class="scattered-text" style="top: 35%; left: 60%;">rites</div>
+      <div class="scattered-text" style="top: 70%; left: 65%;">flame.</div>
+      <div class="scattered-text rot90" style="top: 25%; left: 85%;">The maze grows its</div>
+    </div>
+
+    <!-- 图一点缀：像素火焰 -->
+    <div class="lobby-decor decor-fire">
+      <svg viewBox="0 0 16 16" width="100" height="100" style="image-rendering: pixelated;">
+        <rect x="6" y="2" width="2" height="2" fill="#FF527C"/>
+        <rect x="5" y="4" width="4" height="2" fill="#FFA500"/>
+        <rect x="8" y="4" width="2" height="2" fill="#FF527C"/>
+        <rect x="4" y="6" width="6" height="2" fill="#FFA500"/>
+        <rect x="6" y="6" width="2" height="2" fill="#FFF"/>
+        <rect x="3" y="8" width="8" height="2" fill="#FFA500"/>
+        <rect x="5" y="8" width="4" height="2" fill="#FFF"/>
+        <rect x="7" y="8" width="2" height="2" fill="#00F0FF"/>
+        <rect x="4" y="10" width="8" height="2" fill="#FFA500"/>
+        <rect x="5" y="10" width="4" height="2" fill="#FFF"/>
+        <rect x="7" y="10" width="2" height="2" fill="#00F0FF"/>
+        <rect x="5" y="12" width="6" height="2" fill="#FF527C"/>
+        <rect x="6" y="12" width="4" height="2" fill="#FFA500"/>
+        <rect x="7" y="14" width="2" height="2" fill="#FF527C"/>
+        <rect x="12" y="6" width="1" height="1" fill="#FFD700"/>
+        <rect x="2" y="5" width="1" height="1" fill="#FFD700"/>
+      </svg>
+      <div class="pixel-text">STEP 2</div>
+    </div>
+
+    <!-- 图二点缀：像素泡泡 -->
+    <div class="lobby-decor decor-bubbles">
+      <svg viewBox="0 0 24 24" width="120" height="120" style="image-rendering: pixelated;">
+        <path d="M8,4 h8 v2 h4 v8 h-2 v4 h-4 v2 h-8 v-2 h-4 v-8 h2 v-4 h4 z" fill="rgba(0, 54, 255, 0.4)" />
+        <path d="M8,4 h8 v1 h-8 z M4,8 v8 h1 v-8 z M20,8 v8 h-1 v-8 z M8,19 h8 v1 h-8 z M5,6 h2 v1 h-2 z M17,6 h2 v1 h-2 z M5,17 h2 v1 h-2 z M17,17 h2 v1 h-2 z" fill="#00F0FF"/>
+        <rect x="6" y="8" width="2" height="4" fill="#FFF"/>
+        <rect x="8" y="6" width="4" height="2" fill="#FFF"/>
+        <rect x="14" y="14" width="2" height="2" fill="#FF527C"/>
+        <rect x="16" y="12" width="2" height="2" fill="#B5F800"/>
+        <path d="M16,2 h4 v1 h2 v4 h-1 v2 h-4 v-1 h-2 v-4 h1 v-2 z" fill="rgba(0, 240, 255, 0.4)"/>
+        <rect x="17" y="3" width="2" height="1" fill="#FFF"/>
+        <rect x="2" y="3" width="1" height="3" fill="#00F0FF"/>
+        <rect x="1" y="4" width="3" height="1" fill="#00F0FF"/>
+      </svg>
+      <div class="pixel-text">STEP 9</div>
+    </div>
+
+    <div class="lobby-header">
+      <div class="lobby-title">
+        <span>⚡ 浪尖儿大学生社区 · FYL 堡垒战役</span>
+      </div>
+      <div class="lobby-stats">
+        <button class="music-toggle-btn" id="music-btn-lobby" onclick="toggleBGM()">
+          <span id="music-icon-lobby">🔊</span> <span id="music-text-lobby">动感乐章: ON</span>
+        </button>
+        <div>等级: <span id="lobby-lvl" class="stat-badge">Lv.1 破阵学员</span></div>
+        <div>战功: <span id="lobby-honor" class="stat-badge">0 勋章</span></div>
+        <div>已攻克: <span id="lobby-cleared" class="stat-badge">0 / 3 关</span></div>
+      </div>
+    </div>
+
+    <div class="npc-court">
+      <div class="npc-card" onclick="interactNPC('xifeng')">
+        <div id="bubble-xifeng" class="dialogue-bubble">
+          <strong>【教学者·西风】:</strong><br>
+          <span id="text-xifeng"></span>
+        </div>
+        <div class="npc-avatar-wrap">
+          <svg viewBox="0 0 100 120" width="100" height="120">
+            <defs>
+              <linearGradient id="robeGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0036FF"/>
+                <stop offset="100%" stop-color="#00F0FF"/>
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="40" r="22" fill="#fad390"/>
+            <path d="M30,35 Q50,15 70,35 Q50,22 30,35" fill="#FF527C"/>
+            <rect x="42" y="38" width="16" height="6" rx="2" fill="#222" opacity="0.8"/>
+            <path d="M20,120 L35,62 L65,62 L80,120 Z" fill="url(#robeGrad)"/>
+            <path d="M48,62 L52,62 L52,120 L48,120 Z" fill="#B5F800"/>
+            <circle cx="50" cy="80" r="8" fill="#B5F800"/>
+          </svg>
+        </div>
+        <div class="npc-name-tag">西风</div>
+        <div class="npc-role">✦ 社区导师 / 教学者 ✦</div>
+      </div>
+
+      <div class="npc-card" onclick="interactNPC('haoyuan')">
+        <div id="bubble-haoyuan" class="dialogue-bubble">
+          <strong>【传授者·浩源】:</strong><br>
+          <span id="text-haoyuan"></span>
+        </div>
+        <div class="npc-avatar-wrap">
+          <svg viewBox="0 0 100 120" width="100" height="120">
+            <defs>
+              <linearGradient id="armorGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FF527C"/>
+                <stop offset="100%" stop-color="#B5F800"/>
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="40" r="22" fill="#f6b93b"/>
+            <path d="M28,32 Q50,20 72,32 L72,25 Q50,15 28,25 Z" fill="#00F0FF"/>
+            <path d="M25,25 Q50,5 75,25 Q50,18 25,25" fill="#070814"/>
+            <path d="M18,120 L30,58 L70,58 L82,120 Z" fill="url(#armorGrad)"/>
+            <path d="M38,65 L62,65 L50,90 Z" fill="#0036FF"/>
+          </svg>
+        </div>
+        <div class="npc-name-tag">浩源</div>
+        <div class="npc-role">✦ 攻城先锋 / 传授者 ✦</div>
+      </div>
+    </div>
+
+    <div class="lobby-bottom-bar">
+      <div class="level-picker">
+        <div class="level-btn active" id="btn-lvl-1" onclick="selectLevel(1)">
+          <div>第 I 关：【FYL】迷宫林地</div>
+          <div class="sub">超厚装甲 · 入门试炼</div>
+        </div>
+        <div class="level-btn" id="btn-lvl-2" onclick="selectLevel(2)">
+          <div>第 II 关：【FUYULING】熔岩迷宫</div>
+          <div class="sub">中级装甲 · 机械领主</div>
+        </div>
+        <div class="level-btn" id="btn-lvl-3" onclick="selectLevel(3)">
+          <div>第 III 关：【FUYULINGing】终焉迷宫</div>
+          <div class="sub">受损装甲 · 突围破阵</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-acid btn-pink" style="font-size: 17px; padding: 12px 32px;" onclick="startGameFromLobby()">⚔ 出征开战</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 战斗 HUD -->
+  <div id="game-hud" class="view-layer view-hidden">
+    <div class="hud-top">
+      <div class="player-status-card">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 900;">
+          <span id="hud-tank-name" style="color: var(--color-lime);">破阵重装坦克</span>
+          <span id="hud-level" style="color: var(--color-cyan);">Lv.1</span>
+        </div>
+        <div class="bar-container"><div id="hud-hp-bar" class="bar-fill hp-fill"></div></div>
+        <div class="bar-container" style="height: 6px;"><div id="hud-exp-bar" class="bar-fill exp-fill"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #a4b0be; margin-top: 4px;">
+          <span>HP: <b id="hud-hp-text">3600/3600</b></span>
+          <span>击毁: <b id="hud-kills">0</b></span>
+        </div>
+        <div id="hud-shield-info" class="shield-hud-tag">
+          <span>🛡️ 开局圣盾: </span><span id="hud-shield-time" style="color: var(--color-lime);">10.0s</span>
+        </div>
+        <div id="hud-maze-suppress" class="maze-suppress-tag">
+          <span>⚡ 迷宫力场：敌军移速/攻击 -50%</span>
+        </div>
+      </div>
+
+      <div id="boss-hud-bar" class="boss-health-bar-wrap" style="display: none;">
+        <div id="boss-name-label" class="boss-name">【终焉要塞 · FYL 禁忌核心】</div>
+        <div class="bar-container" style="height: 14px; border-color: var(--color-pink);">
+          <div id="boss-hp-fill" class="bar-fill hp-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <div class="hud-top-actions">
+        <button class="music-toggle-btn" id="music-btn-hud" onclick="toggleBGM()">🔊 乐章</button>
+        <!-- 绝对稳定的撤退按键 -->
+        <button class="btn-acid" style="padding: 6px 14px; font-size: 12px;" onclick="quitToLobby()">🏳 撤退大厅</button>
+      </div>
+    </div>
+
+    <div class="skills-hud">
+      <div class="skill-slot" onclick="castSkill(1)">
+        <div class="skill-icon">✈️</div>
+        <div class="skill-key">[Q] 战机支援</div>
+        <div id="skill1-cd" class="skill-cd-mask">0s</div>
+      </div>
+      <div class="skill-slot" onclick="castSkill(2)">
+        <div class="skill-icon">🛡️</div>
+        <div class="skill-key">[E] 圣光铁幕</div>
+        <div id="skill2-cd" class="skill-cd-mask">0s</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VN 对话引导 -->
+  <div id="vn-modal" class="modal-overlay view-hidden">
+    <div class="acid-dialog-box">
+      <div class="vn-title">⚡ 浪尖儿大学生社区 · 战阵号令</div>
+      <div class="vn-content" id="vn-text">
+        “欢迎来到浪尖儿大学生社区游戏世界，开始你的第一次大战吧！”<br><br>
+        本关场景由【FYL】字型复杂迷宫构成，内部藏有攻击强化与恢复道具。主控已装配10秒开局圣盾。勇士，出击吧！
+      </div>
+      <div class="vn-actions">
+        <button class="btn-acid" style="background: #0e1226;" onclick="showOperationGuide()">📖 了解操作方法</button>
+        <button class="btn-acid btn-pink" onclick="dismissVNAndFight()">⚔️ 直接开战</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 指南弹窗 -->
+  <div id="guide-modal" class="modal-overlay view-hidden">
+    <div class="acid-dialog-box" style="width: 500px;">
+      <div class="vn-title">🎯 皇家操作战术指南</div>
+      <div class="vn-content" style="font-size: 14px; line-height: 2;">
+        ✦ <b>移动机动</b>：<b>W / A / S / D</b> 操控战车平滑穿梭。<br>
+        ✦ <b>瞄准开火</b>：<b>鼠标瞄准</b>，<b>左键长按</b> 持续射击。<br>
+        ✦ <b>搜寻道具</b>：迷宫内蕴藏【双倍伤害 ⚡】、【立即空袭 ✈️】、【战车急救 ❤️】。<br>
+        ✦ <b>第三关特别机制</b>：开局在【FUYULINGing】迷宫中心，<b>迷宫内敌军速度攻击削弱50%</b>，寻找出口到达上方战区才能最终破城！
+      </div>
+      <div class="vn-actions">
+        <button class="btn-acid btn-pink" onclick="closeGuideAndFight()">我知道了，出征！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MVP 胜利喜报大屏 -->
+  <div id="mvp-modal" class="modal-overlay view-hidden">
+    <div class="mvp-surveillance-container">
+      <div class="surv-corner sc-tl"></div>
+      <div class="surv-corner sc-tr"></div>
+      <div class="surv-corner sc-bl"></div>
+      <div class="surv-corner sc-br"></div>
+      <div class="surv-header">
+        <div>2026-08-23 21:00</div>
+        <div>[====] 100% 战区监控联机 · 目标瓦解</div>
+      </div>
+      <div class="surv-body">
+        <div class="surv-target-frame">
+          <div class="surv-target-box-head"></div>
+          <div class="surv-target-box-body"></div>
+          <div style="font-size: 40px; margin-top: -10px;">👑</div>
+          <div style="font-size: 12px; color: var(--color-hud-green); margin-top: 15px; font-weight: 900;">【锁定目标：破阵先锋】</div>
+        </div>
+        <div>
+          <div class="surv-info-panel-win">
+            <div class="surv-info-title" id="mvp-main-title">恭喜获得 MVP · 战术评估报表</div>
+            <div style="font-size: 13px; line-height: 1.6;" id="mvp-desc-text"></div>
+            <div class="surv-progress-bar"><div style="width: 100%; height: 100%; background: #0036FF;"></div></div>
+          </div>
+          <div class="surv-callout-lines">
+            <div class="surv-callout-item" id="mvp-stat-line1">✦ 炮塔火力系统: 击毁敌军 0 架 | 总伤害输出 0</div>
+            <div class="surv-callout-item" id="mvp-stat-line2">✦ 装甲机动底盘: 迷宫突破耗时 00:00 | 存活率 100%</div>
+          </div>
+        </div>
+      </div>
+      <div class="surv-footer">
+        <div style="font-size: 12px; opacity: 0.8;">浪尖儿大学生社区 · 2026 战役胜利档案</div>
+        <div style="display: flex; gap: 12px;" id="mvp-actions-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 失败结算大屏 -->
+  <div id="defeat-modal" class="modal-overlay view-hidden">
+    <div class="defeat-surveillance-container">
+      <div class="surv-corner sc-tl"></div>
+      <div class="surv-corner sc-tr"></div>
+      <div class="surv-corner sc-bl"></div>
+      <div class="surv-corner sc-br"></div>
+      <div class="surv-header">
+        <div>2026-08-23 21:02</div>
+        <div>[====] 警告: 战车信号受损脱机</div>
+      </div>
+      <div class="surv-body">
+        <div class="surv-target-frame">
+          <div class="surv-target-box-head"></div>
+          <div class="surv-target-box-body"></div>
+          <div style="font-size: 40px; margin-top: -10px;">💔</div>
+          <div style="font-size: 12px; color: var(--color-hud-red); margin-top: 15px; font-weight: 900;">【战车状态：受损撤退】</div>
+        </div>
+        <div>
+          <div class="surv-info-panel-defeat">
+            <div class="surv-info-title">差一点…… · 战术失利复盘</div>
+            <div style="font-size: 13px; line-height: 1.6;">
+              档案代号: 浪尖先锋战车 (LIANA)<br>
+              战况总结: 敌方火力压制强烈，战车耐久告罄<br>
+              评估结论: <b>核心战术已验证，重新整备即可破阵！</b>
+            </div>
+            <div class="surv-progress-bar"><div style="width: 75%; height: 100%; background: #FF2A55;"></div></div>
+          </div>
+          <div class="surv-callout-lines">
+            <div class="surv-callout-item" id="defeat-stat-line1">✦ 战损统计: 已摧毁敌机 0 架 | 累计造成伤害 0</div>
+            <div class="surv-callout-item" id="defeat-stat-line2">✦ 突围分析: 迷宫生存坚持 00:00 | 需更谨慎躲避或拾取补给</div>
+          </div>
+        </div>
+      </div>
+      <div class="surv-footer">
+        <div style="font-size: 12px; opacity: 0.8;">浪尖儿大学生社区 · 战备维修保障中心</div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-acid" onclick="returnToLobbyFromDefeat()">🏛 撤回社区大厅</button>
+          <button class="btn-acid btn-red" onclick="restartCurrentStage()">🔄 再次发起冲击</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   全新高质量·动感悦耳 3 阶段动态合成音乐引擎 (Web Audio API)
+   ========================================================================== */
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.bgmPlaying = true;
+    this.currentTrack = 'LOBBY';
+    this.step = 0;
+    this.timer = null;
+    this.noiseBuffer = null;
+    this.masterGain = null;
+    this.useSynthBGM = true;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioContext();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+      this.masterGain.connect(this.ctx.destination);
+      this.createNoiseBuffer();
+      if (this.useSynthBGM) this.startBGMSequencer();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  createNoiseBuffer() {
+    const bufferSize = this.ctx.sampleRate * 2;
+    this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const output = this.noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+  }
+
+  noteToFreq(note) {
+    const notes = {
+      'C2': 65.41, 'D2': 73.42, 'Eb2': 77.78, 'E2': 82.41, 'F2': 87.31, 'G2': 98.00, 'Ab2': 103.83, 'A2': 110.00, 'Bb2': 116.54, 'B2': 123.47,
+      'C3': 130.81, 'D3': 146.83, 'Eb3': 155.56, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00, 'Ab3': 207.65, 'A3': 220.00, 'Bb3': 233.08, 'B3': 246.94,
+      'C4': 261.63, 'D4': 293.66, 'Eb4': 311.13, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'Ab4': 415.30, 'A4': 440.00, 'Bb4': 466.16, 'B4': 493.88,
+      'C5': 523.25, 'D5': 587.33, 'Eb5': 622.25, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'Ab5': 830.61, 'A5': 880.00, 'Bb5': 932.33, 'B5': 987.77,
+      'C6': 1046.50, 'D6': 1174.66, 'E6': 1318.51, 'G6': 1567.98
+    };
+    return notes[note] || 0;
+  }
+
+  playSoftKick(time) {
+    if (!this.bgmPlaying || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.frequency.setValueAtTime(110, time);
+    osc.frequency.exponentialRampToValueAtTime(36, time + 0.16);
+    gain.gain.setValueAtTime(0.4, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start(time);
+    osc.stop(time + 0.16);
+  }
+
+  playTambourine(time, accent = false) {
+    if (!this.bgmPlaying || !this.ctx || !this.noiseBuffer) return;
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = this.noiseBuffer;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 6800;
+    const gain = this.ctx.createGain();
+    const vol = accent ? 0.12 : 0.04;
+    gain.gain.setValueAtTime(vol, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    noise.start(time);
+    noise.stop(time + 0.08);
+  }
+
+  playMelodyNote(freq, time, dur) {
+    if (!this.bgmPlaying || !this.ctx || freq <= 0) return;
+    const osc = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, time);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1600, time);
+
+    gain.gain.setValueAtTime(0.001, time);
+    gain.gain.linearRampToValueAtTime(0.12, time + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+
+    osc.start(time);
+    osc.stop(time + dur);
+  }
+
+  playAcousticBass(freq, time, dur) {
+    if (!this.bgmPlaying || !this.ctx || freq <= 0) return;
+    const osc = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, time);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(450, time);
+
+    gain.gain.setValueAtTime(0.001, time);
+    gain.gain.linearRampToValueAtTime(0.2, time + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start(time);
+    osc.stop(time + dur);
+  }
+
+  // Synthesized background music removed — external MP3 will be used for BGM.
+  // startBGMSequencer() { /* removed */ }
+
+  setTrack(trackName) {
+    if (this.currentTrack === trackName) return;
+    this.currentTrack = trackName;
+    this.step = 0;
+  }
+
+  playShoot() {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.12);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1200, this.ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.24, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.12);
+  }
+
+  playExplode() {
+    if (!this.ctx || !this.noiseBuffer) return;
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = this.noiseBuffer;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(380, this.ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(35, this.ctx.currentTime + 0.45);
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.45, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.45);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    noise.start();
+  }
+
+  playAirstrike() {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(700, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(180, this.ctx.currentTime + 1.2);
+    gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 1.2);
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 1.2);
+  }
+
+  playVictory() {
+    if (!this.ctx) return;
+    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+    notes.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.1);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.1);
+      gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.1 + 0.45);
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(this.ctx.currentTime + i * 0.1);
+      osc.stop(this.ctx.currentTime + i * 0.1 + 0.45);
+    });
+  }
+
+  playBlip() {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(540, this.ctx.currentTime);
+    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.08);
+  }
+}
+const audio = new SoundEngine();
+// 使用外部彩蛋音乐文件代替合成器背景音乐
+audio.useSynthBGM = false;
+const bgmEl = document.getElementById('bgm-audio');
+if (bgmEl) {
+  if (audio.bgmPlaying) {
+    bgmEl.play().catch(()=>{});
+  } else {
+    bgmEl.pause();
+  }
+}
+
+function toggleBGM() {
+  audio.init();
+  audio.bgmPlaying = !audio.bgmPlaying;
+  const bgmEl = document.getElementById('bgm-audio');
+  if (bgmEl) {
+    if (audio.bgmPlaying) {
+      bgmEl.play().catch(()=>{});
+    } else {
+      bgmEl.pause();
+    }
+  }
+  const stateText = audio.bgmPlaying ? "乐章: ON" : "乐章: OFF";
+  const icon = audio.bgmPlaying ? "🔊" : "🔇";
+  
+  const bLobby = document.getElementById('music-text-lobby');
+  if (bLobby) bLobby.innerText = stateText;
+  const iLobby = document.getElementById('music-icon-lobby');
+  if (iLobby) iLobby.innerText = icon;
+
+  const bHud = document.getElementById('music-btn-hud');
+  if (bHud) bHud.innerText = audio.bgmPlaying ? "🔊 乐章" : "🔇 静音";
+}
+
+const NPC_DATA = {
+  xifeng: [
+    "第三关的【FUYULINGing】迷宫可是个好地方，在里面敌军会被大幅削弱！不过你要是迷路了，浩源肯定又要调侃你开坦克像是在逛街了。",
+    "多收集经验晶石强化主炮！只要升到 Lv.3 就能解锁强劲的副炮。我刚才还看到浩源为了抢晶石，硬是把重型战车开出了跑车的速度！",
+    "浩源昨天给战机换了全新的炼金燃烧喷嘴，空袭范围扩大了整整两成！不得不承认，他在火力改装这方面确实是个天才。",
+    "欢迎来到浪尖儿大学生社区！遇到密集的弹幕记得灵活使用掩体，当然，你也可以像浩源一样直接开着圣盾冲过去，战术灵活最重要！"
+  ],
+  haoyuan: [
+    "哈哈！第三关装甲虽然变薄了，但在迷宫里敌军也慢得像乌龟！就像西风说的那样，我们要利用地形，但我更喜欢直接给他们来一发重炮！",
+    "看到那座写着【fyl】的终极城堡了吗？西风刚才还在严谨地计算弹道轨迹，但我早就准备好呼叫空中支援了，直接轰炸就完事了！",
+    "别犹豫！遇到大群敌人直接按 [Q] 呼叫空袭！西风给飞机加配了精准制导引擎，现在闭着眼睛都能炸中目标，他的技术简直无敌！",
+    "西风学长调校的穿甲弹道精准得让人惊叹！再配合我给坦克加装的重型双管火力，咱们浪尖小队绝对能完美通关，拿下 AAAAAA 级证书！"
+  ]
+};
+
+let currentXifengIdx = 0;
+let currentHaoyuanIdx = 0;
+function interactNPC(who) {
+  audio.init();
+  audio.playBlip();
+  if (who === 'xifeng') {
+    const list = NPC_DATA.xifeng;
+    currentXifengIdx = (currentXifengIdx + 1) % list.length;
+    document.getElementById('text-xifeng').innerText = list[currentXifengIdx];
+    const b = document.getElementById('bubble-xifeng');
+    b.classList.add('show');
+    setTimeout(() => b.classList.remove('show'), 6000);
+  } else {
+    const list = NPC_DATA.haoyuan;
+    currentHaoyuanIdx = (currentHaoyuanIdx + 1) % list.length;
+    document.getElementById('text-haoyuan').innerText = list[currentHaoyuanIdx];
+    const b = document.getElementById('bubble-haoyuan');
+    b.classList.add('show');
+    setTimeout(() => b.classList.remove('show'), 6000);
+  }
+}
+
+const GlobalState = {
+  playerLevel: 1,
+  playerHonor: 120,
+  maxClearedLevel: 0,
+  selectedLevel: 1,
+  totalKills: 0
+};
+
+function selectLevel(lvl) {
+  GlobalState.selectedLevel = lvl;
+  for (let i = 1; i <= 3; i++) {
+    const btn = document.getElementById(`btn-lvl-${i}`);
+    if (btn) btn.classList.toggle('active', i === lvl);
+  }
+  audio.init();
+  audio.playBlip();
+}
+
+/* ==========================================================================
+   游戏核心 Canvas 引擎 & 实体逻辑
+   ========================================================================== */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameState = 'LOBBY';
+let currentLevelConfig = null;
+
+const Input = {
+  keys: {},
+  mouse: { x: 0, y: 0, isDown: false }
+};
+
+window.addEventListener('resize', resizeCanvas);
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+
+window.addEventListener('keydown', (e) => {
+  audio.init();
+  Input.keys[e.code] = true;
+  if (e.code === 'KeyQ') castSkill(1);
+  if (e.code === 'KeyE') castSkill(2);
+});
+window.addEventListener('keyup', (e) => {
+  Input.keys[e.code] = false;
+});
+window.addEventListener('mousemove', (e) => {
+  Input.mouse.x = e.clientX;
+  Input.mouse.y = e.clientY;
+});
+window.addEventListener('mousedown', (e) => {
+  audio.init();
+  Input.mouse.isDown = true;
+});
+window.addEventListener('mouseup', () => {
+  Input.mouse.isDown = false;
+});
+
+let player = null;
+let enemies = [];
+let bullets = [];
+let particles = [];
+let expGems = [];
+let planes = [];
+let mazeWalls = [];
+let mazeItems = [];
+let levelStats = { kills: 0, damageDealt: 0, startTime: 0 };
+let bossEntity = null;
+
+// 关卡配置
+const LEVEL_CONFIGS = {
+  1: {
+    name: "第一关：【FYL】迷宫林地",
+    targetKills: 10,
+    spawnRate: 130,
+    hasBoss: false,
+    bossName: "",
+    playerHp: 3600,
+    enemyAp: 18,
+    mazeType: "FYL",
+    bgTile: "#070814",
+    gridColor: "rgba(0, 240, 255, 0.12)"
+  },
+  2: {
+    name: "第二关：【FUYULING】熔岩迷宫",
+    targetKills: 16,
+    spawnRate: 105,
+    hasBoss: true,
+    bossName: "【熔炉领主·重装攻城巨兽】",
+    bossMaxHP: 4500,
+    playerHp: 2200,
+    enemyAp: 36,
+    mazeType: "FUYULING",
+    bgTile: "#120713",
+    gridColor: "rgba(255, 82, 124, 0.15)"
+  },
+  3: {
+    name: "第三关：【FUYULINGing】终焉迷宫",
+    targetKills: 20,
+    spawnRate: 85,
+    hasBoss: true,
+    bossName: "【终焉要塞 · FYL 禁忌核心】",
+    bossMaxHP: 9000,
+    playerHp: 1300,
+    enemyAp: 58,
+    mazeType: "FUYULINGing",
+    bgTile: "#05091a",
+    gridColor: "rgba(181, 248, 0, 0.15)"
+  }
+};
+
+/* 严格字型迷宫构建器 */
+function buildLabyrinth(type) {
+  mazeWalls = [];
+  mazeItems = [];
+  const W = canvas.width;
+  const H = canvas.height;
+  const cx = W / 2;
+  const cy = H / 2;
+
+  function addWall(x, y, w, h, text="The maze grows its rites") {
+    mazeWalls.push({ x, y, w, h, text });
+  }
+
+  function addItem(x, y, itemType, icon, name) {
+    mazeItems.push({ x, y, type: itemType, icon, name, collected: false });
+  }
+
+  if (type === "FYL") {
+    addWall(cx - 380, cy - 180, 24, 360, "F-MAZE PILLAR");
+    addWall(cx - 380, cy - 180, 160, 24, "for cities that dissolved");
+    addWall(cx - 380, cy - 40, 120, 24, "sugar cubes in blue");
+
+    addWall(cx - 150, cy - 180, 24, 110, "Y-BRANCH LEFT");
+    addWall(cx - 10, cy - 180, 24, 110, "Y-BRANCH RIGHT");
+    addWall(cx - 150, cy - 70, 160, 24, "Y-JUNCTION");
+    addWall(cx - 80, cy - 70, 24, 250, "Y-STEM DEEP");
+
+    addWall(cx + 140, cy - 180, 24, 360, "L-WALL PILLAR");
+    addWall(cx + 140, cy + 156, 180, 24, "L-CORRIDOR EXIT");
+
+    addItem(cx - 300, cy - 100, 'DAMAGE', '⚡', '魔导双倍火力');
+    addItem(cx - 40, cy + 50, 'HEAL', '❤️', '战车紧急修复');
+    addItem(cx + 220, cy + 80, 'AIRSTRIKE', '✈️', '即时空袭呼叫');
+  } 
+  else if (type === "FUYULING") {
+    const startX = cx - 520;
+    addWall(startX, cy - 160, 18, 320, "F"); addWall(startX, cy - 160, 90, 18, "F1"); addWall(startX, cy - 30, 70, 18, "F2");
+    addWall(startX + 130, cy - 160, 18, 280, "U1"); addWall(startX + 130, cy + 102, 90, 18, "UB"); addWall(startX + 202, cy - 160, 18, 280, "U2");
+    addWall(startX + 250, cy - 160, 18, 120, "Y1"); addWall(startX + 320, cy - 160, 18, 120, "Y2"); addWall(startX + 250, cy - 40, 88, 18, "Y-MID"); addWall(startX + 285, cy - 40, 18, 200, "Y-STEM");
+    addWall(startX + 380, cy - 160, 18, 280, "U3"); addWall(startX + 380, cy + 102, 90, 18, "UB2"); addWall(startX + 452, cy - 160, 18, 280, "U4");
+    addWall(startX + 500, cy - 160, 18, 320, "L"); addWall(startX + 500, cy + 142, 90, 18, "L-BASE");
+    addWall(startX + 630, cy - 160, 18, 320, "I-PILLAR");
+    addWall(startX + 690, cy - 160, 18, 320, "N1"); addWall(startX + 690, cy - 160, 90, 18, "N-TOP"); addWall(startX + 762, cy - 160, 18, 320, "N2");
+    addWall(startX + 820, cy - 160, 18, 320, "G-L"); addWall(startX + 820, cy - 160, 100, 18, "G-T"); addWall(startX + 820, cy + 142, 100, 18, "G-B"); addWall(startX + 902, cy, 18, 160, "G-R"); addWall(startX + 860, cy, 60, 18, "G-MID");
+
+    addItem(startX + 160, cy, 'DAMAGE', '⚡', '魔导火力');
+    addItem(startX + 410, cy, 'HEAL', '❤️', '战车修复');
+    addItem(startX + 720, cy, 'SHIELD', '🛡️', '圣盾补给');
+    addItem(startX + 860, cy + 80, 'AIRSTRIKE', '✈️', '空袭呼叫');
+  } 
+  else if (type === "FUYULINGing") {
+    const sx = cx - 580;
+    addWall(sx - 30, cy - 240, 520, 20, "NORTH EXIT LEFT");
+    addWall(sx + 660, cy - 240, 560, 20, "NORTH EXIT RIGHT");
+    addWall(sx - 30, cy + 240, 1250, 20, "SOUTH BOUNDARY");
+    addWall(sx - 30, cy - 240, 20, 500, "WEST BOUNDARY");
+    addWall(sx + 1200, cy - 240, 20, 500, "EAST BOUNDARY");
+
+    addWall(sx + 80, cy - 160, 18, 280, "F"); addWall(sx + 80, cy - 160, 70, 18, "F1"); addWall(sx + 80, cy - 40, 50, 18, "F2");
+    addWall(sx + 190, cy - 160, 18, 240, "U1"); addWall(sx + 190, cy + 62, 70, 18, "UB"); addWall(sx + 242, cy - 160, 18, 240, "U2");
+    addWall(sx + 300, cy - 160, 18, 100, "Y1"); addWall(sx + 360, cy - 160, 18, 100, "Y2"); addWall(sx + 300, cy - 60, 78, 18, "Y-M"); addWall(sx + 330, cy - 60, 18, 160, "Y-S");
+    addWall(sx + 420, cy - 160, 18, 240, "U3"); addWall(sx + 420, cy + 62, 70, 18, "UB2"); addWall(sx + 472, cy - 160, 18, 240, "U4");
+    addWall(sx + 530, cy - 160, 18, 280, "L"); addWall(sx + 530, cy + 102, 70, 18, "L-B");
+    addWall(sx + 640, cy - 160, 18, 280, "I");
+    addWall(sx + 700, cy - 160, 18, 280, "N"); addWall(sx + 700, cy - 160, 70, 18, "NT"); addWall(sx + 752, cy - 160, 18, 280, "N2");
+    addWall(sx + 810, cy - 160, 18, 280, "G"); addWall(sx + 810, cy - 160, 70, 18, "GT"); addWall(sx + 810, cy + 102, 70, 18, "GB"); addWall(sx + 862, cy, 18, 120, "GR");
+    addWall(sx + 920, cy - 100, 18, 220, "i");
+    addWall(sx + 970, cy - 100, 18, 220, "n-sub"); addWall(sx + 970, cy - 100, 50, 18, "nT"); addWall(sx + 1002, cy - 100, 18, 220, "n2");
+    addWall(sx + 1050, cy - 100, 18, 220, "g-sub"); addWall(sx + 1050, cy + 102, 50, 18, "gB");
+
+    addItem(cx - 150, cy + 160, 'DAMAGE', '⚡', '魔导火力');
+    addItem(cx + 150, cy + 160, 'HEAL', '❤️', '战车修复');
+    addItem(cx - 200, cy - 200, 'SHIELD', '🛡️', '圣盾补给');
+    addItem(cx + 200, cy - 200, 'AIRSTRIKE', '✈️', '空袭呼叫');
+  }
+}
+
+/* 玩家坦克类 */
+class PlayerTank {
+  constructor() {
+    const lvl = GlobalState.selectedLevel;
+    const cfg = LEVEL_CONFIGS[lvl];
+
+    if (lvl === 3) {
+      this.x = canvas.width / 2;
+      this.y = canvas.height / 2 + 180;
+    } else {
+      this.x = canvas.width / 2;
+      this.y = canvas.height - 120;
+    }
+
+    this.level = 1;
+    this.exp = 0;
+    this.nextExp = 100;
+    
+    this.maxHp = cfg.playerHp;
+    this.hp = cfg.playerHp;
+    this.speed = 4.2;
+    this.attackPower = 65;
+    this.angle = 0;
+    this.turretAngle = 0;
+    this.shootCooldown = 0;
+
+    this.shieldTimer = 600; 
+    this.skill1CD = 0;
+    this.skill2CD = 0;
+  }
+
+  update() {
+    let dx = 0, dy = 0;
+    if (Input.keys['KeyW'] || Input.keys['ArrowUp']) dy -= 1;
+    if (Input.keys['KeyS'] || Input.keys['ArrowDown']) dy += 1;
+    if (Input.keys['KeyA'] || Input.keys['ArrowLeft']) dx -= 1;
+    if (Input.keys['KeyD'] || Input.keys['ArrowRight']) dx += 1;
+
+    if (dx !== 0 && dy !== 0) { dx *= 0.7071; dy *= 0.7071; }
+
+    if (dx !== 0 || dy !== 0) {
+      this.angle = Math.atan2(dy, dx);
+      const nextX = this.x + dx * this.speed;
+      const nextY = this.y + dy * this.speed;
+
+      let canMoveX = true;
+      let canMoveY = true;
+      const pR = 10; 
+
+      for (let wall of mazeWalls) {
+        if (nextX + pR > wall.x && nextX - pR < wall.x + wall.w &&
+            this.y + pR > wall.y && this.y - pR < wall.y + wall.h) {
+          canMoveX = false;
+        }
+        if (this.x + pR > wall.x && this.x - pR < wall.x + wall.w &&
+            nextY + pR > wall.y && nextY - pR < wall.y + wall.h) {
+          canMoveY = false;
+        }
+      }
+
+      if (canMoveX) this.x = nextX;
+      if (canMoveY) this.y = nextY;
+
+      if (Math.random() < 0.3) {
+        particles.push(new Particle(this.x, this.y, (Math.random()-0.5), (Math.random()-0.5), 14, 'rgba(0, 240, 255, 0.4)'));
+      }
+    }
+
+    this.x = Math.max(30, Math.min(canvas.width - 30, this.x));
+    this.y = Math.max(30, Math.min(canvas.height - 30, this.y));
+    this.turretAngle = Math.atan2(Input.mouse.y - this.y, Input.mouse.x - this.x);
+
+    const cy = canvas.height / 2;
+    const isLevel3 = GlobalState.selectedLevel === 3;
+    const isInsideLevel3Maze = (isLevel3 && this.y > cy - 230);
+    const suppressTag = document.getElementById('hud-maze-suppress');
+    if (suppressTag) suppressTag.style.display = isInsideLevel3Maze ? 'block' : 'none';
+
+    mazeItems.forEach(item => {
+      if (!item.collected && Math.hypot(this.x - item.x, this.y - item.y) < 32) {
+        item.collected = true;
+        audio.playVictory();
+        
+        if (item.type === 'DAMAGE') {
+          const buff = isLevel3 ? 60 : 40;
+          this.attackPower += buff;
+          floatingTexts.push(new FloatingText(this.x, this.y - 30, `⚡ 魔导火力强化 +${buff}!`, "#B5F800", 20));
+        } else if (item.type === 'HEAL') {
+          const heal = isLevel3 ? 1500 : 1000;
+          this.hp = Math.min(this.maxHp, this.hp + heal);
+          floatingTexts.push(new FloatingText(this.x, this.y - 30, `❤️ 战车紧急修复 +${heal}!`, "#00FF66", 20));
+        } else if (item.type === 'SHIELD') {
+          const shield = isLevel3 ? 540 : 360;
+          const sec = isLevel3 ? 9 : 6;
+          this.shieldTimer += shield;
+          floatingTexts.push(new FloatingText(this.x, this.y - 30, `🛡️ 圣盾充能 +${sec}秒!`, "#00F0FF", 20));
+        } else if (item.type === 'AIRSTRIKE') {
+          this.skill1CD = 0;
+          floatingTexts.push(new FloatingText(this.x, this.y - 30, "✈️ 空袭支援装填就绪!", "#FF527C", 20));
+        }
+      }
+    });
+
+    if (this.shootCooldown > 0) this.shootCooldown--;
+    if (Input.mouse.isDown && this.shootCooldown <= 0) {
+      this.shoot();
+      this.shootCooldown = Math.max(7, 16 - this.level);
+    }
+
+    if (this.shieldTimer > 0) {
+      this.shieldTimer--;
+      const remainSec = (this.shieldTimer / 60).toFixed(1);
+      document.getElementById('hud-shield-info').style.display = 'flex';
+      document.getElementById('hud-shield-time').innerText = remainSec + 's';
+    } else {
+      document.getElementById('hud-shield-info').style.display = 'none';
+    }
+
+    if (this.skill1CD > 0) {
+      this.skill1CD--;
+      document.getElementById('skill1-cd').innerText = Math.ceil(this.skill1CD / 60) + 's';
+      document.getElementById('skill1-cd').classList.add('active');
+    } else {
+      document.getElementById('skill1-cd').classList.remove('active');
+    }
+
+    if (this.skill2CD > 0) {
+      this.skill2CD--;
+      document.getElementById('skill2-cd').innerText = Math.ceil(this.skill2CD / 60) + 's';
+      document.getElementById('skill2-cd').classList.add('active');
+    } else {
+      document.getElementById('skill2-cd').classList.remove('active');
+    }
+
+    if (this.exp >= this.nextExp && this.level < 10) {
+      this.levelUp();
+    }
+  }
+
+  levelUp() {
+    this.level++;
+    this.exp -= this.nextExp;
+    this.nextExp = Math.floor(100 * Math.pow(this.level, 1.4));
+    this.maxHp += 300;
+    this.hp = this.maxHp;
+    this.attackPower += 15;
+    createExplosion(this.x, this.y, 40, '#B5F800');
+    floatingTexts.push(new FloatingText(this.x, this.y - 30, `LEVEL UP! Lv.${this.level}`, '#B5F800', 24));
+    audio.playVictory();
+  }
+
+  shoot() {
+    audio.playShoot();
+    const speed = 13;
+    const vx = Math.cos(this.turretAngle) * speed;
+    const vy = Math.sin(this.turretAngle) * speed;
+
+    if (this.level >= 3) {
+      bullets.push(new Bullet(this.x + Math.cos(this.turretAngle)*25, this.y + Math.sin(this.turretAngle)*25, vx, vy, this.attackPower, true, '#00F0FF'));
+      if (Math.random() < 0.45) {
+        const a2 = this.turretAngle + (Math.random()-0.5)*0.2;
+        bullets.push(new Bullet(this.x, this.y, Math.cos(a2)*speed*1.1, Math.sin(a2)*speed*1.1, this.attackPower*0.5, true, '#FF527C'));
+      }
+    } else {
+      bullets.push(new Bullet(this.x + Math.cos(this.turretAngle)*25, this.y + Math.sin(this.turretAngle)*25, vx, vy, this.attackPower, true, '#B5F800'));
+    }
+
+    particles.push(new Particle(this.x + Math.cos(this.turretAngle)*30, this.y + Math.sin(this.turretAngle)*30, vx*0.2, vy*0.2, 8, '#00F0FF'));
+  }
+
+  takeDamage(amount) {
+    if (this.shieldTimer > 0) {
+      floatingTexts.push(new FloatingText(this.x, this.y - 20, "SANCTUARY BLOCKED!", "#00F0FF", 16));
+      return;
+    }
+    this.hp -= amount;
+    floatingTexts.push(new FloatingText(this.x, this.y - 20, `-${Math.round(amount)}`, '#FF527C', 16));
+    audio.playExplode();
+    if (this.hp <= 0) {
+      this.hp = 0;
+      triggerDefeatScreen();
+    }
+  }
+
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    if (this.shieldTimer > 0) {
+      const pulse = 0.6 + Math.sin(Date.now() * 0.008) * 0.3;
+      ctx.beginPath();
+      ctx.arc(0, 0, 40, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0, 240, 255, ${pulse})`;
+      ctx.lineWidth = 4;
+      ctx.fillStyle = `rgba(0, 240, 255, ${pulse * 0.2})`;
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.rotate(this.angle);
+    ctx.fillStyle = "#070814";
+    ctx.fillRect(-22, -18, 44, 8);
+    ctx.fillRect(-22, 10, 44, 8);
+    ctx.fillStyle = "#0036FF";
+    ctx.fillRect(-18, -12, 36, 24);
+    ctx.strokeStyle = "#00F0FF";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-18, -12, 36, 24);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.turretAngle);
+    ctx.fillStyle = "#00F0FF";
+    ctx.fillRect(0, -3, 26, 6);
+    ctx.strokeRect(0, -3, 26, 6);
+    ctx.beginPath();
+    ctx.arc(0, 0, 10, 0, Math.PI * 2);
+    ctx.fillStyle = "#0036FF";
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+/* 敌方实体与 BOSS */
+class Enemy {
+  constructor(x, y, type = 'normal') {
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.angle = 0;
+    this.isBoss = type.startsWith('boss');
+    const cfg = currentLevelConfig;
+
+    if (type === 'normal') {
+      this.hp = 140;
+      this.maxHp = 140;
+      this.baseSpeed = 2.2;
+      this.baseAp = cfg.enemyAp;
+      this.color = '#FF527C';
+      this.radius = 18;
+      this.expVal = 25;
+    } else if (type === 'fast_kamikaze') {
+      this.hp = 70;
+      this.maxHp = 70;
+      this.baseSpeed = 3.6;
+      this.baseAp = cfg.enemyAp * 1.5;
+      this.color = '#B5F800';
+      this.radius = 14;
+      this.expVal = 30;
+    } else if (type === 'heavy_mortar') {
+      this.hp = 320;
+      this.maxHp = 320;
+      this.baseSpeed = 1.2;
+      this.baseAp = cfg.enemyAp * 1.2;
+      this.color = '#0036FF';
+      this.radius = 24;
+      this.expVal = 60;
+    } else if (type === 'boss_magma') {
+      this.hp = cfg.bossMaxHP;
+      this.maxHp = cfg.bossMaxHP;
+      this.baseSpeed = 1.6;
+      this.baseAp = cfg.enemyAp * 1.2;
+      this.color = '#FF527C';
+      this.radius = 45;
+      this.expVal = 500;
+    } else if (type === 'boss_fyl') {
+      this.hp = cfg.bossMaxHP;
+      this.maxHp = cfg.bossMaxHP;
+      this.baseSpeed = 1.8;
+      this.baseAp = cfg.enemyAp * 1.3;
+      this.color = '#0036FF';
+      this.radius = 65;
+      this.expVal = 1000;
+    }
+
+    this.shootCD = Math.floor(Math.random() * 60);
+    this.strafeTimer = 0;
+    this.strafeDir = 1;
+  }
+
+  update() {
+    if (!player) return;
+    const dx = player.x - this.x;
+    const dy = player.y - this.y;
+    const dist = Math.hypot(dx, dy);
+    this.angle = Math.atan2(dy, dx);
+
+    const cy = canvas.height / 2;
+    const isPlayerInMaze = (GlobalState.selectedLevel === 3 && player.y > cy - 230);
+    const speedRate = isPlayerInMaze ? 0.5 : 1.0;
+    const actualSpeed = this.baseSpeed * speedRate;
+
+    if (this.isBoss) {
+      this.strafeTimer++;
+      if (this.strafeTimer > 40) {
+        this.strafeTimer = 0;
+        this.strafeDir = Math.random() > 0.5 ? 1 : -1;
+      }
+      const strafeAngle = this.angle + (Math.PI / 2) * this.strafeDir;
+      this.x += Math.cos(strafeAngle) * actualSpeed * 1.2;
+      this.y += Math.sin(strafeAngle) * actualSpeed * 1.2;
+
+      if (dist < 220) {
+        this.x -= Math.cos(this.angle) * actualSpeed * 0.9;
+        this.y -= Math.sin(this.angle) * actualSpeed * 0.9;
+      }
+    } else {
+      if (dist > 120) {
+        this.x += Math.cos(this.angle) * actualSpeed;
+        this.y += Math.sin(this.angle) * actualSpeed;
+      }
+    }
+
+    this.x = Math.max(50, Math.min(canvas.width - 50, this.x));
+    this.y = Math.max(50, Math.min(canvas.height - 50, this.y));
+
+    this.shootCD--;
+    if (this.shootCD <= 0) this.fireBullet(isPlayerInMaze);
+  }
+
+  fireBullet(isWeakened) {
+    const spd = 6;
+    const apRate = isWeakened ? 0.5 : 1.0;
+    const currentAp = this.baseAp * apRate;
+
+    if (this.type === 'boss_fyl') {
+      audio.playShoot();
+      for (let i = 0; i < 8; i++) {
+        const a = this.angle + (i * Math.PI / 4) + Math.sin(Date.now() * 0.005);
+        bullets.push(new Bullet(this.x, this.y, Math.cos(a)*spd, Math.sin(a)*spd, currentAp, false, '#FF527C'));
+      }
+      this.shootCD = 80;
+    } else if (this.type === 'boss_magma') {
+      [-0.3, 0, 0.3].forEach(offset => {
+        const a = this.angle + offset;
+        bullets.push(new Bullet(this.x, this.y, Math.cos(a)*spd*1.2, Math.sin(a)*spd*1.2, currentAp, false, '#B5F800'));
+      });
+      this.shootCD = 65;
+    } else {
+      bullets.push(new Bullet(this.x, this.y, Math.cos(this.angle)*spd, Math.sin(this.angle)*spd, currentAp, false, '#FF527C'));
+      this.shootCD = 75;
+    }
+  }
+
+  takeDamage(amount) {
+    if (this.isBoss && Math.random() < 0.05) {
+      this.x += (Math.random() > 0.5 ? 45 : -45);
+      floatingTexts.push(new FloatingText(this.x, this.y - 25, "⚡ 闪避 (5%)", "#00F0FF", 16));
+      return;
+    }
+
+    this.hp -= amount;
+    floatingTexts.push(new FloatingText(this.x, this.y - 15, `-${Math.round(amount)}`, '#00F0FF', 14));
+    if (this.hp <= 0) {
+      this.hp = 0;
+      createExplosion(this.x, this.y, this.radius * 1.5, this.color);
+      audio.playExplode();
+      expGems.push(new ExpGem(this.x, this.y, this.expVal));
+      levelStats.kills++;
+      GlobalState.totalKills++;
+    }
+  }
+
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    if (this.type === 'boss_fyl') {
+      ctx.fillStyle = '#070814';
+      ctx.fillRect(-this.radius, -this.radius, this.radius*2, this.radius*2);
+      ctx.strokeStyle = '#FF527C';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(-this.radius, -this.radius, this.radius*2, this.radius*2);
+
+      ctx.fillStyle = '#B5F800';
+      ctx.font = 'italic 900 32px Impact, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#B5F800';
+      ctx.shadowBlur = 15;
+      ctx.fillText("fyl", 0, 0);
+      ctx.shadowBlur = 0;
+
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius + 15, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+      ctx.setLineDash([10, 15]);
+      ctx.stroke();
+    } else {
+      ctx.rotate(this.angle);
+      ctx.fillStyle = this.color;
+      ctx.fillRect(-this.radius, -this.radius*0.7, this.radius*2, this.radius*1.4);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-this.radius, -this.radius*0.7, this.radius*2, this.radius*1.4);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, -3, this.radius + 8, 6);
+    }
+
+    ctx.restore();
+
+    if (this.hp < this.maxHp && !this.isBoss) {
+      const bw = this.radius * 2;
+      ctx.fillStyle = '#111';
+      ctx.fillRect(this.x - bw/2, this.y - this.radius - 10, bw, 4);
+      ctx.fillStyle = '#FF527C';
+      ctx.fillRect(this.x - bw/2, this.y - this.radius - 10, bw * (this.hp / this.maxHp), 4);
+    }
+  }
+}
+
+class Bullet {
+  constructor(x, y, vx, vy, damage, isPlayer = true, color = '#B5F800', radius = 4) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.damage = damage;
+    this.isPlayer = isPlayer;
+    this.color = color;
+    this.radius = radius;
+    this.life = 120;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life--;
+
+    for (let wall of mazeWalls) {
+      if (this.x > wall.x && this.x < wall.x + wall.w &&
+          this.y > wall.y && this.y < wall.y + wall.h) {
+        this.life = 0;
+        particles.push(new Particle(this.x, this.y, 0, 0, 4, this.color));
+        return;
+      }
+    }
+
+    if (this.isPlayer) {
+      for (let enemy of enemies) {
+        if (Math.hypot(this.x - enemy.x, this.y - enemy.y) < enemy.radius + this.radius) {
+          enemy.takeDamage(this.damage);
+          levelStats.damageDealt += this.damage;
+          this.life = 0;
+          particles.push(new Particle(this.x, this.y, -this.vx*0.2, -this.vy*0.2, 6, this.color));
+          break;
+        }
+      }
+    } else {
+      if (player && Math.hypot(this.x - player.x, this.y - player.y) < 22 + this.radius) {
+        player.takeDamage(this.damage);
+        this.life = 0;
+      }
+    }
+  }
+
+  draw() {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class AirSupportPlane {
+  constructor(targetX, targetY) {
+    this.x = -100;
+    this.y = targetY; 
+    this.targetX = targetX;
+    this.targetY = targetY;
+    this.speed = 14;
+    this.hasBombed = false;
+    audio.playAirstrike();
+  }
+
+  update() {
+    this.x += this.speed;
+
+    if (!this.hasBombed && this.x >= this.targetX - 50) {
+      this.hasBombed = true;
+      const isL3 = GlobalState.selectedLevel === 3;
+      const spreadX = isL3 ? 180 * 1.2 : 180;
+      const spreadY = isL3 ? 60 * 1.2 : 60;
+      const blastRadius = isL3 ? 120 * 1.2 : 120;
+      const dmg = isL3 ? 400 * 1.5 : 400;
+
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const bx = this.targetX + (Math.random() - 0.5) * spreadX;
+          const by = this.targetY + (Math.random() - 0.5) * spreadY;
+          createExplosion(bx, by, 60, '#FF527C');
+          audio.playExplode();
+
+          enemies.forEach(e => {
+            if (Math.hypot(e.x - bx, e.y - by) < blastRadius) {
+              e.takeDamage(dmg);
+              levelStats.damageDealt += dmg;
+            }
+          });
+        }, i * 120);
+      }
+    }
+  }
+
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.fillStyle = '#0036FF';
+    ctx.beginPath();
+    ctx.moveTo(35, 0);
+    ctx.lineTo(-25, -20);
+    ctx.lineTo(-15, 0);
+    ctx.lineTo(-25, 20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#B5F800';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+class ExpGem {
+  constructor(x, y, value) {
+    this.x = x;
+    this.y = y;
+    this.value = value;
+  }
+  update() {
+    if (!player) return;
+    const dist = Math.hypot(player.x - this.x, player.y - this.y);
+    if (dist < 150) {
+      this.x += (player.x - this.x) * 0.15;
+      this.y += (player.y - this.y) * 0.15;
+    }
+    if (dist < 25) {
+      player.exp += this.value;
+      this.value = 0;
+      audio.playBlip();
+    }
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.fillStyle = '#00F0FF';
+    ctx.beginPath();
+    ctx.moveTo(0, -6); ctx.lineTo(6, 0); ctx.lineTo(0, 6); ctx.lineTo(-6, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class Particle {
+  constructor(x, y, vx, vy, size, color) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.size = size;
+    this.color = color;
+    this.life = 1.0;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= 0.03;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+let floatingTexts = [];
+class FloatingText {
+  constructor(x, y, text, color = '#fff', size = 16) {
+    this.x = x;
+    this.y = y;
+    this.text = text;
+    this.color = color;
+    this.size = size;
+    this.life = 1.0;
+  }
+  update() {
+    this.y -= 0.8;
+    this.life -= 0.02;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.fillStyle = this.color;
+    ctx.font = `italic 900 ${this.size}px Impact, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(this.text, this.x, this.y);
+    ctx.restore();
+  }
+}
+
+function createExplosion(x, y, count = 20, color = '#FF527C') {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const spd = Math.random() * 5 + 1;
+    particles.push(new Particle(x, y, Math.cos(angle)*spd, Math.sin(angle)*spd, Math.random()*8+3, color));
+  }
+}
+
+function castSkill(slot) {
+  if (gameState !== 'PLAYING' || !player) return;
+  audio.init();
+
+  if (slot === 1 && player.skill1CD <= 0) {
+    player.skill1CD = 360;
+    planes.push(new AirSupportPlane(Input.mouse.x, player.y));
+    floatingTexts.push(new FloatingText(player.x, player.y - 40, "AIR RAID INCOMING!", "#FF527C", 18));
+  } else if (slot === 2 && player.skill2CD <= 0) {
+    player.skill2CD = 480;
+    player.shieldTimer = Math.max(player.shieldTimer, 180);
+    floatingTexts.push(new FloatingText(player.x, player.y - 40, "SANCTUARY SHIELD ACTIVE!", "#00F0FF", 18));
+    audio.playVictory();
+  }
+}
+
+let enemySpawnTimer = 0;
+
+function startGameFromLobby() {
+  audio.init();
+  audio.playBlip();
+  const lvl = GlobalState.selectedLevel;
+  currentLevelConfig = LEVEL_CONFIGS[lvl];
+
+  buildLabyrinth(currentLevelConfig.mazeType);
+  player = new PlayerTank();
+  enemies = [];
+  bullets = [];
+  particles = [];
+  expGems = [];
+  planes = [];
+  floatingTexts = [];
+  bossEntity = null;
+  levelStats = { kills: 0, damageDealt: 0, startTime: Date.now() };
+
+  document.getElementById('lobby-view').classList.add('view-hidden');
+  document.getElementById('game-hud').classList.remove('view-hidden');
+  document.getElementById('mvp-modal').classList.add('view-hidden');
+  document.getElementById('defeat-modal').classList.add('view-hidden');
+
+  if (lvl === 3) {
+    audio.setTrack('BOSS');
+  } else {
+    audio.setTrack('BATTLE');
+  }
+
+  if (lvl === 1) {
+    gameState = 'PAUSED_VN';
+    document.getElementById('vn-modal').classList.remove('view-hidden');
+  } else {
+    gameState = 'PLAYING';
+    initBossIfNeeded();
+  }
+}
+
+function initBossIfNeeded() {
+  if (currentLevelConfig.hasBoss) {
+    const bType = GlobalState.selectedLevel === 2 ? 'boss_magma' : 'boss_fyl';
+    const bossY = GlobalState.selectedLevel === 3 ? 80 : 120;
+    bossEntity = new Enemy(canvas.width / 2, bossY, bType);
+    enemies.push(bossEntity);
+    document.getElementById('boss-hud-bar').style.display = 'block';
+    document.getElementById('boss-name-label').innerText = currentLevelConfig.bossName;
+  } else {
+    document.getElementById('boss-hud-bar').style.display = 'none';
+  }
+}
+
+function showOperationGuide() {
+  document.getElementById('vn-modal').classList.add('view-hidden');
+  document.getElementById('guide-modal').classList.remove('view-hidden');
+  audio.playBlip();
+}
+
+function dismissVNAndFight() {
+  document.getElementById('vn-modal').classList.add('view-hidden');
+  gameState = 'PLAYING';
+  initBossIfNeeded();
+  audio.playBlip();
+}
+
+function closeGuideAndFight() {
+  document.getElementById('guide-modal').classList.add('view-hidden');
+  gameState = 'PLAYING';
+  initBossIfNeeded();
+  audio.playBlip();
+}
+
+function quitToLobby() {
+  gameState = 'LOBBY';
+  audio.setTrack('LOBBY');
+  
+  document.getElementById('game-hud').classList.add('view-hidden');
+  document.getElementById('mvp-modal').classList.add('view-hidden');
+  document.getElementById('defeat-modal').classList.add('view-hidden');
+  document.getElementById('guide-modal').classList.add('view-hidden');
+  document.getElementById('vn-modal').classList.add('view-hidden');
+  
+  document.getElementById('gameCanvas').style.display = 'block';
+  document.getElementById('lobby-view').classList.remove('view-hidden');
+  document.getElementById('lobby-view').style.display = 'flex';
+  
+  player = null;
+  enemies = [];
+  bullets = [];
+  particles = [];
+  expGems = [];
+  planes = [];
+  floatingTexts = [];
+  bossEntity = null;
+
+  audio.playBlip();
+}
+
+function checkVictoryCondition() {
+  if (currentLevelConfig.hasBoss) {
+    if (bossEntity && bossEntity.hp <= 0) triggerVictoryMVP();
+  } else {
+    if (levelStats.kills >= currentLevelConfig.targetKills) triggerVictoryMVP();
+  }
+}
+
+function triggerVictoryMVP() {
+  gameState = 'MVP';
+  audio.playVictory();
+
+  const elapsedSec = Math.floor((Date.now() - levelStats.startTime) / 1000);
+  const min = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+  const sec = String(elapsedSec % 60).padStart(2, '0');
+
+  const actsContainer = document.getElementById('mvp-actions-container');
+  
+  if (GlobalState.selectedLevel === 3) {
+    document.getElementById('mvp-main-title').innerText = "授予 AAAAAA 神级好战将证明";
+    document.getElementById('mvp-desc-text').innerHTML = `
+      恭喜你完美结束本阶段的战斗！<br>
+      <b>已授予最高战誉：【AAAAAA神级好战将证明】</b><br>
+      已解锁开发者特别准备的独家全景粒子彩蛋！
+    `;
+    actsContainer.innerHTML = `
+      <button class="btn-acid" onclick="returnToLobbyFromMVP()">🏛 返回社区大厅</button>
+      <button class="btn-acid btn-gold" onclick="window.location.href='easter_egg.html'">🎁 拆开开发者准备的彩蛋</button>
+    `;
+  } else {
+    document.getElementById('mvp-main-title').innerText = "恭喜获得 MVP · 战术评估报表";
+    document.getElementById('mvp-desc-text').innerHTML = `
+      档案代号: 浪尖核心指挥官 (LIANA)<br>
+      战役状态: 攻克当前防区迷宫集群<br>
+      战力释放评估: <b>SSS 极度致命 (100%)</b>
+    `;
+    actsContainer.innerHTML = `
+      <button class="btn-acid" onclick="returnToLobbyFromMVP()">🏛 返回社区大厅</button>
+      <button class="btn-acid btn-pink" onclick="nextStageFromMVP()">⚔️ 征讨下一战役</button>
+    `;
+  }
+
+  document.getElementById('mvp-stat-line1').innerText = `✦ 炮塔火力系统: 击毁敌军 ${levelStats.kills} 架 | 伤害输出 ${Math.round(levelStats.damageDealt)} 点`;
+  document.getElementById('mvp-stat-line2').innerText = `✦ 装甲机动底盘: 迷宫突围耗时 ${min}:${sec} | 存活率 ${(player.hp / player.maxHp * 100).toFixed(0)}%`;
+
+  if (GlobalState.selectedLevel > GlobalState.maxClearedLevel) {
+    GlobalState.maxClearedLevel = GlobalState.selectedLevel;
+  }
+
+  document.getElementById('lobby-honor').innerText = `${GlobalState.maxClearedLevel * 100 + 120} 勋章`;
+  document.getElementById('lobby-cleared').innerText = `${GlobalState.maxClearedLevel} / 3 关`;
+
+  document.getElementById('mvp-modal').classList.remove('view-hidden');
+}
+
+function triggerDefeatScreen() {
+  gameState = 'GAMEOVER';
+  audio.playExplode();
+
+  const elapsedSec = Math.floor((Date.now() - levelStats.startTime) / 1000);
+  const min = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+  const sec = String(elapsedSec % 60).padStart(2, '0');
+
+  document.getElementById('defeat-stat-line1').innerText = `✦ 战损统计: 已击毁敌机 ${levelStats.kills} 架 | 累计造成伤害 ${Math.round(levelStats.damageDealt)} 点`;
+  document.getElementById('defeat-stat-line2').innerText = `✦ 突围分析: 迷宫生存坚持 ${min}:${sec} | 需更谨慎躲避或拾取补给`;
+
+  document.getElementById('defeat-modal').classList.remove('view-hidden');
+}
+
+function returnToLobbyFromMVP() {
+  quitToLobby();
+}
+
+function returnToLobbyFromDefeat() {
+  quitToLobby();
+}
+
+function restartCurrentStage() {
+  document.getElementById('defeat-modal').classList.add('view-hidden');
+  startGameFromLobby();
+}
+
+function nextStageFromMVP() {
+  document.getElementById('mvp-modal').classList.add('view-hidden');
+  if (GlobalState.selectedLevel < 3) {
+    selectLevel(GlobalState.selectedLevel + 1);
+    startGameFromLobby();
+  } else {
+    quitToLobby();
+  }
+}
+
+/* 底图绘制：横条纹切削风格“浪尖儿大学生社区” */
+function drawStripedBackgroundWatermark() {
+  const text = "浪尖儿大学生社区";
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.font = 'italic 900 78px Impact, Arial Black, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.fillStyle = 'rgba(0, 54, 255, 0.08)';
+  ctx.fillText(text, 0, 0);
+
+  ctx.save();
+  ctx.beginPath();
+  const stripeHeight = 3;
+  const stripeGap = 5;
+  for (let y = -80; y <= 80; y += (stripeHeight + stripeGap)) {
+    ctx.rect(-canvas.width / 2, y, canvas.width, stripeHeight);
+  }
+  ctx.clip();
+  ctx.fillStyle = 'rgba(181, 248, 0, 0.22)';
+  ctx.fillText(text, 0, 0);
+  ctx.restore();
+
+  ctx.strokeStyle = 'rgba(255, 82, 124, 0.25)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([12, 6]);
+  ctx.beginPath();
+  ctx.moveTo(-320, -50); ctx.lineTo(320, -50);
+  ctx.moveTo(-320, 50); ctx.lineTo(320, 50);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* 绘制版画字型迷宫墙壁与道具 */
+function drawMazeWalls() {
+  mazeWalls.forEach(w => {
+    ctx.fillStyle = '#0a0e20';
+    ctx.fillRect(w.x, w.y, w.w, w.h);
+
+    ctx.strokeStyle = 'rgba(181, 248, 0, 0.85)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(w.x, w.y, w.w, w.h);
+
+    ctx.save();
+    ctx.clip(new Path2D(`M${w.x} ${w.y} h${w.w} v${w.h} h${-w.w} Z`));
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+    ctx.font = 'bold 10px Courier New, monospace';
+    ctx.fillText(w.text, w.x + 4, w.y + 12);
+    ctx.restore();
+  });
+
+  mazeItems.forEach(item => {
+    if (!item.collected) {
+      ctx.save();
+      ctx.translate(item.x, item.y);
+      const pulse = 1 + Math.sin(Date.now() * 0.006) * 0.2;
+      ctx.scale(pulse, pulse);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 16, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 255, 102, 0.2)';
+      ctx.fill();
+      ctx.strokeStyle = '#00FF66';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.font = '16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(item.icon, 0, 0);
+      ctx.restore();
+    }
+  });
+}
+
+function gameLoop() {
+  requestAnimationFrame(gameLoop);
+
+  ctx.fillStyle = currentLevelConfig ? currentLevelConfig.bgTile : '#070814';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  drawStripedBackgroundWatermark();
+
+  if (gameState === 'PLAYING' || gameState === 'PAUSED_VN') {
+    drawMazeWalls();
+    
+    expGems.forEach(g => g.draw());
+    particles.forEach(p => p.draw());
+    bullets.forEach(b => b.draw());
+    enemies.forEach(e => e.draw());
+    if (player) player.draw();
+    planes.forEach(p => p.draw());
+    floatingTexts.forEach(t => t.draw());
+  }
+
+  if (gameState === 'PLAYING') {
+    enemySpawnTimer++;
+    if (enemySpawnTimer > currentLevelConfig.spawnRate && enemies.length < 8) {
+      enemySpawnTimer = 0;
+      const edge = Math.floor(Math.random() * 4);
+      let sx, sy;
+      if (edge === 0) { sx = Math.random()*canvas.width; sy = -30; }
+      else if (edge === 1) { sx = canvas.width + 30; sy = Math.random()*canvas.height; }
+      else if (edge === 2) { sx = Math.random()*canvas.width; sy = canvas.height + 30; }
+      else { sx = -30; sy = Math.random()*canvas.height; }
+
+      const types = ['normal', 'fast_kamikaze', 'heavy_mortar'];
+      const chosen = types[Math.floor(Math.random() * (GlobalState.selectedLevel === 1 ? 1 : 3))];
+      enemies.push(new Enemy(sx, sy, chosen));
+    }
+
+    if (player) player.update();
+    enemies.forEach(e => e.update());
+    bullets.forEach(b => b.update());
+    expGems.forEach(g => g.update());
+    planes.forEach(p => p.update());
+    particles.forEach(p => p.update());
+    floatingTexts.forEach(t => t.update());
+
+    enemies = enemies.filter(e => e.hp > 0);
+    bullets = bullets.filter(b => b.life > 0 && b.x > -50 && b.x < canvas.width+50 && b.y > -50 && b.y < canvas.height+50);
+    expGems = expGems.filter(g => g.value > 0);
+    planes = planes.filter(p => p.x < canvas.width + 200);
+    particles = particles.filter(p => p.life > 0);
+    floatingTexts = floatingTexts.filter(t => t.life > 0);
+
+    checkVictoryCondition();
+
+    if (player) {
+      document.getElementById('hud-hp-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
+      document.getElementById('hud-exp-bar').style.width = `${(player.exp / player.nextExp) * 100}%`;
+      document.getElementById('hud-hp-text').innerText = `${Math.floor(player.hp)} / ${player.maxHp}`;
+      document.getElementById('hud-level').innerText = `Lv.${player.level}`;
+      document.getElementById('hud-kills').innerText = levelStats.kills;
+    }
+    if (bossEntity) {
+      document.getElementById('boss-hp-fill').style.width = `${Math.max(0, (bossEntity.hp / bossEntity.maxHp) * 100)}%`;
+    }
+  }
+}
+
+gameLoop();
+</script>
+</body>
+</html>

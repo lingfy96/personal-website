@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>符榆翎 | 个人作品集 - 极客航线</title>
+  <!-- 资源预连接 / DNS 预解析 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <!-- 关键 CSS 内联：首屏抗闪烁、基础排版与溢出保护 -->
+  <style>
+    html, body { margin: 0; padding: 0; overflow-x: hidden; }
+    body { background-color: #111111; color: #F3E6C7; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    img, video, svg, canvas, iframe { max-width: 100%; height: auto; display: block; }
+  </style>
+  <!-- 引入字体 -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <!-- 引入 Tailwind CSS（保持同步，确保内联配置可用） -->
+  <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+  darkMode: 'class',
+  theme: {
+  extend: {
+  colors: {
+  brand: {
+  red: '#DD201B',       /* 冲击红 */
+  blue: '#145A8F',      /* 深海蓝 */
+  yellow: '#EDA634',    /* 明艳黄 */
+  dark: '#1A1A1A',      /* 暗夜黑 */
+  cream: '#F3E6C7',     /* 复古奶油白 */
+  }
+  },
+  fontFamily: {
+  playfair: ['"Playfair Display"', 'serif'],
+  mono: ['"Space Mono"', 'monospace'],
+  sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+  }
+  }
+  }
+  }
+</script>
+<!-- 非关键全局库 defer，避免阻塞首屏 -->
+<script src="https://unpkg.com/feather-icons" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.8.0/countUp.umd.js" defer></script>
+<!-- ================= ES Modules：外部独立挂载 3D 宇宙引擎 ================= -->
+<script type="importmap">
+  {
+  "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+  }
+</script>
+<!-- 独立宇宙引擎挂载，避免影响主逻辑 -->
+<script type="module" src="./universe.js"></script>
+<link rel="preload" href="./style.css" as="style">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body class="font-sans transition-colors duration-300 relative overflow-x-hidden">
+  <!-- ================= 全局浮层组件：PPT 现代水平画廊 (Cover Flow) ================= -->
+  <div id="ppt-carousel-overlay" class="fixed inset-0 z-[1000] hidden bg-[#1A1A1A]/95 backdrop-blur-md items-center justify-start overflow-hidden">
+    <button onclick="closePPTCarousel()" class="absolute top-8 right-8 w-12 h-12 bg-[#DD201B] border-4 border-[#1A1A1A] flex items-center justify-center text-white hover:bg-[#EDA634] hover:text-[#1A1A1A] transition-colors z-[1050]">
+      <i data-feather="x" stroke-width="3"></i>
+  </button>
+  <!-- 极简现代的水平透视画廊容器 -->
+  <div class="w-full md:w-[60vw] h-full flex items-center justify-center relative perspective-[1500px]" id="ppt-stack-viewport">
+    <div id="ppt-stack-scene" class="w-[300px] h-[225px] md:w-[600px] md:h-[450px] relative mx-auto" style="transform-style: preserve-3d;">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+  <!-- 右侧信息描述区域 -->
+  <div class="hidden md:flex w-[40vw] h-full flex-col justify-center px-12 text-[#F3E6C7] relative z-[1010]">
+    <div class="inline-block px-4 py-2 bg-[#EDA634] text-[#1A1A1A] font-mono font-black text-sm mb-6 w-max border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">PPT PRESENTATION</div>
+  <h2 id="ppt-detail-title" class="text-7xl font-black mb-6 font-sans" style="text-shadow: 4px 4px 0 #DD201B; -webkit-text-stroke: 2px #1A1A1A;">TITLE</h2>
+<p id="ppt-detail-desc" class="text-xl font-bold max-w-lg leading-relaxed opacity-90">Description</p>
+<div class="mt-12 flex gap-4">
+  <span class="w-12 h-12 rounded-full border-4 border-[#F3E6C7] flex items-center justify-center animate-bounce"><i data-feather="mouse-pointer"></i></span>
+<div class="text-sm font-mono opacity-70 flex flex-col justify-center">
+  <span>SWIPE / SCROLL TO BROWSE</span>
+<span>CLICK TO BRING FRONT</span>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= ✈️ 虚线轨迹与滑翔飞机 ================= -->
+<div id="flight-path" class="fixed right-4 md:right-[2.5rem] top-0 h-full w-1 border-r-4 border-dashed border-brand-dark/30 dark:border-brand-cream/30 z-40 pointer-events-none no-print"></div>
+<div id="plane-icon" class="fixed z-50 pointer-events-none no-print text-brand-blue drop-shadow-[0_4px_0px_#DD201B]" style="top: -100px; left: -100px;">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" stroke="#1A1A1A" stroke-width="1.5">
+    <path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z" />
+  </svg>
+</div>
+<div id="particles-container" class="fixed inset-0 pointer-events-none z-45 overflow-hidden no-print"></div>
+<div class="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden no-print">
+  <div id="bg-fyl" class="text-[60vw] font-playfair font-black text-brand-dark dark:text-brand-cream select-none whitespace-nowrap opacity-0">
+    fyl
+  </div>
+</div>
+<nav class="fixed top-0 w-full z-50 bg-brand-cream/90 dark:bg-[#111]/90 border-b-4 border-brand-dark no-print transition-colors duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2 text-2xl font-playfair font-black text-brand-red tracking-wider" style="text-shadow: 2px 2px 0px #1A1A1A;">
+      <i data-feather="wind" stroke-width="3"></i> FYL
+  </a>
+  <div class="flex items-center gap-6">
+    <a href="#about" class="text-base font-bold hover:text-brand-red px-2 transition-colors hidden sm:block">关于我 <span class="font-mono text-xs text-gray-500 ml-1 uppercase">About</span></a>
+<a href="#skills" class="text-base font-bold hover:text-brand-red px-2 transition-colors hidden sm:block">特长 <span class="font-mono text-xs text-gray-500 ml-1 uppercase">Skills</span></a>
+<a href="#experience" class="text-base font-bold hover:text-brand-red px-2 transition-colors hidden sm:block">未来实践经历 <span class="font-mono text-xs text-gray-500 ml-1 uppercase">Exp</span></a>
+<div class="w-1 h-6 bg-brand-dark mx-2 hidden sm:block"></div>
+<button onclick="window.print()" class="p-2 border-2 border-brand-dark bg-white text-brand-dark hover:bg-brand-red hover:text-white transition-colors" title="Print">
+  <i data-feather="printer" class="w-5 h-5"></i>
+</button>
+<button id="theme-toggle" class="p-2 border-2 border-brand-dark bg-white text-brand-dark hover:bg-brand-blue hover:text-white transition-colors" title="Toggle Theme">
+  <i data-feather="moon" id="theme-icon" class="w-5 h-5"></i>
+</button>
+</div>
+</div>
+</nav>
+<main class="relative z-10 flex flex-col min-h-screen w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-24">
+  <!-- Hero 首屏 -->
+  <section class="min-h-[85vh] flex flex-col md:flex-row items-center justify-between relative section-trigger pr-4 md:pr-[2.5rem] pl-4 md:pl-8" style="width: calc(100vw - 10px); margin-left: calc(50% - 50vw + 5px);">
+    <div class="absolute z-0 overflow-hidden pointer-events-auto inset-0 w-full h-full" id="solar-system-wrapper">
+      <div id="solar-system-canvas" class="w-full h-full cursor-grab" style="min-height: 500px;"></div>
+    <div id="planet-info-panel">
+      <div class="pi-title" id="pi-name">太阳</div>
+    <div class="pi-stat"><span>半径:</span><span id="pi-radius">696,340 km</span></div>
+<div class="pi-stat"><span>表面温度:</span><span id="pi-temp">5,500 °C</span></div>
+<div class="pi-stat"><span>轨道周期:</span><span id="pi-orbit">-</span></div>
+<div class="pi-desc" id="pi-desc">太阳系的中心恒星，提供光和热。</div>
+</div>
+</div>
+<div class="hidden md:flex w-1/2 h-[70vh] relative items-center justify-center pointer-events-none z-0">
+  <!-- 完美复原的极简代码：复用 is-active 和 cyber-slice，丢弃繁杂历史代码 -->
+  <div class="absolute left-[-2%] md:left-[2%] top-[0%] md:top-[2%] font-sans font-black text-[32vw] md:text-[28vw] leading-none tracking-tighter z-20 cyber-slice is-active" data-text="AI">AI</div>
+<div class="absolute left-[8vw] md:left-[6vw] top-[50%] md:top-[55%] font-mono font-black text-[10vw] md:text-[8vw] z-30 cyber-slice cyber-hover transform -translate-x-1/2 -translate-y-1/2 -rotate-90 tracking-widest text-[#F3E6C7]" data-text="DESIGN" style="text-shadow: 6px 6px 0 #DD201B, -2px -2px 0 #1A1A1A, 2px -2px 0 #1A1A1A, -2px 2px 0 #1A1A1A, 2px 2px 0 #1A1A1A; -webkit-text-stroke: 3px #1A1A1A;">DESIGN</div>
+</div>
+<div class="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left p-8 z-10 pointer-events-none">
+  <div class="relative inline-block mb-6 h-[8rem] md:h-[10rem] pointer-events-auto">
+    <h1 id="hero-title" class="text-7xl md:text-9xl font-black text-brand-cream relative z-10 font-sans tracking-widest scramble-title" style="text-shadow: -4px -4px 0 #145A8F, 4px 4px 0 #DD201B, 0px 0px 0px #1A1A1A, -2px -2px 0px #1A1A1A, 2px 2px 0px #1A1A1A; -webkit-text-stroke: 3px #1A1A1A;" data-final="符榆翎">
+      符榆翎
+    </h1>
+  </div>
+  <div class="marquee-container w-[340px] md:w-[420px] mb-10 border-4 border-brand-dark shadow-[6px_6px_0px_0px_#DD201B] bg-brand-yellow pointer-events-auto">
+    <div class="marquee-track py-3" id="hero-marquee">
+      <span class="marquee-text text-xl md:text-2xl font-bold text-brand-dark">探索 AI 与创意的跨界新航线</span>
+  </div>
+</div>
+<div class="flex flex-wrap justify-center md:justify-start gap-4 mb-12 pointer-events-auto">
+  <button class="px-5 py-2 border-4 border-brand-dark dark:border-brand-cream bg-brand-blue text-brand-cream font-bold text-sm shadow-[4px_4px_0px_0px_#1A1A1A] dark:shadow-[4px_4px_0px_0px_#F3E6C7] liquid-btn"><span>PPT 设计</span></button>
+<button class="px-5 py-2 border-4 border-brand-dark dark:border-brand-cream bg-brand-red text-brand-cream font-bold text-sm shadow-[4px_4px_0px_0px_#1A1A1A] dark:shadow-[4px_4px_0px_0px_#F3E6C7] liquid-btn"><span>AI 编程</span></button>
+<button class="px-5 py-2 border-4 border-brand-dark dark:border-brand-cream bg-brand-yellow text-brand-dark font-bold text-sm shadow-[4px_4px_0px_0px_#1A1A1A] dark:shadow-[4px_4px_0px_0px_#F3E6C7] liquid-btn"><span>写作</span></button>
+<button class="px-5 py-2 border-4 border-brand-dark dark:border-brand-cream bg-white dark:bg-[#111111] text-brand-dark dark:text-brand-cream font-bold text-sm shadow-[4px_4px_0px_0px_#1A1A1A] dark:shadow-[4px_4px_0px_0px_#F3E6C7] liquid-btn"><span>视频剪辑</span></button>
+</div>
+<div class="flex gap-6 no-print pointer-events-auto" id="contact-info"></div>
+<div class="flex gap-6 mt-12 no-print pointer-events-auto">
+  <a href="#skills" class="kinetic-btn px-8 py-4 bg-brand-red text-brand-cream border-4 border-brand-dark dark:border-brand-cream shadow-[6px_6px_0px_0px_#145A8F] dark:shadow-[6px_6px_0px_0px_#F3E6C7] hover:shadow-[2px_2px_0px_0px_#145A8F] transition-shadow font-black text-lg tracking-widest uppercase font-sans">
+    <span class="text-part">开启航线</span>
+  <span class="arrow-part"><i data-feather="chevrons-right" class="inline w-5 h-5 ml-1"></i></span>
+</a>
+</div>
+</div>
+</section>
+<!-- 座右铭 -->
+<section class="min-h-[40vh] flex items-center justify-center py-20 px-4 section-trigger">
+  <div class="comic-card p-10 md:p-16 relative">
+    <div class="absolute -top-4 -left-4 w-8 h-8 bg-brand-yellow border-4 border-brand-dark z-10"></div>
+  <div class="absolute -bottom-4 -right-4 w-8 h-8 bg-brand-blue border-4 border-brand-dark z-10"></div>
+<h2 id="motto-text" class="text-4xl md:text-5xl lg:text-6xl font-black text-center leading-relaxed tracking-widest text-brand-cream font-playfair">
+  自洽而内求，达观而内醒
+</h2>
+</div>
+</section>
+<!-- 关于我 -->
+<section id="about" class="pt-40 pb-20 section-trigger relative overflow-visible">
+  <div class="airport-sign mb-32 relative z-10">
+    <i data-feather="user" class="mr-2 stroke-[3]"></i> 关于我 <span class="ml-2 font-mono text-sm">ABOUT</span>
+<span class="sign-gate">01</span>
+</div>
+<div class="relative z-10 max-w-5xl mx-auto bg-white/95 dark:bg-[#111111]/95 backdrop-blur-md border-4 border-brand-dark dark:border-brand-cream p-8 md:p-12 shadow-[12px_12px_0px_0px_#145A8F]">
+  <div class="absolute top-[-90px] md:top-[-110px] left-[-20px] md:left-[-60px] z-40 flex items-end pointer-events-none select-none hover-float">
+    <svg viewBox="0 0 800 620" class="w-full h-auto overflow-visible bg-transparent">
+      <defs>
+        <g id="ling-text" transform="translate(130, 360) rotate(-10) skewX(-15)">
+          <text x="0" y="0" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="200" letter-spacing="-5">Lin</text>
+        <text x="320" y="100" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="280">g</text>
+    </g>
+  </defs>
+  <rect x="50" y="200" width="700" height="220" fill="#E62E2D" stroke="#1A1A1A" stroke-width="12" />
+  <path d="M 120 400 L 330 400 L 310 560 L 510 560 L 530 420 L 750 420 L 750 200 L 520 60 Z" fill="#1A1A1A" stroke="#1A1A1A" stroke-width="12" stroke-linejoin="round" />
+  <use href="#ling-text" x="4" y="4" fill="#1A1A1A" />
+  <use href="#ling-text" x="8" y="8" fill="#1A1A1A" />
+  <use href="#ling-text" x="12" y="12" fill="#1A1A1A" />
+  <use href="#ling-text" x="0" y="0" fill="#F59E0B" stroke="#1A1A1A" stroke-width="8" stroke-linejoin="miter" stroke-miterlimit="4" paint-order="stroke fill" />
+</svg>
+<div class="absolute bottom-[35%] right-[10%] text-white font-sans font-black text-sm md:text-xl tracking-widest z-10" style="text-shadow: 2px 2px 0 #1A1A1A;">
+  FU YU LING
+</div>
+</div>
+<div class="w-full flex justify-center">
+  <div class="avatar-portrait">
+    <img class="avatar-person" src="./photo/Avatar.png" alt="人物照片" loading="eager" decoding="async">
+  </div>
+  </div>
+  <div class="w-full mt-10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4 mb-10 text-center">
+      <div class="border-b-4 border-brand-dark pb-3">
+        <span class="text-brand-red font-bold text-xs block uppercase tracking-widest font-mono mb-1">Name</span>
+      <span class="font-black text-2xl text-brand-dark dark:text-brand-cream">符榆翎</span>
+  </div>
+  <div class="border-b-4 border-brand-dark pb-3">
+    <span class="text-brand-red font-bold text-xs block uppercase tracking-widest font-mono mb-1">Age</span>
+  <span class="font-black text-2xl text-brand-dark dark:text-brand-cream font-mono">18</span>
+</div>
+<div class="border-b-4 border-brand-dark pb-3">
+  <span class="text-brand-red font-bold text-xs block uppercase tracking-widest font-mono mb-1">School</span>
+<span class="font-black text-xl text-brand-dark dark:text-brand-cream">上海商学院</span>
+</div>
+<div class="border-b-4 border-brand-dark pb-3">
+  <span class="text-brand-red font-bold text-xs block uppercase tracking-widest font-mono mb-1">Major</span>
+<span class="font-black text-xl text-brand-dark dark:text-brand-cream">旅游管理</span>
+</div>
+</div>
+<div class="p-6 text-lg font-bold leading-relaxed bg-brand-cream dark:bg-[#1A1A1A] border-2 border-brand-dark dark:border-brand-cream shadow-[4px_4px_0_#1A1A1A] dark:shadow-[4px_4px_0_#F3E6C7] dark:text-brand-cream">
+  热衷于探索设计与技术的交汇点。将旅游管理的宏观视野与 AI 编程、视觉设计的微观实践相结合，致力于在数字化时代打造具有创新体验的产品与内容。
+</div>
+</div>
+</div>
+</section>
+<!-- 亮点成果 -->
+<section class="py-16 section-trigger relative z-10">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-brand-red border-4 border-brand-dark text-brand-cream p-8 shadow-[8px_8px_0px_0px_#1A1A1A] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_#1A1A1A] transition-all">
+      <div class="text-6xl font-black mb-2 font-mono" style="-webkit-text-stroke: 2px #1A1A1A;"><span class="count-up" data-val="50">0</span>+</div>
+  <div class="font-black tracking-widest text-xs uppercase bg-brand-dark text-white inline-block px-2 py-1 font-mono">PROJECTS</div>
+<div class="mt-3 font-bold text-xl">完成设计项目</div>
+</div>
+<div class="bg-brand-blue border-4 border-brand-dark text-brand-cream p-8 shadow-[8px_8px_0px_0px_#1A1A1A] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_#1A1A1A] transition-all">
+  <div class="text-6xl font-black mb-2 font-mono" style="-webkit-text-stroke: 2px #1A1A1A;"><span class="count-up" data-val="10">0</span>W</div>
+<div class="font-black tracking-widest text-xs uppercase bg-brand-dark text-white inline-block px-2 py-1 font-mono">VIEWS</div>
+<div class="mt-3 font-bold text-xl">全网内容阅读量</div>
+</div>
+<div class="bg-brand-yellow border-4 border-brand-dark text-brand-dark p-8 shadow-[8px_8px_0px_0px_#1A1A1A] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_#1A1A1A] transition-all">
+  <div class="text-6xl font-black mb-2 font-mono text-white" style="-webkit-text-stroke: 2px #1A1A1A;"><span class="count-up" data-val="3">0</span>项</div>
+<div class="font-black tracking-widest text-xs uppercase bg-brand-dark text-white inline-block px-2 py-1 font-mono">AWARDS</div>
+<div class="mt-3 font-bold text-xl">核心赛事荣誉</div>
+</div>
+</div>
+</section>
+<!-- ================= 教育与技能 (防入侵绝对隔离跑道) ================= -->
+<section id="education" class="py-20 relative section-trigger min-h-[90vh] flex items-center">
+  <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden flex justify-center items-end" style="perspective: 1200px;">
+    <!-- 3D 旋转的完美对称地平面 -->
+    <div class="relative w-[1400px] h-[300vh] origin-bottom transform-gpu flex justify-between" style="transform: rotateX(72deg) translateY(10%);">
+      <!-- 左侧流动字母流 (隔离到中线左侧 240px，绝对防入侵) -->
+      <div class="absolute right-[50%] mr-[240px] bottom-0 w-[460px] h-[200%] overflow-hidden runway-text-column flex flex-col justify-end">
+        <div class="runway-track absolute top-0 w-full text-right flex flex-col justify-start">
+          <div class="runway-word-group items-end">
+            <div class="runway-word">KEEP LEARNING</div>
+          <div class="runway-word">STAY POSITIVE</div>
+        <div class="runway-word">EMBRACE AI</div>
+      <div class="runway-word">DESIGN THE FUTURE</div>
+    <div class="runway-word">STAY HUNGRY</div>
+  <div class="runway-word">KEEP IMPROVING</div>
+<div class="runway-word">BREAK BOUNDARIES</div>
+<div class="runway-word">STAY FOOLISH</div>
+<div class="runway-word">CHASE THE LIGHT</div>
+<div class="runway-word">NEVER SETTLE</div>
+</div>
+<!-- JS 注入克隆组以完美无限下落 -->
+</div>
+</div>
+<!-- 核心极简跑道 (绝对居中宽度 450px) -->
+<div class="absolute left-1/2 -translate-x-1/2 bottom-0 w-[300px] md:w-[450px] h-[200%] runway-bg border-x-[2px] md:border-x-[4px] shadow-[0_0_80px_rgba(0,0,0,0.1)] dark:shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden">
+  <!-- 中央脉冲连贯虚线 (亮光黑/暗光白) -->
+  <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[6px] md:w-[10px] h-[200%] animate-runway-dash-fast opacity-90 runway-dash"></div>
+<!-- 地贴式前进动态箭头 (科幻脉冲呼吸) -->
+<div class="absolute bottom-[20%] left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
+  <i data-feather="chevron-up" class="w-16 h-16 md:w-24 md:h-24 stroke-[4] text-[#1A1A1A] dark:text-[#F3E6C7] arrow-1 -mb-8 md:-mb-12"></i>
+<i data-feather="chevron-up" class="w-16 h-16 md:w-24 md:h-24 stroke-[4] text-[#1A1A1A] dark:text-[#F3E6C7] arrow-2 -mb-8 md:-mb-12"></i>
+<i data-feather="chevron-up" class="w-16 h-16 md:w-24 md:h-24 stroke-[4] text-[#1A1A1A] dark:text-[#F3E6C7] arrow-3"></i>
+</div>
+</div>
+<!-- 右侧流动字母流 (隔离到中线右侧 240px，绝对防入侵) -->
+<div class="absolute left-[50%] ml-[240px] bottom-0 w-[460px] h-[200%] overflow-hidden runway-text-column flex flex-col justify-end">
+  <div class="runway-track absolute top-0 w-full text-left flex flex-col justify-start">
+    <div class="runway-word-group items-start">
+      <div class="runway-word">SHALL I COMPARE THEE</div>
+    <div class="runway-word">TO A SUMMER'S DAY?</div>
+  <div class="runway-word">THOU ART MORE LOVELY</div>
+<div class="runway-word">AND MORE TEMPERATE</div>
+<div class="runway-word">ROUGH WINDS DO SHAKE</div>
+<div class="runway-word">THE DARLING BUDS OF MAY</div>
+<div class="runway-word">AND SUMMER'S LEASE</div>
+<div class="runway-word">HATH ALL TOO SHORT A DATE</div>
+<div class="runway-word">SOMETIME TOO HOT</div>
+<div class="runway-word">THE EYE OF HEAVEN SHINES</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 迷雾遮罩 -->
+<div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-transparent via-[#F3E6C7]/90 to-[#F3E6C7] dark:via-[#111111]/95 dark:to-[#111111] z-10 h-[75%] top-0"></div>
+<!-- 航线飞机图标 (绝对中线，修正 SVG 几何偏左问题 0.5) -->
+<div class="absolute bottom-[10%] md:bottom-[15%] left-1/2 -translate-x-1/2 z-20 pointer-events-none filter drop-shadow-[0_20px_25px_rgba(0,0,0,0.5)] dark:drop-shadow-[0_20px_25px_rgba(0,0,0,0.8)] flex justify-center items-center">
+  <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor" class="text-[#1A1A1A] dark:text-[#F3E6C7] md:w-[160px] md:h-[160px]">
+    <!-- <g transform="translate(0.5, 0)"> 修正重心，让虚线完美贯穿机身 -->
+      <g transform="translate(0.5, 0)">
+        <path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z" />
+      </g>
+    </svg>
+  </div>
+</div>
+<div class="relative z-20 w-full flex flex-col md:flex-row gap-12 md:gap-24 p-4 md:p-8 max-w-6xl mx-auto items-start mt-[-10vh]">
+  <div class="flex-1 w-full pt-4">
+    <div class="airport-sign mb-12 shadow-[6px_6px_0px_0px_#1A1A1A]">
+      <i data-feather="map" class="mr-2"></i> 教育背景 <span class="sign-gate">EDU</span>
+</div>
+<div class="relative pl-8 md:pl-12">
+  <div class="absolute left-[14px] md:left-[22px] top-8 bottom-[-40px] w-[6px] bg-brand-dark z-0"></div>
+<div class="absolute left-0 md:left-2 top-4 w-8 h-12 bg-brand-red border-4 border-brand-dark z-10 shadow-[4px_4px_0_#1A1A1A]"></div>
+<div class="comic-card p-8 bg-white dark:bg-[#111111] !text-brand-dark dark:!text-brand-cream border-4 border-brand-dark dark:border-brand-cream shadow-[12px_12px_0px_0px_#DD201B] relative z-20 hover:-translate-y-2 hover:shadow-[16px_16px_0px_0px_#145A8F] transition-all ml-4">
+  <h3 class="text-3xl font-black mb-4">上海商学院</h3>
+<div class="font-bold text-xl mb-6 text-brand-red">旅游管理 <span class="text-brand-dark dark:text-brand-cream text-lg font-bold">(本科)</span></div>
+<div class="inline-block bg-brand-dark text-brand-cream px-4 py-2 font-mono font-bold text-sm">2026 - 至今</div>
+</div>
+</div>
+</div>
+<div class="flex-1 w-full mt-16 md:mt-0">
+  <div class="airport-sign mb-12 shadow-[6px_6px_0px_0px_#1A1A1A]">
+    <i data-feather="cpu" class="mr-2"></i> 技能矩阵 <span class="sign-gate">SKILL</span>
+</div>
+<div class="space-y-6">
+  <div class="border-4 border-brand-dark dark:border-brand-cream bg-white dark:bg-[#111111] p-6 shadow-[8px_8px_0px_0px_#1A1A1A] dark:shadow-[8px_8px_0px_0px_#F3E6C7] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_#145A8F] transition-all">
+    <h4 class="font-black text-brand-dark dark:text-brand-cream text-sm mb-4 pb-2 border-b-[3px] border-brand-dark dark:border-brand-cream flex justify-between items-center">
+      设计工具 <span class="font-mono text-gray-400 dark:text-gray-300 text-xs">DESIGN</span>
+  </h4>
+  <div class="flex flex-wrap gap-3 font-bold">
+    <span class="px-3 py-1 bg-brand-red text-white border-2 border-brand-dark">PPT 设计</span>
+  <span class="px-3 py-1 bg-white dark:bg-[#1A1A1A] text-brand-dark dark:text-brand-cream border-2 border-brand-dark dark:border-brand-cream font-mono text-sm shadow-[2px_2px_0_#1A1A1A] dark:shadow-[2px_2px_0_#F3E6C7]">Figma</span>
+<span class="px-3 py-1 bg-white dark:bg-[#1A1A1A] text-brand-dark dark:text-brand-cream border-2 border-brand-dark dark:border-brand-cream font-mono text-sm shadow-[2px_2px_0_#1A1A1A] dark:shadow-[2px_2px_0_#F3E6C7]">Photoshop</span>
+</div>
+</div>
+<div class="border-4 border-brand-dark dark:border-brand-cream bg-white dark:bg-[#111111] p-6 shadow-[8px_8px_0px_0px_#1A1A1A] dark:shadow-[8px_8px_0px_0px_#F3E6C7] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_#DD201B] transition-all">
+  <h4 class="font-black text-brand-dark dark:text-brand-cream text-sm mb-4 pb-2 border-b-[3px] border-brand-dark dark:border-brand-cream flex justify-between items-center">
+    编程技术 <span class="font-mono text-gray-400 dark:text-gray-300 text-xs">CODE</span>
+</h4>
+<div class="flex flex-wrap gap-3 font-bold">
+  <span class="px-3 py-1 bg-brand-red text-white border-2 border-brand-dark">AI 编程</span>
+<span class="px-3 py-1 bg-white dark:bg-[#1A1A1A] text-brand-dark dark:text-brand-cream border-2 border-brand-dark dark:border-brand-cream font-mono text-sm shadow-[2px_2px_0_#1A1A1A] dark:shadow-[2px_2px_0_#F3E6C7]">Python</span>
+<span class="px-3 py-1 bg-white dark:bg-[#1A1A1A] text-brand-dark dark:text-brand-cream border-2 border-brand-dark dark:border-brand-cream font-mono text-sm shadow-[2px_2px_0_#1A1A1A] dark:shadow-[2px_2px_0_#F3E6C7]">Prompt</span>
+</div>
+</div>
+<div class="border-4 border-brand-dark dark:border-brand-cream bg-white dark:bg-[#111111] p-6 shadow-[8px_8px_0px_0px_#1A1A1A] dark:shadow-[8px_8px_0px_0px_#F3E6C7] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_#EDA634] transition-all">
+  <h4 class="font-black text-brand-dark dark:text-brand-cream text-sm mb-4 pb-2 border-b-[3px] border-brand-dark dark:border-brand-cream flex justify-between items-center">
+    内容创作 <span class="font-mono text-gray-400 dark:text-gray-300 text-xs">CREATION</span>
+</h4>
+<div class="flex flex-wrap gap-3 font-bold">
+  <span class="px-3 py-1 bg-brand-red text-white border-2 border-brand-dark">写作</span>
+<span class="px-3 py-1 bg-brand-red text-white border-2 border-brand-dark">视频剪辑</span>
+<span class="px-3 py-1 bg-white dark:bg-[#1A1A1A] text-brand-dark dark:text-brand-cream border-2 border-brand-dark dark:border-brand-cream font-mono text-sm shadow-[2px_2px_0_#1A1A1A] dark:shadow-[2px_2px_0_#F3E6C7]">文案策划</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 四大特长 -->
+<section id="skills" class="py-20 section-trigger relative z-10">
+  <div class="flex justify-center mb-12">
+    <div class="airport-sign text-center">
+      <i data-feather="star" class="mr-2"></i> 核心特长 <span class="ml-2 font-mono text-sm">CORE</span>
+  <span class="sign-gate">02</span>
+</div>
+</div>
+<!-- ================= 主 Tabs ================= -->
+<div class="dock-panel flex justify-center items-end gap-4 mb-12 h-[100px] w-max mx-auto relative z-50" id="main-tabs" role="tablist">
+  <button data-target="tab-ppt" class="tab-btn dock-item active transition-colors group relative">
+    <i data-feather="layout"></i>
+  <span class="dock-label">PPT 设计</span>
+</button>
+<button data-target="tab-ai" class="tab-btn dock-item bg-white dark:bg-[#1A1A1A] transition-colors group relative">
+  <i data-feather="cpu"></i>
+<span class="dock-label">AI 编程</span>
+</button>
+<button data-target="tab-writing" class="tab-btn dock-item bg-white dark:bg-[#1A1A1A] transition-colors group relative">
+  <i data-feather="edit-3"></i>
+<span class="dock-label">写作</span>
+</button>
+<button data-target="tab-video" class="tab-btn dock-item bg-white dark:bg-[#1A1A1A] transition-colors group relative">
+  <i data-feather="video"></i>
+<span class="dock-label">视频剪辑</span>
+</button>
+</div>
+<!-- ================= Tab 1: PPT 设计 ================= -->
+<div id="tab-ppt" class="tab-content block animate-fade-in">
+  <div class="card-folder-wrapper">
+    <div class="card-folder">
+      <div class="folder-back"></div>
+    <!-- 更换为触发 3D 堆叠画廊 -->
+    <div class="ppt-card card1" onclick="openPPTCarousel('project1')">
+      <picture>
+        <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F800%2F600%3Frandom%3D1&output=webp" type="image/webp">
+        <img class="ppt-card-img" src="https://picsum.photos/800/600?random=1" loading="lazy" decoding="async">
+        </picture>
+        <div class="ppt-card-overlay">
+          <span class="font-black text-white text-xl border-4 border-white px-4 py-2 shadow-[4px_4px_0_#1A1A1A]">商业企划PPT</span>
+      </div>
+    </div>
+    <div class="ppt-card card2" onclick="openPPTCarousel('project2')">
+      <picture>
+        <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F600%2F800%3Frandom%3D2&output=webp" type="image/webp">
+        <img class="ppt-card-img" src="https://picsum.photos/600/800?random=2" loading="lazy" decoding="async">
+        </picture>
+        <div class="ppt-card-overlay">
+          <span class="font-black text-white text-xl border-4 border-white px-4 py-2 shadow-[4px_4px_0_#1A1A1A]">年终总结模板</span>
+      </div>
+    </div>
+    <div class="ppt-card card3" onclick="openPPTCarousel('project3')">
+      <picture>
+        <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F800%2F500%3Frandom%3D3&output=webp" type="image/webp">
+        <img class="ppt-card-img" src="https://picsum.photos/800/500?random=3" loading="lazy" decoding="async">
+        </picture>
+        <div class="ppt-card-overlay">
+          <span class="font-black text-brand-dark text-xl border-4 border-brand-dark px-4 py-2 shadow-[4px_4px_0_#1A1A1A] bg-brand-cream">课程答辩演示</span>
+      </div>
+    </div>
+    <div class="folder-front">
+      <div class="folder-label">PROJECTS</div>
+  </div>
+</div>
+</div>
+</div>
+<!-- ================= Tab 2: AI 编程 ================= -->
+<div id="tab-ai" class="tab-content hidden animate-fade-in">
+  <div class="flex flex-wrap justify-center gap-6 md:gap-8 mb-12 sub-tabs">
+    <button data-subtarget="ai-music" class="sub-tab-btn active text-xl font-black pb-2 border-b-4 border-brand-dark">音乐项目 <span class="text-sm ml-1 font-mono uppercase">Music</span></button>
+<button data-subtarget="ai-game" class="sub-tab-btn text-xl font-black pb-2 border-b-4 border-transparent text-gray-500">游戏项目 <span class="text-sm ml-1 font-mono uppercase">Game</span></button>
+<button data-subtarget="ai-certs" class="sub-tab-btn text-xl font-black pb-2 border-b-4 border-transparent text-gray-500">资质证书 <span class="text-sm ml-1 font-mono uppercase">Certs</span></button>
+</div>
+<!-- ================= 子 Tab: 音乐项目 ================= -->
+<div id="ai-music" class="sub-tab-content block">
+  <div class="music-container relative mx-auto max-w-5xl rounded-lg bg-[#40FFA7] border-4 border-brand-dark shadow-[12px_12px_0px_0px_#1A1A1A] flex flex-col overflow-hidden h-[650px] md:h-[600px]">
+    <!-- 左上角：播放铭牌与半圆 -->
+    <div class="absolute top-12 left-8 z-10 hidden sm:block pointer-events-none">
+      <div class="absolute -top-14 left-4 w-28 h-28 bg-[#1A1A1A] rounded-full z-0 flex items-center justify-center shadow-[6px_0_0_#DD201B]">
+        <span class="text-[#F6D034] font-black text-3xl font-mono transform -rotate-12 -translate-y-5 translate-x-2">08/21</span>
+    </div>
+    <div class="relative z-10 flex items-center bg-[#1F2269] border-2 border-[#1A1A1A] px-5 py-3 shadow-[6px_6px_0px_0px_#1A1A1A]">
+      <i data-feather="radio" class="mr-3 text-[#40FFA7]"></i>
+    <span class="text-[#40FFA7] font-black text-xl mr-6 tracking-widest">PLAYBACK</span>
+  <span class="bg-[#40FFA7] text-[#1A1A1A] border-2 border-[#1A1A1A] font-black text-lg px-3 py-0.5">MAX</span>
+</div>
+</div>
+<!-- 全屏可抓取的物理贴纸 -->
+<!-- 贴纸 1: 震撼美味 Starburst -->
+<div class="music-sticker absolute cursor-grab transition-shadow drop-shadow-2xl bg-[rgba(255,255,255,0.01)] rounded-[30px]" style="bottom: 12%; left: 8%; transform: rotate(-8deg);">
+  <svg width="220" height="180" viewBox="0 0 220 180" class="pointer-events-none">
+    <path d="M110,5 L125,35 L160,20 L165,55 L200,60 L185,90 L210,120 L175,135 L180,165 L145,155 L125,180 L95,160 L60,175 L55,140 L20,135 L35,105 L10,75 L45,60 L40,30 L75,40 L95,10 Z" fill="#FFF100" stroke="#E32024" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M40,140 C20,140 20,80 40,80 C50,80 60,60 60,40 C60,20 90,20 90,40 C90,60 80,80 100,80 L120,80 C130,80 130,140 120,140 Z" fill="#E32024" stroke="#1A1A1A" stroke-width="5" />
+  </svg>
+  <div class="absolute inset-0 flex flex-col items-center justify-center transform -rotate-12 pointer-events-none pl-8">
+    <span class="text-4xl font-black text-[#1A1A1A] leading-none mb-1" style="-webkit-text-stroke: 1.5px #FFF;">震撼</span>
+  <span class="text-5xl font-black text-[#1A1A1A] leading-none" style="-webkit-text-stroke: 1.5px #FFF;">美味!</span>
+</div>
+</div>
+<!-- 贴纸 2: Ginn Luggage Tag -->
+<div class="music-sticker absolute w-[140px] h-[260px] bg-[#1A1A1A] border-[3px] border-[#F3E6C7] cursor-grab shadow-[6px_6px_0_#F3E6C7]" style="bottom: 5%; left: 32%; transform: rotate(12deg); clip-path: polygon(25% 0, 75% 0, 100% 15%, 100% 100%, 0 100%, 0 15%);">
+  <div class="w-full flex justify-center mt-3 mb-2 pointer-events-none">
+    <div class="w-5 h-5 bg-[#F3E6C7] rounded-full border-[3px] border-[#1A1A1A] outline outline-[3px] outline-[#F3E6C7]"></div>
+</div>
+<div class="px-3 flex flex-col items-center text-[#F3E6C7] pointer-events-none">
+  <div class="text-[8px] font-mono font-bold leading-none self-start mb-2 text-[#40FFA7]">☑ SOF, СОФИЯ<br>☑ 08/11</div>
+<svg width="80" height="90" viewBox="0 0 100 100" class="mb-2">
+  <circle cx="70" cy="20" r="12" fill="#40FFA7" />
+  <path d="M45,40 L70,30 L60,60 L30,90 L15,80 L40,55 L25,45 Z" fill="#F3E6C7" />
+  <path d="M70,30 L80,50 L60,70" fill="none" stroke="#F3E6C7" stroke-width="10" stroke-linecap="round" />
+  <rect x="50" y="65" width="45" height="30" rx="5" fill="none" stroke="#F3E6C7" stroke-width="5" />
+</svg>
+<div class="self-end mr-2 text-right">
+  <span class="text-[8px] font-bold border-b-2 border-[#40FFA7] block text-[#40FFA7]">Date</span>
+<span class="text-3xl font-black leading-none">08<span class="text-sm">Nov</span></span>
+</div>
+<h4 class="font-black text-4xl leading-[0.8] mt-2 w-full text-left tracking-tighter">Ginn</h4>
+<p class="font-bold text-sm w-full text-right tracking-widest mt-1 opacity-70">Bulgary</p>
+</div>
+</div>
+<!-- 贴纸 3: Price Tag (9999) -->
+<div class="music-sticker absolute w-[160px] h-[85px] bg-[#F8F9FA] border border-gray-300 cursor-grab shadow-[2px_6px_15px_rgba(0,0,0,0.4)] flex flex-col justify-center overflow-hidden" style="top: 15%; right: 12%; transform: rotate(18deg);">
+  <div class="absolute top-[12px] w-full h-[3px] bg-[#D93838] opacity-85 pointer-events-none"></div>
+<div class="absolute bottom-[12px] w-full h-[3px] bg-[#D93838] opacity-85 pointer-events-none"></div>
+<div class="relative z-10 flex w-full justify-between items-center px-4 pt-1 pointer-events-none">
+  <span class="font-sans italic font-bold text-2xl text-[#3A4A4A] transform -rotate-[10deg] opacity-80" style="font-family: 'Comic Sans MS', cursive, sans-serif;">R$</span>
+<span class="font-mono font-black text-5xl text-[#2B3B3B] transform -rotate-3 tracking-tighter opacity-90 leading-none">9999</span>
+</div>
+</div>
+<!-- 贴纸 4: 恭喜发财 -->
+<div class="music-sticker absolute w-[260px] h-[160px] bg-[#F5F5F5] cursor-grab flex shadow-[4px_6px_15px_rgba(0,0,0,0.3)] overflow-hidden border-[3px] border-white" style="top: 28%; left: 45%; transform: rotate(-5deg);">
+  <div class="w-[72%] h-full flex flex-col justify-center items-center py-2 bg-[#F5F5F5] gap-[2px] pointer-events-none">
+    <div class="font-sans font-black text-[38px] tracking-[0.1em] text-[#D72323] leading-[1.1] ml-2 scale-y-110">恭喜發财</div>
+  <div class="font-sans font-black text-[38px] tracking-[0.1em] text-[#2A3793] leading-[1.1] ml-2 scale-y-110">恭喜發财</div>
+<div class="font-sans font-black text-[38px] tracking-[0.1em] text-[#1B8D43] leading-[1.1] ml-2 scale-y-110">恭喜發财</div>
+</div>
+<div class="w-[28%] h-full bg-[#D72323] flex flex-col justify-center items-center relative gap-1 pointer-events-none">
+  <svg width="100%" height="100%" viewBox="0 0 60 160" class="absolute inset-0">
+    <ellipse cx="30" cy="42" rx="16" ry="30" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-dasharray="21 4" />
+    <ellipse cx="30" cy="118" rx="16" ry="30" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-dasharray="21 4" />
+  </svg>
+</div>
+</div>
+<!-- 贴纸 5: Don't want to pay? Fine. -->
+<div class="music-sticker absolute bg-[#7A1728] cursor-grab flex items-center justify-center px-6 py-5 shadow-[4px_6px_15px_rgba(0,0,0,0.3)]" style="bottom: 30%; right: 5%; transform: rotate(4deg);">
+  <div class="font-sans font-bold text-white text-[32px] md:text-[42px] leading-[1.05] tracking-tight pointer-events-none select-none">
+    Don't want<br>to pay? Fine.
+  </div>
+</div>
+<!-- 播放器主体 -->
+<div class="relative w-full h-full flex flex-col z-20 pt-24 md:pt-10 pointer-events-none">
+  <div class="relative w-full flex-1 flex justify-center items-center overflow-visible pointer-events-auto" id="vinyl-slider"></div>
+<div class="w-full max-w-sm mx-auto bg-[#050761] border-4 border-brand-dark rounded-xl p-4 shadow-[8px_8px_0_#1A1A1A] relative z-30 mb-8 self-end mr-4 md:mr-16 pointer-events-auto">
+  <div class="flex justify-between items-center mb-4">
+    <button onclick="goToAlbum(currentSliderAlbum - 1)" class="p-2 bg-[#050761] text-[#40FFA7] hover:bg-[#40FFA7] hover:text-[#050761] border-2 border-[#40FFA7] transition-colors rounded-full shadow-[2px_2px_0_#1A1A1A]"><i data-feather="chevron-left"></i></button>
+<div class="text-center w-full px-2 overflow-hidden">
+  <h3 id="album-title" class="font-black text-lg md:text-xl uppercase tracking-wider text-[#40FFA7] truncate transition-all">Urban Fashion</h3>
+<p id="album-artist" class="text-xs text-[#40FFA7] opacity-80 font-bold font-mono truncate">Elias Solero</p>
+</div>
+<button onclick="goToAlbum(currentSliderAlbum + 1)" class="p-2 bg-[#050761] text-[#40FFA7] hover:bg-[#40FFA7] hover:text-[#050761] border-2 border-[#40FFA7] transition-colors rounded-full shadow-[2px_2px_0_#1A1A1A]"><i data-feather="chevron-right"></i></button>
+</div>
+<div id="track-list" class="space-y-1 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= 子 Tab: 游戏项目 ================= -->
+<div id="ai-game" class="sub-tab-content hidden w-full">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <div class="comic-card bg-white dark:bg-white !text-brand-dark dark:!text-brand-dark p-0 flex flex-col group dark:!border-brand-dark cursor-pointer relative hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#DD201B] transition-all" onclick="window.open('https://github.com/your-game-repo-1', '_blank')">
+      <div class="h-48 border-b-4 border-brand-dark relative overflow-hidden">
+        <picture>
+          <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F400%2F300%3Frandom%3D40&output=webp" type="image/webp">
+          <img class="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all" src="https://picsum.photos/400/300?random=40" loading="lazy" decoding="async">
+          </picture>
+          <div class="absolute top-0 right-0 bg-brand-red text-white font-mono font-black px-3 py-1 border-b-4 border-l-4 border-brand-dark text-sm shadow-[-2px_2px_0_#1A1A1A]">GAME AI</div>
+      </div>
+      <div class="p-6 flex-1 flex flex-col">
+        <h3 class="font-black text-2xl mb-3 group-hover:text-brand-red transition-colors underline underline-offset-4 decoration-[3px] decoration-transparent group-hover:decoration-brand-red">神经网络 NPC 引擎</h3>
+      <p class="font-medium text-gray-700 dark:text-gray-700 mb-6 flex-1">基于强化学习的非玩家角色行为决策树，实现动态对战策略。</p>
+    <div class="flex gap-2">
+      <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">Python</span>
+    <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">RL</span>
+</div>
+</div>
+</div>
+<div class="comic-card bg-white dark:bg-white !text-brand-dark dark:!text-brand-dark p-0 flex flex-col group dark:!border-brand-dark cursor-pointer relative hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#145A8F] transition-all" onclick="window.open('https://github.com/your-game-repo-2', '_blank')">
+  <div class="h-48 border-b-4 border-brand-dark relative overflow-hidden">
+    <picture>
+      <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F400%2F300%3Frandom%3D41&output=webp" type="image/webp">
+      <img class="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all" src="https://picsum.photos/400/300?random=41" loading="lazy" decoding="async">
+      </picture>
+      <div class="absolute top-0 right-0 bg-brand-blue text-white font-mono font-black px-3 py-1 border-b-4 border-l-4 border-brand-dark text-sm shadow-[-2px_2px_0_#1A1A1A]">PROC-GEN</div>
+  </div>
+  <div class="p-6 flex-1 flex flex-col">
+    <h3 class="font-black text-2xl mb-3 group-hover:text-brand-blue transition-colors underline underline-offset-4 decoration-[3px] decoration-transparent group-hover:decoration-brand-blue">AI 迷宫生成器</h3>
+  <p class="font-medium text-gray-700 dark:text-gray-700 mb-6 flex-1">程序化生成无限扩展的地牢地图，结合智能路径寻优算法。</p>
+<div class="flex gap-2">
+  <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">C#</span>
+<span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">A* Path</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="ai-certs" class="sub-tab-content hidden w-full">
+  <div class="bg-white dark:bg-white border-4 border-brand-dark dark:border-brand-dark shadow-[12px_12px_0px_0px_#1A1A1A] dark:shadow-[12px_12px_0px_0px_#1A1A1A] relative overflow-hidden h-[450px]">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 font-black text-[12vw] text-gray-200 pointer-events-none whitespace-nowrap" style="text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);">AWARDS</div>
+  <div id="magnetic-carousel-container"><div class="mc-backdrop"></div></div>
+</div>
+</div>
+</div>
+<!-- Tab 3: 写作 -->
+<div id="tab-writing" class="tab-content hidden animate-fade-in">
+  <div class="flex justify-center gap-8 mb-12 sub-tabs">
+    <button data-subtarget="write-projects" class="sub-tab-btn active text-xl font-black pb-2 border-b-4 border-brand-dark">精选文章 <span class="text-sm ml-1 font-mono uppercase">Articles</span></button>
+</div>
+<div id="write-projects" class="sub-tab-content block">
+  <div class="flex flex-col gap-8">
+    <a href="#" class="comic-card bg-white dark:bg-[#111111] !text-brand-dark dark:!text-brand-cream p-0 flex flex-col sm:flex-row group hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#EDA634] dark:border-brand-cream">
+      <div class="w-full sm:w-32 bg-brand-yellow flex items-center justify-center p-6 border-b-4 sm:border-b-0 sm:border-r-4 border-brand-dark group-hover:bg-brand-red group-hover:text-white transition-colors">
+        <i data-feather="file-text" class="w-12 h-12"></i>
+    </div>
+    <div class="p-8 flex-1">
+      <div class="inline-block bg-brand-dark text-brand-cream px-3 py-1 font-mono font-bold text-xs mb-3">Aug 01, 2026</div>
+    <h3 class="font-black text-2xl mb-3">旅游行业 AI 赋能研究</h3>
+  <p class="font-medium text-gray-700 dark:text-gray-300">探讨AI在旅游管理中的实际应用场景、挑战及未来跨界融合前景。</p>
+</div>
+</a>
+<a href="#" class="comic-card bg-white dark:bg-[#111111] !text-brand-dark dark:!text-brand-cream p-0 flex flex-col sm:flex-row group hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#145A8F] dark:border-brand-cream">
+  <div class="w-full sm:w-32 bg-brand-blue text-white flex items-center justify-center p-6 border-b-4 sm:border-b-0 sm:border-r-4 border-brand-dark group-hover:bg-brand-red transition-colors">
+    <i data-feather="edit-3" class="w-12 h-12"></i>
+</div>
+<div class="p-8 flex-1">
+  <div class="inline-block bg-brand-dark text-brand-cream px-3 py-1 font-mono font-bold text-xs mb-3">Jul 15, 2026</div>
+<h3 class="font-black text-2xl mb-3">跨界创意思考笔记</h3>
+<p class="font-medium text-gray-700 dark:text-gray-300">记录如何将设计思维与编程逻辑有机融入日常学习与生活。</p>
+</div>
+</a>
+</div>
+</div>
+</div>
+<!-- Tab 4: 剪辑 -->
+<div id="tab-video" class="tab-content hidden animate-fade-in">
+  <div class="flex justify-center gap-8 mb-12 sub-tabs">
+    <button data-subtarget="video-projects" class="sub-tab-btn active text-xl font-black pb-2 border-b-4 border-brand-dark">视频作品 <span class="text-sm ml-1 font-mono uppercase">Videos</span></button>
+</div>
+<div id="video-projects" class="sub-tab-content block">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <div class="comic-card p-2 group cursor-pointer">
+      <div class="border-4 border-brand-dark relative bg-brand-dark h-64 overflow-hidden">
+        <picture>
+          <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F600%2F400%3Frandom%3D7&output=webp" type="image/webp">
+          <img class="w-full h-full object-cover opacity-60 filter grayscale group-hover:grayscale-0 group-hover:opacity-40 transition-all duration-500" src="https://picsum.photos/600/400?random=7" loading="lazy" decoding="async">
+          </picture>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-20 h-20 rounded-full border-4 border-brand-cream flex items-center justify-center group-hover:bg-brand-red group-hover:border-brand-red group-hover:scale-110 transition-all">
+              <i data-feather="play" class="text-brand-cream fill-brand-cream ml-2 w-8 h-8"></i>
+          </div>
+        </div>
+        <div class="absolute bottom-4 left-4 bg-brand-dark border-2 border-brand-cream px-4 py-2">
+          <span class="text-brand-cream font-black text-lg">校园宣传片</span>
+      </div>
+    </div>
+  </div>
+  <div class="comic-card p-2 group cursor-pointer">
+    <div class="border-4 border-brand-dark relative bg-brand-dark h-64 overflow-hidden">
+      <picture>
+        <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F600%2F400%3Frandom%3D8&output=webp" type="image/webp">
+        <img class="w-full h-full object-cover opacity-60 filter grayscale group-hover:grayscale-0 group-hover:opacity-40 transition-all duration-500" src="https://picsum.photos/600/400?random=8" loading="lazy" decoding="async">
+        </picture>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-20 h-20 rounded-full border-4 border-brand-cream flex items-center justify-center group-hover:bg-brand-yellow group-hover:border-brand-yellow group-hover:scale-110 transition-all">
+            <i data-feather="play" class="text-brand-dark fill-brand-dark ml-2 w-8 h-8"></i>
+        </div>
+      </div>
+      <div class="absolute bottom-4 left-4 bg-brand-dark border-2 border-brand-cream px-4 py-2">
+        <span class="text-brand-cream font-black text-lg">Vlog: 探索上海</span>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= 未来实践经历 ================= -->
+<section id="experience" class="py-20 section-trigger relative z-10">
+  <div class="airport-sign mb-12">
+    <i data-feather="briefcase" class="mr-2"></i> 未来实践经历 <span class="ml-2 font-mono text-sm">EXPERIENCE</span>
+<span class="sign-gate">03</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+  <!-- Exp 1 -->
+  <div class="border-4 border-[#1A1A1A] bg-[#2E2E2E] p-6 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-[12px_12px_0px_0px_#1A1A1A]">
+    <div class="mb-6 border-b-2 border-[#E7D2BF] pb-4">
+      <span class="text-[#E7D2BF] text-sm font-mono tracking-widest uppercase">Experience 01</span>
+    <h3 class="text-[#E7D2BF] text-4xl md:text-5xl font-black mt-2 tracking-tight">校园媒体中心</h3>
+  <p class="text-[#E7D2BF] opacity-80 mt-2 font-bold text-xl uppercase tracking-widest">视频剪辑 / 文案</p>
+</div>
+<div class="flex gap-4 flex-1">
+  <div class="bg-[#64A1C0] border-4 border-[#1A1A1A] p-4 flex-1 flex flex-col justify-between">
+    <h4 class="text-[#2E2E2E] font-black text-2xl uppercase leading-none">25.09<br>PRESENT</h4>
+  <p class="text-[#2E2E2E] font-bold mt-4 leading-snug">负责校园活动的视频拍摄与剪辑，撰写相关推文，把控整体视觉与文字风格的统一性。</p>
+</div>
+<div class="flex flex-col gap-4 w-1/3">
+  <div class="bg-[#E7D2BF] border-4 border-[#1A1A1A] flex-1 flex items-center justify-center p-2 cursor-pointer hover:scale-110 transition-transform duration-300 shadow-[0_8px_22px_rgba(0,0,0,0.14)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]">
+    <span class="text-[#2E2E2E] font-black text-sm text-center">单篇破万阅读</span>
+</div>
+<div class="bg-[#FF6357] border-4 border-[#1A1A1A] flex-1 flex items-center justify-center">
+  <i data-feather="zap" class="text-[#2E2E2E] w-8 h-8"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- Exp 2 -->
+<div class="border-4 border-[#1A1A1A] bg-[#2E2E2E] p-6 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-[12px_12px_0px_0px_#1A1A1A]">
+  <div class="mb-6 border-b-2 border-[#E7D2BF] pb-4">
+    <span class="text-[#E7D2BF] text-sm font-mono tracking-widest uppercase">Experience 02</span>
+  <h3 class="text-[#E7D2BF] text-4xl md:text-5xl font-black mt-2 tracking-tight">某旅游科技公司</h3>
+<p class="text-[#E7D2BF] opacity-80 mt-2 font-bold text-xl uppercase tracking-widest">产品助理</p>
+</div>
+<div class="flex gap-4 flex-1">
+  <div class="bg-[#64A1C0] border-4 border-[#1A1A1A] p-4 flex-1 flex flex-col justify-between">
+    <h4 class="text-[#2E2E2E] font-black text-2xl uppercase leading-none">25.07<br>25.08</h4>
+  <p class="text-[#2E2E2E] font-bold mt-4 leading-snug">协助设计产品原型，参与 AI 旅游助手的知识库构建，结合专业知识进行数据清洗与标注。</p>
+</div>
+<div class="flex flex-col gap-4 w-1/3">
+  <div class="bg-[#E7D2BF] border-4 border-[#1A1A1A] flex-1 flex items-center justify-center p-2 cursor-pointer hover:scale-110 transition-transform duration-300 shadow-[0_8px_22px_rgba(0,0,0,0.14)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]">
+    <span class="text-[#2E2E2E] font-black text-sm text-center">提升命中率<br>20%</span>
+</div>
+<div class="bg-[#FF6357] border-4 border-[#1A1A1A] flex-1 flex items-center justify-center">
+  <i data-feather="check-square" class="text-[#2E2E2E] w-8 h-8"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer 页脚 -->
+<footer id="footer" class="bg-brand-dark text-brand-cream py-20 mt-20 no-print border-t-8 border-brand-red relative z-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center mb-16 border-b-4 border-brand-cream/20 pb-16">
+      <div>
+        <h3 class="text-5xl font-playfair font-black text-brand-yellow mb-4" style="text-shadow: 4px 4px 0 #DD201B;">FYL</h3>
+      <p class="text-lg font-mono font-bold tracking-widest bg-brand-cream text-brand-dark inline-block px-2">PORTFOLIO © 2026</p>
+  </div>
+  <div class="flex justify-center gap-8 font-black text-xl tracking-widest uppercase">
+    <a href="#about" class="hover:text-brand-red transition-colors">ABOUT</a>
+  <a href="#skills" class="hover:text-brand-red transition-colors">SKILLS</a>
+<a href="#experience" class="hover:text-brand-red transition-colors">EXP</a>
+</div>
+<div class="flex justify-end gap-6" id="footer-contact"></div>
+</div>
+<div class="text-center font-mono font-bold text-brand-cream/50 tracking-wider flex flex-col items-center gap-3">
+  <span>LAST UPDATED: AUG 2026</span>
+<span class="flex items-center gap-2">DESIGNED WITH <i data-feather="heart" class="w-4 h-4 text-brand-red fill-brand-red"></i> BY 符榆翎</span>
+</div>
+</div>
+</footer>
+<!-- Lightbox 模态框 -->
+<div id="lightbox" class="fixed inset-0 z-[100] bg-brand-dark/95 flex items-center justify-center p-4 hidden no-print" onclick="closeLightbox()">
+  <div class="relative comic-card p-2 bg-brand-cream dark:bg-[#111111] max-w-5xl">
+    <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] border-4 border-brand-dark" alt="Preview" loading="lazy" decoding="async">
+    <button class="absolute -top-6 -right-6 w-12 h-12 bg-brand-red border-4 border-brand-dark flex items-center justify-center text-white hover:bg-brand-yellow hover:text-brand-dark transition-colors" onclick="closeLightbox()">
+      <i data-feather="x" stroke-width="3"></i>
+  </button>
+</div>
+</div>
+<script src="./main.js" defer></script>
+</body>
+</html>

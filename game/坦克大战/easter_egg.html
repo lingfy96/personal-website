@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>土星之舞 - 浪尖儿社区终极彩蛋</title>
+
+<!-- 引入 3D 渲染引擎与 AI 手势识别引擎 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
+<style>
+  :root {
+    --color-pink: #FF527C;
+    --color-cyan: #00F0FF;
+    --color-lime: #B5F800;
+    --color-blue: #0036FF;
+    --color-dark: #070814;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  
+  body { 
+    background-color: var(--color-dark); 
+    color: #ffffff; 
+    font-family: 'Impact', 'Arial Black', -apple-system, sans-serif; 
+    overflow: hidden; 
+    width: 100vw; 
+    height: 100vh; 
+  }
+
+  /* 基础按钮样式 - 全面放大并增加点击区域 */
+  .btn-acid { 
+    background: var(--color-blue); border: 2px solid var(--color-lime); color: var(--color-lime); 
+    padding: 14px 28px; font-size: 18px; font-weight: 900; letter-spacing: 1px; cursor: pointer; 
+    border-radius: 6px; box-shadow: 4px 4px 0px var(--color-lime); transition: all 0.15s ease; 
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; 
+    pointer-events: auto; 
+  }
+  .btn-acid:hover { background: var(--color-lime); color: var(--color-blue); box-shadow: 0 0 20px var(--color-lime); transform: translate(-2px, -2px); }
+  .btn-acid:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0px var(--color-lime); }
+  
+  .btn-pink { background: var(--color-pink); border: 2px solid var(--color-cyan); color: #ffffff; box-shadow: 4px 4px 0px var(--color-cyan); }
+  .btn-pink:hover { background: var(--color-cyan); color: var(--color-dark); box-shadow: 0 0 20px var(--color-cyan); }
+  
+  .btn-gold { background: linear-gradient(135deg, #FFD700, #FFA500); border: 2px solid #FFF; color: #000; box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); font-size: 20px; animation: pulseGold 1.5s infinite alternate; }
+  @keyframes pulseGold { from { transform: scale(1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); } to { transform: scale(1.05); box-shadow: 0 0 35px rgba(255, 215, 0, 1); } }
+
+  /* 3D画布层 */
+  #saturn-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: auto; }
+  
+  /* 上层UI交互层 */
+  .egg-ui-layer { position: absolute; inset: 0; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .egg-top-bar { position: absolute; top: 30px; left: 30px; right: 30px; display: flex; justify-content: space-between; pointer-events: auto; align-items: center;}
+  
+  /* 中央弹出的长条语录框 - 放大字体以适宜阅读 */
+  .egg-message-box {
+    font-size: 32px; color: #fff; text-shadow: 0 0 20px #FF527C; font-weight: bold; text-align: center;
+    background: rgba(0,0,0,0.65); padding: 25px 45px; border-radius: 12px; border: 2px solid #FF527C;
+    opacity: 0; transition: opacity 0.8s ease; max-width: 85%; line-height: 1.6;
+  }
+  
+  /* =========================================================
+     伴侣系统 UI (彻底重构：取消全局缩放，采用流体定位)
+     ========================================================= */
+  #companion-panel {
+    position: absolute; 
+    left: 50%; top: 50%; transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    opacity: 0; transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); 
+    pointer-events: none; z-index: 100;
+  }
+  #companion-panel.active { opacity: 1; pointer-events: auto; }
+  
+  /* 移动到角落时，仅改变定位，绝对不使用 Scale 缩小全局面板 */
+  #companion-panel.corner {
+    left: auto; top: auto; right: 40px; bottom: 40px; transform: translate(0, 0);
+  }
+  
+  .companion-img {
+    width: 300px; /* 中心时很大 */
+    border-radius: 20px; box-shadow: 0 0 40px rgba(0, 240, 255, 0.6); 
+    border: 4px solid #00F0FF; cursor: pointer; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+    position: relative; z-index: 10;
+  }
+  .companion-img:hover { transform: scale(1.05); }
+  
+  /* 在角落时仅改变图片尺寸，保持 UI 原生清晰大字 */
+  #companion-panel.corner .companion-img {
+    width: 150px; border-radius: 50%; border-width: 3px;
+  }
+  
+  /* 聊天气泡：锚定在图片上方 */
+  .companion-dialog {
+    position: absolute; bottom: 100%; margin-bottom: 25px;
+    background: rgba(10, 13, 30, 0.95); border: 2px solid #B5F800; color: #B5F800; 
+    padding: 16px 28px; border-radius: 12px; white-space: nowrap; 
+    font-size: 22px; font-weight: 900; box-shadow: 0 0 20px rgba(181, 248, 0, 0.6);
+    opacity: 0; transition: opacity 0.3s; z-index: 10; pointer-events: none;
+  }
+  .companion-dialog::after {
+    content: ''; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); 
+    border-width: 12px 12px 0; border-style: solid; border-color: #B5F800 transparent;
+  }
+
+  /* 伴侣动作菜单：锚定在图片上方，尺寸大幅提升 */
+  .companion-menu {
+    position: absolute; bottom: 100%; margin-bottom: 25px; right: -20px;
+    background: rgba(7, 8, 20, 0.95); border: 3px solid var(--color-cyan);
+    border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px;
+    opacity: 0; transform: translateY(20px); pointer-events: none; 
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5; box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+  }
+  .companion-menu.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  
+  .menu-btn {
+    background: #0a0d1e; border: 2px solid var(--color-cyan); color: var(--color-cyan); 
+    padding: 14px 24px; font-size: 18px; border-radius: 6px; font-weight: 900; 
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .menu-btn:hover { background: var(--color-cyan); color: #000; box-shadow: 0 0 15px var(--color-cyan); transform: translateX(-4px); }
+  .menu-btn:active { transform: translateX(2px); }
+
+  #webcam-video { position: absolute; opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+  <!-- 3D渲染画布 -->
+  <canvas id="saturn-canvas"></canvas>
+  <video id="webcam-video" autoplay playsinline></video>
+  
+  <div class="egg-ui-layer">
+    <!-- 顶部全屏与返回控制 -->
+    <div class="egg-top-bar">
+      <!-- 保证跳转回主游戏，如果你的主游戏不是 index.html 请自行修改 -->
+      <button class="btn-acid btn-gold" onclick="window.location.href='index.html'">🏛 载誉凯旋 · 返回社区大厅</button>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span id="cam-status" style="font-size: 16px; font-weight:bold; color:#FF527C; background: rgba(0,0,0,0.7); padding: 10px 18px; border-radius: 6px; border: 2px solid #FF527C;">📸 AI连接中...(需本地服务器/长按替代)</span>
+        <button class="btn-acid" onclick="toggleFullScreen()">⛶ 全屏沉浸</button>
+      </div>
+    </div>
+
+    <!-- 中心温馨大字区域 -->
+    <div id="egg-msg" class="egg-message-box"></div>
+    <button id="come-out-btn" class="btn-acid btn-pink" style="margin-top: 40px; font-size: 22px; padding: 16px 40px; display: none; pointer-events: auto;">请出来</button>
+  </div>
+
+  <!-- 弹出的陪伴图片与对话面板 -->
+  <div id="companion-panel">
+    <div class="companion-dialog" id="companion-dialog">你好呀！我是你的观星向导。点击我继续...</div>
+    <!-- 伴侣操作菜单 (完全独立不受图片缩小影响) -->
+    <div class="companion-menu" id="companion-menu">
+      <button class="menu-btn" onclick="saturnApp.randomizeColors(event)">🎨 [重塑星系] 变幻色彩</button>
+      <button class="menu-btn" onclick="saturnApp.boostSpeed(event)">🌪️ [星轨加速] 疯狂自转</button>
+      <button class="menu-btn" onclick="saturnApp.triggerRandomTalk(event)">💬 [深空电波] 聊聊天</button>
+    </div>
+    <img src="9cbc5ae8b1c98eae4ce19401d2f6fc80.jpg" class="companion-img" id="companion-img" alt="Companion" />
+  </div>
+
+<script>
+/* ==========================================================================
+   AI 手势识别 3D 土星粒子系统引擎 (新增视差引擎与灵敏度调优大菜单)
+   ========================================================================== */
+let saturnApp = {
+  running: false,
+  scene: null, camera: null, renderer: null, particlesObj: null,
+  isScattered: false, companionState: 'hidden', scatterCount: 0,
+  reqFrame: null,
+  baseRotationSpeed: 0.005,
+  mouseX: 0, mouseY: 0,
+  targetColor1: new THREE.Color('#FFD700'),
+  targetColor2: new THREE.Color('#B5F800'),
+  targetColor3: new THREE.Color('#00F0FF'),
+  
+  phrases: [
+    "星河滚烫，你是人间理想", "每一次张开手，都是与宇宙的拥抱", "很高兴在这颗星球遇见你", "你的指尖，跳动着星辰的光芒", "愿你如星辰，璀璨且坚韧", "我们都是星尘，跨越光年相遇", "宇宙之大，而我只在乎你", "手掌张开，是为了更好的握紧", "光年的距离，抵不过一个回眸", "你好，孤独的旅人", "星星在为你闪烁", "漫天星光，不如你眼底的温柔", "别怕黑，我在暗处为你发光", "张开手，接住属于你的流星", "浪漫的不是宇宙，是看宇宙的你", "跨过星光，拥抱真实", "每一次呼吸，都有星屑的余温", "土星的环，圈不住自由的灵魂", "我是一颗在等你降落的星", "星海漫漫，愿你平安",
+    "不要停下脚步，前方的星系更美", "你是这浩瀚宇宙中的唯一奇迹", "所有的相遇，都是久别重逢", "把心张开，宇宙就会进来", "星轨交错，我们的故事刚刚开始", "无论多远，光总会到达", "宇宙的尽头，是爱", "夜空再暗，也掩不住你的光芒", "伸出手，触摸亿万年前的光", "我们在星光下相拥", "孤独是宇宙的常态，但陪伴是奇迹", "你的到来，点亮了我的星系", "每一颗粒子，都在为你欢呼", "让星风拂过你的指尖", "闭上眼，听星辰的歌唱", "浩瀚星海，为你存在", "在这个维度，我们是相连的", "愿你的征途，是星辰大海", "散落的星光，是指引你回家的路", "就算化为星尘，也要守护你",
+    "不要怕，宇宙会给你答案", "张开双手，拥抱这无尽的虚空", "你是我的星系中最亮的恒星", "跟随光的指引", "在失重中寻找平衡", "每一次心跳，都与星系共振", "繁星为你铺路", "这片星空，因你而灵动", "星辰的轨迹，写着相遇的密码", "向着光芒最盛的地方去", "星尘不灭，浪漫不死", "你是宇宙写给我最美的情书", "在这个空间里，时间因你停滞", "收集满天星光，赠予你", "土星的光环，是宇宙的拥抱", "不要畏惧黑洞，里面藏着新生", "张开手，释放你的小宇宙", "每一颗流星，都是为你许的愿", "星系旋转，而你是我永远的中心", "在这漫长岁月里，很高兴认识你",
+    "让心灵在星际间漫游", "你看，连星星都在对你笑", "宇宙为你准备了一场盛大的烟火", "星辉洒落，是你独有的温柔", "拥抱不完美，就像拥抱陨石坑", "你是宇宙的一抹亮色", "即使在光年之外，我也能感应到你", "星云流转，只为与你相逢", "在无数个平行宇宙中，我依然选择你", "手握星辰，心向自由", "星夜再长，也会有曙光", "你的每一次挥手，都在拨动星弦", "在失重的天地里，找回最初的自己", "陪伴是最长情的告白，在这宇宙里也是", "星海无垠，幸好有你", "你比银河还要灿烂", "接住这颗落向你的星", "我们在不同星系，却看着同一片星空", "将心事寄托给流星", "星辰为你指引方向",
+    "感受这来自深空的温暖", "你是引力，让我不由自主靠近", "繁星在水面，也在你心里", "土星的光环，是永恒的誓言", "让星辰见证我们的轨迹", "不要回头，星光在前面", "手一松，就能触碰到整个宇宙", "星河长明，因为有你的注视", "在黑夜中绽放，在星空下相依", "每一颗星星，都是一个未完的梦", "宇宙深处，有我为你留的灯", "让星风带走你的烦恼", "我们是彼此宇宙里的坐标", "星际穿越，只为抵达你的心", "在这个无垠的世界，你是我的归宿", "你的微笑，比超新星爆发还要耀眼", "星海沉浮，我们紧紧相依", "张开双手，整个宇宙都在你掌心", "因为你，这片星空有了温度", "你好呀，宇宙中最特别的你"
+  ],
+  
+  miniTalks: ["我在听呢！", "这里的星空真美~", "加油，指挥官！", "我一直陪着你哦！", "要再张开手看看吗？", "宇宙这么大，遇见你真好。", "今天也是充满星光的一天！", "随时为你效劳！"],
+
+  init: function() {
+    this.running = true;
+    const canvas = document.getElementById('saturn-canvas');
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera.position.set(0, 12, 35);
+    this.camera.lookAt(0, 0, 0);
+
+    const group = new THREE.Group();
+    this.scene.add(group);
+    
+    const pCount = 12000;
+    const pos = new Float32Array(pCount * 3);
+    const targetPos = new Float32Array(pCount * 3); 
+    const scatterPos = new Float32Array(pCount * 3); 
+    const cols = new Float32Array(pCount * 3);
+
+    const colorLime = new THREE.Color('#B5F800');
+    const colorCyan = new THREE.Color('#00F0FF');
+    const colorPink = new THREE.Color('#FF527C');
+    const colorGold = new THREE.Color('#FFD700');
+
+    const sphereCount = Math.floor(pCount * 0.4);
+    for(let i=0; i<sphereCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      const r = 5.5 + Math.random() * 0.5; 
+
+      const tx = r * Math.sin(phi) * Math.cos(theta);
+      const ty = r * Math.cos(phi);
+      const tz = r * Math.sin(phi) * Math.sin(theta);
+      
+      targetPos[i*3] = tx; targetPos[i*3+1] = ty; targetPos[i*3+2] = tz;
+      
+      const sr = 4 + Math.random() * 4;
+      scatterPos[i*3] = tx * sr; scatterPos[i*3+1] = ty * sr; scatterPos[i*3+2] = tz * sr;
+      pos[i*3] = tx * sr; pos[i*3+1] = ty * sr; pos[i*3+2] = tz * sr;
+
+      cols[i*3] = this.targetColor1.r; cols[i*3+1] = this.targetColor1.g; cols[i*3+2] = this.targetColor1.b;
+    }
+
+    for(let i=sphereCount; i<pCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const r = 7 + Math.random() * 7;
+      
+      const tx = r * Math.cos(theta);
+      const ty = (Math.random() - 0.5) * 0.8; 
+      const tz = r * Math.sin(theta);
+
+      targetPos[i*3] = tx; targetPos[i*3+1] = ty; targetPos[i*3+2] = tz;
+      const sr = 3 + Math.random() * 5;
+      scatterPos[i*3] = tx * sr; scatterPos[i*3+1] = ty * sr * 5; scatterPos[i*3+2] = tz * sr;
+      pos[i*3] = tx * sr; pos[i*3+1] = ty * sr * 5; pos[i*3+2] = tz * sr;
+
+      const c = Math.random() > 0.5 ? this.targetColor2 : this.targetColor3;
+      cols[i*3] = c.r; cols[i*3+1] = c.g; cols[i*3+2] = c.b;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    this.particlesObj = new THREE.Points(geo, new THREE.PointsMaterial({ vertexColors: true, size: 0.12, transparent: true, opacity: 0.8 }));
+    
+    group.rotation.x = Math.PI / 8;
+    group.rotation.z = Math.PI / 16;
+    group.add(this.particlesObj);
+
+    document.addEventListener('mousemove', (e) => {
+      this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    let currentPos = pos.slice();
+    const animate = () => {
+      if(!this.running) return;
+      this.reqFrame = requestAnimationFrame(animate);
+      
+      group.rotation.y += this.baseRotationSpeed;
+      if (this.baseRotationSpeed > 0.005) {
+        this.baseRotationSpeed *= 0.98; 
+      }
+
+      group.rotation.x += (Math.PI / 8 + this.mouseY * 0.3 - group.rotation.x) * 0.05;
+      group.rotation.z += (Math.PI / 16 - this.mouseX * 0.3 - group.rotation.z) * 0.05;
+      
+      const target = this.isScattered ? scatterPos : targetPos;
+      for(let i=0; i<pCount * 3; i++) {
+        currentPos[i] += (target[i] - currentPos[i]) * 0.06;
+      }
+      geo.attributes.position.array.set(currentPos);
+      geo.attributes.position.needsUpdate = true;
+      this.renderer.render(this.scene, this.camera);
+    };
+    animate();
+
+    window.addEventListener('resize', () => {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    this.initHandTracking();
+  },
+
+  initHandTracking: function() {
+    const video = document.getElementById('webcam-video');
+    const statusText = document.getElementById('cam-status');
+    
+    // 超强防穿透点击拦截：只要点在 UI 按钮、菜单、面板上，绝不触发底层的鼠标散开
+    const handleAction = (e, isOpen) => {
+      if(e.target.tagName === 'BUTTON' || e.target.closest('#companion-panel') || e.target.closest('.egg-top-bar')) {
+        return; 
+      }
+      if(this.running) this.triggerScatter(isOpen); 
+    };
+
+    document.addEventListener('mousedown', (e) => handleAction(e, true));
+    document.addEventListener('mouseup', (e) => handleAction(e, false));
+    document.addEventListener('touchstart', (e) => handleAction(e, true));
+    document.addEventListener('touchend', (e) => handleAction(e, false));
+
+    try {
+      const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+      hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+      
+      let isInit = false;
+      hands.onResults((results) => {
+        if (!this.running) return;
+        if (!isInit) {
+          statusText.innerText = "📸 AI视觉已连接 (张手/握拳)";
+          statusText.style.color = "#00FF66";
+          statusText.style.borderColor = "#00FF66";
+          isInit = true;
+        }
+
+        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+          const lm = results.multiHandLandmarks[0];
+          const d1 = Math.hypot(lm[8].x - lm[4].x, lm[8].y - lm[4].y);
+          const d2 = Math.hypot(lm[20].x - lm[4].x, lm[20].y - lm[4].y);
+          if (d1 > 0.2 && d2 > 0.2) this.triggerScatter(true);
+          else this.triggerScatter(false);
+        } else {
+          this.triggerScatter(false);
+        }
+      });
+
+      const camera = new Camera(video, { onFrame: async () => { await hands.send({image: video}); }, width: 320, height: 240 });
+      camera.start().catch(e => { 
+        statusText.innerText = "⚠️ 无本地服务器/无摄像头，请直接长按鼠标体验"; 
+      });
+    } catch(e) {
+      statusText.innerText = "⚠️ AI模型加载受限，请直接长按鼠标/屏幕体验";
+    }
+  },
+
+  triggerScatter: function(open) {
+    if (this.isScattered === open) return;
+    this.isScattered = open;
+    
+    const msgBox = document.getElementById('egg-msg');
+    
+    if (open) {
+      this.scatterCount++;
+      if (this.scatterCount === 1) {
+        msgBox.innerText = "感谢你的到来，我们为你准备了一个同伴一起观看这场盛宴";
+        msgBox.style.opacity = 1;
+        setTimeout(() => {
+          document.getElementById('come-out-btn').style.display = 'block';
+        }, 2000);
+      } else if (this.companionState === 'corner') {
+        if (this.phrases.length > 0) {
+          const rIdx = Math.floor(Math.random() * this.phrases.length);
+          const phrase = this.phrases.splice(rIdx, 1)[0]; 
+          msgBox.innerText = phrase;
+          msgBox.style.opacity = 1;
+        }
+      }
+    } else {
+      if (this.scatterCount !== 1 && this.companionState === 'corner') {
+        msgBox.style.opacity = 0;
+      }
+    }
+  },
+
+  /* 玩法 1：重塑星系颜色 */
+  randomizeColors: function(e) {
+    if(e) e.stopPropagation();
+    const colors = ['#FF527C', '#00F0FF', '#B5F800', '#FFD700', '#9b59b6', '#e74c3c', '#3498db', '#f1c40f'];
+    this.targetColor1.set(colors[Math.floor(Math.random() * colors.length)]);
+    this.targetColor2.set(colors[Math.floor(Math.random() * colors.length)]);
+    this.targetColor3.set(colors[Math.floor(Math.random() * colors.length)]);
+    
+    const geo = this.particlesObj.geometry;
+    const cols = geo.attributes.color.array;
+    const pCount = 12000;
+    const sphereCount = Math.floor(pCount * 0.4);
+    
+    for(let i=0; i<sphereCount; i++) {
+      cols[i*3] = this.targetColor1.r; cols[i*3+1] = this.targetColor1.g; cols[i*3+2] = this.targetColor1.b;
+    }
+    for(let i=sphereCount; i<pCount; i++) {
+      const c = Math.random() > 0.5 ? this.targetColor2 : this.targetColor3;
+      cols[i*3] = c.r; cols[i*3+1] = c.g; cols[i*3+2] = c.b;
+    }
+    geo.attributes.color.needsUpdate = true;
+    this.showMiniDialog("已为您重新调配绝美星系色彩！");
+  },
+
+  /* 玩法 2：星轨狂暴加速 */
+  boostSpeed: function(e) {
+    if(e) e.stopPropagation();
+    this.baseRotationSpeed = 0.3; // 瞬间提速
+    this.showMiniDialog("引力引擎已过载，抓紧了！");
+  },
+
+  /* 玩法 3：主动随机聊天 */
+  triggerRandomTalk: function(e) {
+    if(e) e.stopPropagation();
+    if (this.phrases.length > 0) {
+      const rIdx = Math.floor(Math.random() * this.phrases.length);
+      const phrase = this.phrases.splice(rIdx, 1)[0];
+      this.showMiniDialog(phrase);
+    } else {
+      this.showMiniDialog("我们已经聊了很多啦，好好欣赏这片星空吧~");
+    }
+  },
+
+  showMiniDialog: function(text) {
+    const dialog = document.getElementById('companion-dialog');
+    dialog.innerText = text;
+    dialog.style.opacity = 1;
+    document.getElementById('companion-menu').classList.remove('show');
+    setTimeout(() => { dialog.style.opacity = 0; }, 3500);
+  }
+};
+
+window.onload = function() {
+  saturnApp.init();
+};
+
+function toggleFullScreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else if (document.exitFullscreen) document.exitFullscreen();
+}
+
+// 伴侣主流程：点击“请出来”
+document.getElementById('come-out-btn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  this.style.display = 'none';
+  document.getElementById('egg-msg').style.opacity = 0;
+  
+  const panel = document.getElementById('companion-panel');
+  panel.classList.add('active'); 
+  saturnApp.companionState = 'center';
+  setTimeout(() => {
+    document.getElementById('companion-dialog').style.opacity = 1;
+  }, 1000);
+});
+
+// 点击伴侣图片
+document.getElementById('companion-img').addEventListener('click', function(e) {
+  e.stopPropagation();
+  const dialog = document.getElementById('companion-dialog');
+  const panel = document.getElementById('companion-panel');
+  const menu = document.getElementById('companion-menu');
+  
+  if (saturnApp.companionState === 'center') {
+    // 退至角落
+    dialog.style.opacity = 0;
+    panel.classList.add('corner');
+    saturnApp.companionState = 'corner';
+  } else if (saturnApp.companionState === 'corner') {
+    // 展开超大控制菜单
+    dialog.style.opacity = 0;
+    menu.classList.toggle('show');
+  }
+});
+
+// 点击空白处关闭超大控制菜单
+document.addEventListener('mousedown', (e) => {
+  if(!e.target.closest('#companion-panel')) {
+    document.getElementById('companion-menu').classList.remove('show');
+  }
+});
+</script>
+</body>
+</html>
