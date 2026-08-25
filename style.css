@@ -422,22 +422,78 @@
         box-shadow: 3px 3px 0 rgba(0,0,0,0.15) !important;
       }
 
-      /* 证书轮播静态网格 */
+      .hover-float {
+        transform: scale(0.72) translate(-12px, 6px) !important;
+      }
+      .hover-float:hover {
+        transform: scale(0.74) translate(-12px, 6px) !important;
+      }
+      .avatar-portrait {
+        width: 120px !important;
+        height: 120px !important;
+        margin-top: -80px !important;
+      }
+      .avatar-person {
+        width: 130% !important;
+        height: 130% !important;
+        transform: translate(-50%, -50%) translateY(-20px) scale(1.08) !important;
+      }
+
+      /* 证书轮播改为水平滑动 */
       .mobile-degrade #magnetic-carousel-container,
       #magnetic-carousel-container.mc-static {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr);
+        display: flex !important;
+        flex-direction: row;
         gap: 0.75rem;
         align-items: stretch;
-        padding: 1rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1rem 0.75rem 1.25rem;
         height: auto !important;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
       }
       .mobile-degrade #magnetic-carousel-container .mc-card,
       #magnetic-carousel-container.mc-static .mc-card {
-        width: 100% !important;
+        width: 72vw !important;
         height: auto !important;
+        min-width: 72vw;
         aspect-ratio: 4 / 3;
         box-shadow: 2px 2px 0 rgba(0,0,0,0.15) !important;
+        scroll-snap-align: center;
+      }
+
+      /* PPT 展开图组在窄屏纵向滑动浏览 */
+      #ppt-stack-viewport {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 240px !important;
+        padding: 0 !important;
+      }
+      #ppt-stack-scene {
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        width: 100% !important;
+        height: 100% !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        padding: 0 12px !important;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+      }
+      #ppt-stack-scene > div {
+        position: relative !important;
+        inset: auto !important;
+        width: 72vw !important;
+        height: 54vw !important;
+        min-width: 72vw !important;
+        min-height: 54vw !important;
+        max-width: 300px;
+        max-height: 220px;
+        flex: 0 0 auto;
+        scroll-snap-align: center;
       }
 
       /* 音乐贴纸静态化，避免触控拖拽阻塞滚动 */
@@ -446,6 +502,8 @@
         position: relative !important;
         top: auto !important;
         left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
         transform: none !important;
         touch-action: pan-y !important;
         pointer-events: none !important;
@@ -456,6 +514,23 @@
       .mobile-degrade #ppt-stack-scene > div { transform: none !important; }
 
       /* 黑胶唱片封面 3D 旋转回退 */
+      .music-container {
+        height: 610px !important;
+      }
+      .slider-album {
+        width: 156px !important;
+        height: 156px !important;
+        margin-left: -78px !important;
+        margin-top: -78px !important;
+      }
+      .slider-album.active { transform: translateX(0) scale(1) perspective(1000px) rotateY(-18deg) rotateX(4deg) !important; }
+      .slider-album.prev { transform: translateX(-94px) scale(0.64) perspective(1000px) rotateY(-18deg) rotateX(4deg) !important; opacity: 0.7 !important; }
+      .slider-album.next { transform: translateX(94px) scale(0.64) perspective(1000px) rotateY(-18deg) rotateX(4deg) !important; opacity: 0.7 !important; }
+      .slider-album.active.is-playing { transform: translateX(-12px) scale(0.98) perspective(1000px) rotateY(0deg) rotateX(0deg) !important; }
+      .vinyl-record-wrapper {
+        width: 150px !important;
+        height: 150px !important;
+      }
       .mobile-degrade .slider-album.active,
       .mobile-degrade .slider-album.prev,
       .mobile-degrade .slider-album.next,
