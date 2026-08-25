@@ -652,7 +652,7 @@
 <body>
 
 <div id="game-container">
-  <audio id="bgm-audio" src="彩蛋音乐.mp3" loop></audio>
+  <audio id="bgm-audio" src="./彩蛋音乐.mp3" preload="auto" loop></audio>
   <canvas id="gameCanvas"></canvas>
 
   <!-- 大厅视图 -->
@@ -2213,7 +2213,7 @@ function triggerVictoryMVP() {
     `;
     actsContainer.innerHTML = `
       <button class="btn-acid" onclick="returnToLobbyFromMVP()">🏛 返回社区大厅</button>
-      <button class="btn-acid btn-gold" onclick="window.location.href='easter_egg.html'">🎁 拆开开发者准备的彩蛋</button>
+      <button class="btn-acid btn-gold" onclick="openEasterEggPage()">🎁 拆开开发者准备的彩蛋</button>
     `;
   } else {
     document.getElementById('mvp-main-title').innerText = "恭喜获得 MVP · 战术评估报表";
@@ -2261,6 +2261,14 @@ function returnToLobbyFromMVP() {
 
 function returnToLobbyFromDefeat() {
   quitToLobby();
+}
+
+function openEasterEggPage() {
+  const target = new URL('./easter_egg.html', window.location.href);
+  if (document.getElementById('mvp-modal')) {
+    document.getElementById('mvp-modal').classList.add('view-hidden');
+  }
+  window.location.assign(target.toString());
 }
 
 function restartCurrentStage() {

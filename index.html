@@ -537,41 +537,25 @@
 </div>
 <!-- ================= 子 Tab: 游戏项目 ================= -->
 <div id="ai-game" class="sub-tab-content hidden w-full">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-    <div class="comic-card bg-white dark:bg-white !text-brand-dark dark:!text-brand-dark p-0 flex flex-col group dark:!border-brand-dark cursor-pointer relative hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#DD201B] transition-all" onclick="window.open('https://github.com/your-game-repo-1', '_blank')">
+<div class="grid grid-cols-1 gap-10">
+    <div class="comic-card bg-white dark:bg-white !text-brand-dark dark:!text-brand-dark p-0 flex flex-col group dark:!border-brand-dark cursor-pointer relative hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#DD201B] transition-all" onclick="window.location.assign('./game/坦克大战/index.html')" aria-label="进入坦克大战游戏">
       <div class="h-48 border-b-4 border-brand-dark relative overflow-hidden">
         <picture>
-          <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F400%2F300%3Frandom%3D40&output=webp" type="image/webp">
-          <img class="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all" src="https://picsum.photos/400/300?random=40" loading="lazy" decoding="async">
-          </picture>
-          <div class="absolute top-0 right-0 bg-brand-red text-white font-mono font-black px-3 py-1 border-b-4 border-l-4 border-brand-dark text-sm shadow-[-2px_2px_0_#1A1A1A]">GAME AI</div>
+          <source srcset="./game/坦克大战/9cbc5ae8b1c98eae4ce19401d2f6fc80.jpg" type="image/jpeg">
+          <img class="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all" src="./game/坦克大战/9cbc5ae8b1c98eae4ce19401d2f6fc80.jpg" loading="lazy" decoding="async" alt="坦克大战游戏封面">
+        </picture>
+        <div class="absolute top-0 right-0 bg-brand-red text-white font-mono font-black px-3 py-1 border-b-4 border-l-4 border-brand-dark text-sm shadow-[-2px_2px_0_#1A1A1A]">TANK</div>
       </div>
       <div class="p-6 flex-1 flex flex-col">
-        <h3 class="font-black text-2xl mb-3 group-hover:text-brand-red transition-colors underline underline-offset-4 decoration-[3px] decoration-transparent group-hover:decoration-brand-red">神经网络 NPC 引擎</h3>
-      <p class="font-medium text-gray-700 dark:text-gray-700 mb-6 flex-1">基于强化学习的非玩家角色行为决策树，实现动态对战策略。</p>
-    <div class="flex gap-2">
-      <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">Python</span>
-    <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">RL</span>
-</div>
-</div>
-</div>
-<div class="comic-card bg-white dark:bg-white !text-brand-dark dark:!text-brand-dark p-0 flex flex-col group dark:!border-brand-dark cursor-pointer relative hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#145A8F] transition-all" onclick="window.open('https://github.com/your-game-repo-2', '_blank')">
-  <div class="h-48 border-b-4 border-brand-dark relative overflow-hidden">
-    <picture>
-      <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F400%2F300%3Frandom%3D41&output=webp" type="image/webp">
-      <img class="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all" src="https://picsum.photos/400/300?random=41" loading="lazy" decoding="async">
-      </picture>
-      <div class="absolute top-0 right-0 bg-brand-blue text-white font-mono font-black px-3 py-1 border-b-4 border-l-4 border-brand-dark text-sm shadow-[-2px_2px_0_#1A1A1A]">PROC-GEN</div>
-  </div>
-  <div class="p-6 flex-1 flex flex-col">
-    <h3 class="font-black text-2xl mb-3 group-hover:text-brand-blue transition-colors underline underline-offset-4 decoration-[3px] decoration-transparent group-hover:decoration-brand-blue">AI 迷宫生成器</h3>
-  <p class="font-medium text-gray-700 dark:text-gray-700 mb-6 flex-1">程序化生成无限扩展的地牢地图，结合智能路径寻优算法。</p>
-<div class="flex gap-2">
-  <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">C#</span>
-<span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">A* Path</span>
-</div>
-</div>
-</div>
+        <h3 class="font-black text-2xl mb-3 group-hover:text-brand-red transition-colors underline underline-offset-4 decoration-[3px] decoration-transparent group-hover:decoration-brand-red">坦克大战</h3>
+        <p class="font-medium text-gray-700 dark:text-gray-700 mb-6 flex-1">经典坦克对战体验，包含地图推进、敌军刷新和关卡节奏，点击直达游戏页面。</p>
+        <div class="flex gap-2 flex-wrap">
+          <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">HTML5</span>
+          <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">Canvas</span>
+          <span class="px-2 py-1 bg-brand-dark text-brand-cream font-mono text-sm font-bold">Game</span>
+        </div>
+      </div>
+    </div>
 </div>
 </div>
 <div id="ai-certs" class="sub-tab-content hidden w-full">

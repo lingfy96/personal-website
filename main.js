@@ -156,7 +156,7 @@
 
     // =============== 音乐板块：视频封面挂载与播放联动引擎 ===============
     const albumsData = [
-      { title: "Carnival", artist: "Sonic Youth", videoSrc: "./Music/Just Passing By.mp4", coverColor: "#FF4F97", labelColor: "#3A5DFF", track: { name: "Just Passing By", time: "1:52" } }
+      { title: "Carnival", artist: "Sonic Youth", videoSrc: "./Music/Just%20Passing%20By.mp4", poster: "./game/坦克大战/9cbc5ae8b1c98eae4ce19401d2f6fc80.jpg", coverColor: "#FF4F97", labelColor: "#3A5DFF", track: { name: "Just Passing By", time: "1:52" } }
     ];
 
     let currentSliderAlbum = 0; let playingTrack = null; let isPlaying = false; let isSyncingVideo = false;
@@ -207,8 +207,8 @@
             <div class="vinyl-record-wrapper"><div class="vinyl-record"><div class="vinyl-label" style="--label-color: ${album.labelColor}"><div class="vinyl-hole"></div></div></div></div>
             <div class="vinyl-sleeve">
                 <div class="vinyl-sleeve-spine"></div>
-                <div class="vinyl-sleeve-front" style="position: absolute; width: 100%; height: 100%; background-color: #111; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1;">
-                    <video id="album-video-${i}" src="${album.videoSrc}" preload="metadata" loop muted playsinline style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 0;"></video>
+                <div class="vinyl-sleeve-front" style="position: absolute; width: 100%; height: 100%; background-color: #111; background-image: linear-gradient(135deg, rgba(0,0,0,0.1), rgba(0,0,0,0.45)), url('${album.poster || './game/坦克大战/9cbc5ae8b1c98eae4ce19401d2f6fc80.jpg'}'); background-size: cover; background-position: center; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1;">
+                    <video id="album-video-${i}" src="${album.videoSrc}" preload="metadata" loop muted playsinline poster="${album.poster || './game/坦克大战/9cbc5ae8b1c98eae4ce19401d2f6fc80.jpg'}" onerror="this.style.display='none'; this.parentElement.style.backgroundImage='linear-gradient(135deg, rgba(0,0,0,0.12), rgba(0,0,0,0.44)), url(\'${album.poster || './game/坦克大战/9cbc5ae8b1c98eae4ce19401d2f6fc80.jpg'}\')';" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 0;"></video>
                     <div class="album-play-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); opacity: 0; transition: opacity 0.3s; z-index: 2; pointer-events: none;"><i data-feather="play-circle" style="width: 64px; height: 64px; color: #F3E6C7; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));"></i></div>
                     <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.1); z-index: 1; pointer-events: none;"></div>
                     <div class="album-progress-bar" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: rgba(0,0,0,0.35); z-index: 3; cursor: pointer;"><div class="album-progress-fill" style="height: 100%; width: 0%; background: #70f3ff;"></div></div>
