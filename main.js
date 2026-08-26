@@ -595,11 +595,6 @@
         gsap.set(el, { zIndex: highestStickerZ });
         highestStickerZ++;
 
-        if (isTouch) {
-            el.classList.add('sticker-static');
-            return;
-        }
-
         el.style.touchAction = 'none';
         let isDragging = false;
         let startX, startY;

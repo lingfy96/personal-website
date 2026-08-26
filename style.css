@@ -499,14 +499,6 @@
         scroll-snap-align: center;
       }
 
-      /* 音乐贴纸静态化：保持绝对定位，仅禁用拖拽，避免破坏音乐板块布局 */
-      .mobile-degrade .music-sticker,
-      .music-sticker.sticker-static {
-        transform: none !important;
-        touch-action: pan-y !important;
-        pointer-events: none !important;
-      }
-
       /* PPT 画廊透视回退 */
       .mobile-degrade #ppt-stack-viewport { perspective: none !important; }
       .mobile-degrade #ppt-stack-scene > div { transform: none !important; }
