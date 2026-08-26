@@ -665,7 +665,6 @@
     }
     
     let lastGlitchScroll = window.pageYOffset || document.documentElement.scrollTop;
-    let isScrollingParticle; 
     window.addEventListener('scroll', () => {
         let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
         if (Math.abs(currentScroll - lastGlitchScroll) > 400) { 
@@ -673,8 +672,6 @@
             lastGlitchScroll = currentScroll;
         }
         if(Math.random() > 0.4) createParticle(); 
-        clearTimeout(isScrollingParticle); 
-        isScrollingParticle = setTimeout(() => {}, 66);
     });
 
     document.querySelectorAll('.count-up').forEach(el => {
