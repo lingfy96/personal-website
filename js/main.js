@@ -716,19 +716,43 @@
     }
 
     // =============== 资质证书 Framer-like Cover Flow ===============
+    // 证书统计：共 27 张，按机构分组排列：阿里云/AIT(10) · 科大讯飞(3) · 华为云(6) · Datawhale联合生态(8)
+    // 🔁 检查结果：0 张重复（所有主题相近证书均来自不同发证机构/不同批次）
     const certImages = [
-      "./assets/certificates/ai/aliyun-bailian-agent.jpg",
-      "./assets/certificates/ai/aliyun-llm-content.jpg",
-      "./assets/certificates/ai/aliyun-vision-design-basic.jpg",
-      "./assets/certificates/ai/aliyun-lingma-coding.jpg",
-      "./assets/certificates/ai/ait-trainer-advanced.jpg",
-      "./assets/certificates/ai/aliyun-spring-ai.jpg",
-      "./assets/certificates/ai/iflytek-prompt-engineer.jpg",
-      "./assets/certificates/ai/iflytek-agent-engineer.png",
-      "./assets/certificates/ai/aliyun-rag.jpg",
-      "./assets/certificates/ai/ait-trainer-junior.jpg",
-      "./assets/certificates/ai/aliyun-vision-design-advanced.jpg",
-      "./assets/certificates/ai/aliyun-artlab-aigc.jpg"
+      // ===== 阿里云 / AIT 人工智能训练师体系 — 10 张 =====
+      "./assets/certificates/ai/aliyun-bailian-agent.jpg",              // 阿里云 · 百炼智能体构建
+      "./assets/certificates/ai/aliyun-llm-content.jpg",                // 阿里云 · 大模型内容创作
+      "./assets/certificates/ai/aliyun-vision-design-basic.jpg",        // 阿里云 · AIGC视觉设计师 初级
+      "./assets/certificates/ai/aliyun-vision-design-advanced.jpg",     // 阿里云 · AIGC视觉设计师 高级
+      "./assets/certificates/ai/aliyun-lingma-coding.jpg",              // 阿里云 · 灵马AI编程助手
+      "./assets/certificates/ai/aliyun-spring-ai.jpg",                  // 阿里云 · Spring AI 开发实战
+      "./assets/certificates/ai/aliyun-rag.jpg",                        // 阿里云 · RAG应用构建与优化
+      "./assets/certificates/ai/aliyun-artlab-aigc.jpg",                // 阿里云 · ArtLab AIGC创作
+      "./assets/certificates/ai/ait-trainer-junior.jpg",                // AIT · 人工智能训练师 初级
+      "./assets/certificates/ai/ait-trainer-advanced.jpg",              // AIT · 人工智能训练师 高级
+
+      // ===== 科大讯飞 / AI大学堂 / 讯飞开放平台 — 3 张 =====
+      "./assets/certificates/ai/iflytek-prompt-engineer.jpg",           // 讯飞AI大学堂 · Prompt工程师（2026.07）
+      "./assets/certificates/ai/iflytek-agent-engineer.png",            // 讯飞AI大学堂 · 智能体工程师（2026.07）
+      "./assets/certificates/ai/iflytek-rag-engineer.png",              // 讯飞AI大学堂 · RAG工程师（2026.08）
+
+      // ===== 华为云 / 昇腾 微认证体系 — 6 张 =====
+      "./assets/certificates/ai/huawei-ai-intro-micro-certification.png",   // 华为云 · 人工智能初识微认证
+      "./assets/certificates/ai/huawei-ai-agent-poker-battle.png",          // 华为云 · AI Agent 人机扑克对战
+      "./assets/certificates/ai/huawei-ai-voice-calculator.png",            // 华为云 · AI智能语音识别计算器
+      "./assets/certificates/ai/huawei-ai-poster-enterprise-style.png",     // 华为云 · AI打造企业风格专属海报
+      "./assets/certificates/ai/huawei-yolov8-object-detection-atlas.png",  // 华为云昇腾 · YOLOv8目标检测训练
+      "./assets/certificates/ai/huawei-codearts-quickstart.png",            // 华为云 · 码道CodeArts实战速成
+
+      // ===== Datawhale 联合生态认证 — 8 张 =====
+      "./assets/certificates/ai/datawhale-virtai-cloud-llm-engineer.jpg",       // Datawhale×趋动云 · LLM工程师
+      "./assets/certificates/ai/inspur-datawhale-llm-dev-engineer.jpg",         // Datawhale×浪潮信息 · 大模型开发工程师
+      "./assets/certificates/ai/modelscope-datawhale-agent-engineer.jpg",       // Datawhale×ModelScope魔搭 · Agent工程师
+      "./assets/certificates/ai/datawhale-antgroup-agent-engineer.jpg",         // Datawhale×蚂蚁集团百宝箱 · Agent工程师
+      "./assets/certificates/ai/datawhale-iflytek-finetuning-engineer.jpg",     // Datawhale×科大讯飞 · Fine-tuning微调工程师
+      "./assets/certificates/ai/datawhale-spark-prompt-engineer.jpg",           // Datawhale×讯飞星火 · Prompt工程师
+      "./assets/certificates/ai/datawhale-sensetime-ai-data-analysis.png",      // Datawhale×商汤 · AI+数据分析能力
+      "./assets/certificates/ai/datawhale-marscode-ai-coding.png"               // Datawhale×豆包MarsCode · AI+编程能力
     ];
 
     const mcConfig = { collapsedWidth: 80, hoverWidth: 180, collapsedHeight: 56, hoverHeight: 126, openSize: 600, gap: 12, influence: 200, blur: 2 };
