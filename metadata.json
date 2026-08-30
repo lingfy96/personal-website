@@ -1,0 +1,6 @@
+{
+  "name": "符榆翎 | 个人作品集 - 极客航线",
+  "description": "符榆翎的个人网站与作品集，包含关于我、特长、实践经历、Tank Battle小游戏等模块。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

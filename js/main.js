@@ -240,7 +240,7 @@
             <div class="vinyl-sleeve">
                 <div class="vinyl-sleeve-spine"></div>
                 <div class="vinyl-sleeve-front" style="position: absolute; width: 100%; height: 100%; background-color: #111; background-image: linear-gradient(135deg, rgba(0,0,0,0.1), rgba(0,0,0,0.45)), url('${posterPath}'); background-size: cover; background-position: center; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1;">
-                    <video id="album-video-${i}" src="${album.videoSrc}" preload="metadata" loop muted playsinline poster="${posterPath}" onerror="this.style.display='none'; this.parentElement.style.backgroundImage='linear-gradient(135deg, rgba(0,0,0,0.12), rgba(0,0,0,0.44)), url(\'${posterPath}\')';" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 0;"></video>
+                    <video id="album-video-${i}" src="${album.videoSrc}" preload="metadata" loop muted playsinline poster="${posterPath}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 0;"></video>
                     <div class="album-play-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); opacity: 0; transition: opacity 0.3s; z-index: 2; pointer-events: none;"><i data-feather="play-circle" style="width: 64px; height: 64px; color: #FFFFFF; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));"></i></div>
                     <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.1); z-index: 1; pointer-events: none;"></div>
                     <div class="album-progress-bar" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: rgba(0,0,0,0.35); z-index: 3; cursor: pointer;"><div class="album-progress-fill" style="height: 100%; width: 0%; background: #FFFFFF;"></div></div>
@@ -255,6 +255,14 @@
         sliderContainer.appendChild(albumEl);
 
         const vid = document.getElementById(`album-video-${i}`);
+        if (vid) {
+          vid.addEventListener('error', () => {
+            vid.style.display = 'none';
+            if (vid.parentElement) {
+              vid.parentElement.style.backgroundImage = `linear-gradient(135deg, rgba(0,0,0,0.12), rgba(0,0,0,0.44)), url("${posterPath}")`;
+            }
+          });
+        }
         const progressBar = albumEl.querySelector('.album-progress-bar');
         const progressFill = albumEl.querySelector('.album-progress-fill');
         const zoomBtn = albumEl.querySelector('.album-btn-zoom');
@@ -421,6 +429,67 @@
         }
     };
 
+    // ================= 智能极速懒加载与渐进加载系统 =================
+    function initLazyImages() {
+        const lazyImages = document.querySelectorAll('img.lazy-img');
+        
+        lazyImages.forEach(img => {
+            if (img.complete && img.naturalHeight !== 0) {
+                img.classList.add('is-loaded');
+            } else {
+                img.addEventListener('load', () => {
+                    img.classList.add('is-loaded');
+                }, { once: true });
+                img.addEventListener('error', () => {
+                    img.classList.add('is-loaded');
+                }, { once: true });
+            }
+        });
+
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                        }
+                        observer.unobserve(img);
+                    }
+                });
+            }, { rootMargin: '100px 0px', threshold: 0.01 });
+
+            document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
+        }
+    }
+    // 立即执行一次，并在 DOM 稳定后再次执行
+    initLazyImages();
+    window.addEventListener('load', initLazyImages);
+
+    // ================= 全局现代轻量 Toast 提示系统 =================
+    window.showCyberToast = function(message = '已复制至剪贴板！', iconName = 'check-circle') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = 'cyber-toast';
+        toast.innerHTML = `
+            <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-[#00C88C] animate-pulse"></span>
+                <span class="font-bold text-sm tracking-wide text-white">${message}</span>
+            </div>
+        `;
+        container.appendChild(toast);
+
+        // 3秒后渐隐移除
+        setTimeout(() => {
+            toast.style.animation = 'toastOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+            setTimeout(() => {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 300);
+        }, 2200);
+    };
+
     let pptCardsObj = [];
     let pptCurrentIndex = 0;
 
@@ -428,8 +497,15 @@
         const data = pptProjects[id];
         if(!data) return;
 
-        document.getElementById('ppt-detail-title').innerText = data.title;
-        document.getElementById('ppt-detail-desc').innerText = data.desc;
+        const titleEl = document.getElementById('ppt-detail-title');
+        const descEl = document.getElementById('ppt-detail-desc');
+        const titleMobileEl = document.getElementById('ppt-detail-title-mobile');
+        const descMobileEl = document.getElementById('ppt-detail-desc-mobile');
+
+        if (titleEl) titleEl.innerText = data.title;
+        if (descEl) descEl.innerText = data.desc;
+        if (titleMobileEl) titleMobileEl.innerText = data.title;
+        if (descMobileEl) descMobileEl.innerText = data.desc;
 
         const scene = document.getElementById('ppt-stack-scene');
         scene.innerHTML = '';
@@ -438,7 +514,7 @@
 
         data.images.forEach((src, i) => {
             const el = document.createElement('div');
-            el.className = 'absolute inset-0 bg-cover bg-center border-[4px] border-[#1A1A1A] cursor-pointer shadow-[0_30px_60px_rgba(0,0,0,0.6)] rounded-lg overflow-hidden';
+            el.className = 'absolute inset-0 bg-cover bg-center border-[3px] sm:border-[4px] border-[#1A1A1A] cursor-pointer shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-xl sm:rounded-lg overflow-hidden';
             el.style.backgroundImage = `url(${src})`;
             el.style.transformStyle = 'preserve-3d';
             el.style.transformOrigin = 'center center'; 
@@ -469,9 +545,25 @@
         document.getElementById('ppt-carousel-overlay').classList.remove('flex');
     }
 
+    window.prevPPTCard = function(e) {
+        if(e) e.stopPropagation();
+        if (pptCurrentIndex > 0) {
+            pptCurrentIndex--;
+            updatePPTGallery();
+        }
+    };
+
+    window.nextPPTCard = function(e) {
+        if(e) e.stopPropagation();
+        if (pptCurrentIndex < pptCardsObj.length - 1) {
+            pptCurrentIndex++;
+            updatePPTGallery();
+        }
+    };
+
     const pptOverlay = document.getElementById('ppt-carousel-overlay');
     
-    // 监听滚轮直接切换索引，摒弃原生卡顿阻尼，改用 GSAP 丝滑强控落位
+    // 滚轮切换
     pptOverlay.addEventListener('wheel', (e) => {
         e.preventDefault();
         if(e.deltaY > 0 && pptCurrentIndex < pptCardsObj.length - 1) {
@@ -483,13 +575,48 @@
         }
     }, { passive: false });
 
-    // GSAP 驱动的 3D Cover Flow 核心函数，极致平滑无穿模
+    // 移动端触摸手势滑动支持 (Touch Swipe)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+
+    pptOverlay.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isSwiping = true;
+        }
+    }, { passive: true });
+
+    pptOverlay.addEventListener('touchend', (e) => {
+        if (!isSwiping || e.changedTouches.length === 0) return;
+        isSwiping = false;
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        // 判定横向滑动手势
+        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+            if (deltaX < 0 && pptCurrentIndex < pptCardsObj.length - 1) {
+                // 左滑 -> 下一张
+                pptCurrentIndex++;
+                updatePPTGallery();
+            } else if (deltaX > 0 && pptCurrentIndex > 0) {
+                // 右滑 -> 上一张
+                pptCurrentIndex--;
+                updatePPTGallery();
+            }
+        }
+    }, { passive: true });
+
+    // GSAP 驱动的 3D Cover Flow 核心函数，极致平滑
     function updatePPTGallery() {
         pptCardsObj.forEach((c, i) => {
             let offset = i - pptCurrentIndex; 
-            let targetX = offset * 240; 
-            let targetZ = isMobile ? 0 : (Math.abs(offset) === 0 ? 100 : -Math.abs(offset) * 150); 
-            let targetRY = isMobile ? 0 : (offset === 0 ? 0 : -Math.sign(offset) * 45); 
+            let targetX = isMobile ? offset * 180 : offset * 240; 
+            let targetZ = isMobile ? (Math.abs(offset) === 0 ? 40 : -Math.abs(offset) * 80) : (Math.abs(offset) === 0 ? 100 : -Math.abs(offset) * 150); 
+            let targetRY = isMobile ? (offset === 0 ? 0 : -Math.sign(offset) * 25) : (offset === 0 ? 0 : -Math.sign(offset) * 45); 
             let targetScale = offset === 0 ? 1 : 0.85;
             let opacity = Math.abs(offset) > 2 ? 0 : 1;
             let overlayOpacity = offset === 0 ? 0 : 0.6; 
@@ -500,14 +627,14 @@
                 rotationY: targetRY,
                 scale: targetScale,
                 opacity: opacity,
-                duration: 0.6,
+                duration: 0.5,
                 ease: "power3.out",
                 zIndex: 1000 - Math.abs(offset)
             });
 
             gsap.to(c.overlay, {
                 opacity: overlayOpacity,
-                duration: 0.6,
+                duration: 0.5,
                 ease: "power3.out"
             });
         });
@@ -672,16 +799,31 @@
     }, 300);
 
     const bgFyl = document.getElementById("bg-fyl"); 
+    let glitchTimer = null;
     function triggerGlitch() { 
         if(!bgFyl) return; 
+        bgFyl.classList.remove('glitch-active'); 
+        void bgFyl.offsetWidth; // 强制回流以重新触发 CSS 动画
         bgFyl.classList.add('glitch-active'); 
-        setTimeout(() => { bgFyl.classList.remove('glitch-active'); }, 400); 
+        if (glitchTimer) clearTimeout(glitchTimer);
+        glitchTimer = setTimeout(() => { bgFyl.classList.remove('glitch-active'); }, 500); 
     }
     
+    // 页面初次加载时触发一次炫酷就绪闪烁
+    setTimeout(() => { triggerGlitch(); }, 800);
+
+    // 导航栏 FYL 标志点击时触发彩蛋闪烁
+    const brandLogo = document.querySelector('a[href="#"]');
+    if (brandLogo) {
+        brandLogo.addEventListener('click', (e) => {
+            triggerGlitch();
+        });
+    }
+
     let lastGlitchScroll = window.pageYOffset || document.documentElement.scrollTop;
     window.addEventListener('scroll', () => {
         let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-        if (Math.abs(currentScroll - lastGlitchScroll) > 400) { 
+        if (Math.abs(currentScroll - lastGlitchScroll) > 280) { 
             triggerGlitch();
             lastGlitchScroll = currentScroll;
         }
@@ -707,11 +849,11 @@
 
     function createContactHtml(isHeader) {
       const email = 'wyyt1339@163.com'; const phone = '18289400309';
-      const copyFn = `navigator.clipboard.writeText(this.dataset.val); alert('已复制至剪贴板！');`;
+      const copyFn = `navigator.clipboard.writeText(this.dataset.val); if(window.showCyberToast) { window.showCyberToast('已复制: ' + this.dataset.val); }`;
       if(isHeader) {
         return `<button data-val="${phone}" onclick="${copyFn}" class="flex items-center gap-2 font-mono font-bold px-4 py-2 border-4 border-brand-dark bg-white text-brand-dark hover:bg-brand-yellow shadow-[4px_4px_0px_0px_#1A1A1A] transition-all"><i data-feather="phone" class="w-5 h-5"></i> ${phone}</button><button data-val="${email}" onclick="${copyFn}" class="flex items-center gap-2 font-mono font-bold px-4 py-2 border-4 border-brand-dark bg-white text-brand-dark hover:bg-brand-blue hover:text-white shadow-[4px_4px_0px_0px_#1A1A1A] transition-all"><i data-feather="mail" class="w-5 h-5"></i> ${email}</button>`;
       } else {
-        return `<button data-val="wechat_id" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors"><i data-feather="message-circle" class="w-6 h-6"></i></button><button data-val="${email}" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors"><i data-feather="mail" class="w-6 h-6"></i></button><button data-val="${phone}" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors"><i data-feather="phone" class="w-6 h-6"></i></button>`;
+        return `<button data-val="wechat_id" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors" title="复制微信"><i data-feather="message-circle" class="w-6 h-6"></i></button><button data-val="${email}" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors" title="复制邮箱"><i data-feather="mail" class="w-6 h-6"></i></button><button data-val="${phone}" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors" title="复制电话"><i data-feather="phone" class="w-6 h-6"></i></button>`;
       }
     }
     document.getElementById('contact-info').innerHTML = createContactHtml(true);
@@ -723,22 +865,16 @@
         btn.addEventListener('click', (e) => {
           const targetId = btn.getAttribute(btnSelector === '.tab-btn' ? 'data-target' : 'data-subtarget');
           btn.parentElement.querySelectorAll(btnSelector).forEach(b => {
-            if(btnSelector === '.tab-btn') { 
-                b.classList.remove('active', 'bg-brand-red', 'text-brand-cream', 'shadow-[6px_6px_0px_0px_#111111]'); 
-                b.classList.add('bg-white', 'dark:bg-[#1A1A1A]'); 
-            } 
-            else { 
-                b.classList.remove('active', 'border-brand-dark', 'text-brand-dark', 'dark:text-brand-cream', 'dark:border-brand-cream'); 
-                b.classList.add('border-transparent', 'text-gray-500'); 
+            b.classList.remove('active');
+            if(btnSelector === '.sub-tab-btn') {
+              b.classList.add('text-gray-400', 'dark:text-gray-500', 'border-transparent');
+              b.classList.remove('border-[#1F4FFF]', 'dark:border-[#00C88C]');
             }
           });
-          if(btnSelector === '.tab-btn') { 
-              btn.classList.add('active', 'bg-brand-red', 'text-brand-cream', 'shadow-[6px_6px_0px_0px_#111111]'); 
-              btn.classList.remove('bg-white', 'dark:bg-[#1A1A1A]'); 
-          } 
-          else { 
-              btn.classList.add('active', 'border-brand-dark', 'text-brand-dark', 'dark:text-brand-cream', 'dark:border-brand-cream'); 
-              btn.classList.remove('border-transparent', 'text-gray-500'); 
+          btn.classList.add('active');
+          if(btnSelector === '.sub-tab-btn') {
+            btn.classList.remove('text-gray-400', 'dark:text-gray-500', 'border-transparent');
+            btn.classList.add('border-[#1F4FFF]', 'dark:border-[#00C88C]');
           }
 
           const container = btn.closest('section') || btn.closest('.tab-content');
