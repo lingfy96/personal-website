@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+
+:root {
+    --bg: #FAFAFA;
+    --text-main: #000000;
+    --text-muted: #A0A0A0;
+    --accent: #222222;
+    --line: #EAEAEA;
+    --bullet: #444444;
+    --node-border: #CCCCCC;
+    --boundary: #CCCCCC;
+}
+
+/* 暗光模式：与主站 theme_v2 同步（由 main.js 切换 .dark） */
+.dark {
+    --bg: #111111;
+    --text-main: #FFFFFF;
+    --text-muted: #777777;
+    --accent: #FFFFFF;
+    --line: #2A2A2A;
+    --bullet: #BBBBBB;
+    --node-border: #555555;
+    --boundary: #444444;
+}
+
+body {
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    /* 工程网格底层纹理，与主站呼应 */
+    background-image:
+        linear-gradient(rgba(31,79,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,79,255,0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+
+.dark body {
+    background-image:
+        linear-gradient(rgba(31,79,255,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,79,255,0.07) 1px, transparent 1px);
+}
+
+/* 引导区 */
+.hero {
+    padding: 90px 10% 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin: 0;
+}
+
+/* 经历列表容器 */
+.experience-list {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 5% 150px;
+}
+
+/* 核心聚焦交互：父容器Hover时，所有子项变暗 */
+.experience-list:hover .exp-row {
+    opacity: 0.2;
+}
+
+/* 单行经历 (Grid 布局引入坐标轴) */
+.exp-row {
+    display: grid;
+    grid-template-columns: 180px 60px 1fr;
+    padding: 50px 0;
+    transition: opacity 0.4s ease;
+    position: relative;
+}
+
+/* 悬停当前的经历时，恢复高亮 */
+.experience-list .exp-row:hover {
+    opacity: 1;
+}
+
+/* 左侧：吸顶年份与角色 */
+.meta-col {
+    text-align: right;
+}
+
+.meta-sticky {
+    position: sticky;
+    top: 100px; /* 吸附在距离顶部100px处 */
+}
+
+.year {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.role {
+    font-size: 1.1rem;
+    font-weight: 900;
+    line-height: 1.4;
+}
+
+/* 中间：坐标轴与吸顶节点 */
+.axis-col {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+/* 垂直线 */
+.axis-col::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: -50px; /* 贯穿上下 padding */
+    width: 1px;
+    background: var(--line);
+}
+
+.exp-row:last-child .axis-col::before {
+    bottom: 0; /* 最后一个不向下延伸 */
+}
+
+/* 线条“充能”动效：蓝绿微光实线随滚动向下填充，如电流流过回路 */
+.axis-col::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: -50px;
+    width: 1px;
+    background: linear-gradient(180deg, #1F4FFF, #00C88C);
+    box-shadow: 0 0 6px rgba(0,200,140,0.6);
+    transform: scaleY(var(--charge, 0));
+    transform-origin: top;
+    pointer-events: none;
+}
+
+.exp-row:last-child .axis-col::after {
+    bottom: 0;
+}
+
+/* 吸顶的时间点 */
+.node {
+    position: sticky;
+    top: 106px; /* 与左侧文字对齐 */
+    width: 9px;
+    height: 9px;
+    background: var(--bg);
+    border: 2px solid var(--node-border);
+    border-radius: 50%;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+/* 节点霓虹呼吸灯：hover 变科技绿 + 外发光 */
+.exp-row:hover .node {
+    border-color: #00C88C;
+    background: #00C88C;
+    transform: scale(1.4);
+    box-shadow: 0 0 10px rgba(0,200,140,0.6), 0 0 0 4px rgba(0,200,140,0.15);
+}
+
+/* 右侧：价值详情 */
+.detail-col {
+    padding-bottom: 20px;
+}
+
+/* 核心价值 */
+.core-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 24px 0;
+    color: var(--accent);
+    line-height: 1.5;
+}
+
+/* 细节拆解列表 */
+.bullet-point {
+    font-size: 0.95rem;
+    color: var(--bullet);
+    margin-bottom: 16px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.bullet-point::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+    font-weight: 300;
+}
+
+.highlight {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* 高中分界标记 */
+.boundary {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: var(--boundary);
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.boundary::before,
+.boundary::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+}
+
+.boundary::before {
+    margin-right: 20px;
+}
+
+.boundary::after {
+    margin-left: 20px;
+}
+
+/* 移动端适配：隐藏坐标轴，改为卡片堆叠 */
+@media (max-width: 768px) {
+    .hero { padding: 60px 8% 20px; }
+    .hero h1 { font-size: 1.8rem; }
+    .exp-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 40px 0;
+        border-bottom: 1px solid var(--line);
+    }
+    .axis-col { display: none; }
+    .meta-col { text-align: left; }
+    .meta-sticky { position: relative; top: 0; }
+    .core-value { font-size: 1.15rem; }
+}

@@ -30,23 +30,42 @@
       }
     }
 
-    htmlEl.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
-    updateThemeIcon(true);
+    // 默认亮光模式；仅记住用户主动切换的选择（theme_v2 为新键，忽略旧版强制写入的 dark）
+    const savedTheme = localStorage.getItem('theme_v2');
+    const isDarkInit = savedTheme === 'dark';
+    htmlEl.classList.toggle('dark', isDarkInit);
+    updateThemeIcon(isDarkInit);
 
     themeToggleBtn.addEventListener('click', () => {
       const isDark = !htmlEl.classList.contains('dark');
       if (isDark) {
         htmlEl.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('theme_v2', 'dark');
         updateThemeIcon(true);
       } else {
         htmlEl.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
+        localStorage.setItem('theme_v2', 'light');
         updateThemeIcon(false);
       }
       window.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
     });
+
+    // =============== 实践经历 iframe：高度自适应，消除内部滚动 ===============
+    const timelineFrame = document.querySelector('.timeline-frame');
+    if (timelineFrame) {
+      const fitFrame = () => {
+        const doc = timelineFrame.contentDocument;
+        if (!doc || !doc.body) return;
+        timelineFrame.style.height = doc.body.scrollHeight + 'px';
+      };
+      timelineFrame.addEventListener('load', () => {
+        fitFrame();
+        const doc = timelineFrame.contentDocument;
+        if (doc) {
+          new ResizeObserver(fitFrame).observe(doc.body);
+        }
+      });
+    }
 
     // =============== 首屏文字动效 ===============
     document.querySelectorAll('.cyber-hover').forEach(el => {
@@ -66,7 +85,7 @@
             const scrambled = finalString.split('').map((char, index) => {
                 if(char === ' ') return ' ';
                 if(index < Math.floor(iterations / (maxIterations/finalString.length))) {
-                    return `<span class="hero-char" style="color: #EDA634; -webkit-text-stroke: 0px;">${finalString[index]}</span>`;
+                    return `<span class="hero-char" style="color: #1F4FFF; -webkit-text-stroke: 0px;">${finalString[index]}</span>`;
                 }
                 return `<span class="hero-char">${scrambleChars[Math.floor(Math.random() * scrambleChars.length)]}</span>`;
             }).join('');
@@ -156,7 +175,7 @@
 
     // =============== 音乐板块：视频封面挂载与播放联动引擎 ===============
     const albumsData = [
-      { title: "Carnival", artist: "Sonic Youth", videoSrc: "./Music/Just%20Passing%20By.mp4", /* poster intentionally omitted to derive from video filename */ coverColor: "#FF4F97", labelColor: "#3A5DFF", track: { name: "Just Passing By", time: "1:52" } }
+      { title: "Carnival", artist: "Sonic Youth", videoSrc: "./assets/music/just-passing-by.mp4", /* poster intentionally omitted to derive from video filename */ coverColor: "#FFFFFF", labelColor: "#1A1A1A", track: { name: "Just Passing By", time: "1:52" } }
     ];
 
     // 规范化 poster：如果没有显式 poster，则尝试用同名 jpg（保留 URL 编码形式），避免误引用游戏封面图片
@@ -222,12 +241,12 @@
                 <div class="vinyl-sleeve-spine"></div>
                 <div class="vinyl-sleeve-front" style="position: absolute; width: 100%; height: 100%; background-color: #111; background-image: linear-gradient(135deg, rgba(0,0,0,0.1), rgba(0,0,0,0.45)), url('${posterPath}'); background-size: cover; background-position: center; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1;">
                     <video id="album-video-${i}" src="${album.videoSrc}" preload="metadata" loop muted playsinline poster="${posterPath}" onerror="this.style.display='none'; this.parentElement.style.backgroundImage='linear-gradient(135deg, rgba(0,0,0,0.12), rgba(0,0,0,0.44)), url(\'${posterPath}\')';" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 0;"></video>
-                    <div class="album-play-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); opacity: 0; transition: opacity 0.3s; z-index: 2; pointer-events: none;"><i data-feather="play-circle" style="width: 64px; height: 64px; color: #F3E6C7; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));"></i></div>
+                    <div class="album-play-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); opacity: 0; transition: opacity 0.3s; z-index: 2; pointer-events: none;"><i data-feather="play-circle" style="width: 64px; height: 64px; color: #FFFFFF; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));"></i></div>
                     <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.1); z-index: 1; pointer-events: none;"></div>
-                    <div class="album-progress-bar" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: rgba(0,0,0,0.35); z-index: 3; cursor: pointer;"><div class="album-progress-fill" style="height: 100%; width: 0%; background: #70f3ff;"></div></div>
+                    <div class="album-progress-bar" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: rgba(0,0,0,0.35); z-index: 3; cursor: pointer;"><div class="album-progress-fill" style="height: 100%; width: 0%; background: #FFFFFF;"></div></div>
                     <div class="album-actions" style="position: absolute; bottom: 10px; right: 10px; display: flex; gap: 6px; z-index: 4;">
-                        <button class="album-btn-zoom" title="放大" style="width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0,0,0,0.55); color: #F3E6C7; display: flex; align-items: center; justify-content: center; cursor: pointer;"><i data-feather="maximize-2" style="width: 14px; height: 14px;"></i></button>
-                        <a class="album-btn-download" href="${album.videoSrc}" download title="下载" style="width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0,0,0,0.55); color: #F3E6C7; display: flex; align-items: center; justify-content: center; text-decoration: none;"><i data-feather="download" style="width: 14px; height: 14px;"></i></a>
+                        <button class="album-btn-zoom" title="放大" style="width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0,0,0,0.55); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer;"><i data-feather="maximize-2" style="width: 14px; height: 14px;"></i></button>
+                        <a class="album-btn-download" href="${album.videoSrc}" download title="下载" style="width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0,0,0,0.55); color: #FFFFFF; display: flex; align-items: center; justify-content: center; text-decoration: none;"><i data-feather="download" style="width: 14px; height: 14px;"></i></a>
                     </div>
                 </div>
             </div>
@@ -496,18 +515,18 @@
 
     // =============== 资质证书 Framer-like Cover Flow ===============
     const certImages = [
-      "./AIcertificates/102d2774e028f87def477768ef55f5c9.jpg",
-      "./AIcertificates/1d28f9969420e151e866ac6e647f36ec.jpg",
-      "./AIcertificates/3006334a03a6485c097bd7d08169eb70.jpg",
-      "./AIcertificates/35a03a21290dc8ccc301e6a2543b7d03.jpg",
-      "./AIcertificates/4d73f5a3b9ae01b4d82d84842160e23b.jpg",
-      "./AIcertificates/88b36c66bfcd3084360bbf981d6771d6.jpg",
-      "./AIcertificates/8babadccf1716c5180330f8d8c0ef35d.jpg",
-      "./AIcertificates/d09de460c21743af2d9ba0320aff5b62.png",
-      "./AIcertificates/d7e0152f8e04d17e680376c26769bde3.jpg",
-      "./AIcertificates/d89e0e67a6dfabcf196cc663ebed7723.jpg",
-      "./AIcertificates/e88fb5ec76894e142ac4ff60dcca0596.jpg",
-      "./AIcertificates/e9619014a6a114cae3f34306b4a845a2.jpg"
+      "./assets/certificates/ai/aliyun-bailian-agent.jpg",
+      "./assets/certificates/ai/aliyun-llm-content.jpg",
+      "./assets/certificates/ai/aliyun-vision-design-basic.jpg",
+      "./assets/certificates/ai/aliyun-lingma-coding.jpg",
+      "./assets/certificates/ai/ait-trainer-advanced.jpg",
+      "./assets/certificates/ai/aliyun-spring-ai.jpg",
+      "./assets/certificates/ai/iflytek-prompt-engineer.jpg",
+      "./assets/certificates/ai/iflytek-agent-engineer.png",
+      "./assets/certificates/ai/aliyun-rag.jpg",
+      "./assets/certificates/ai/ait-trainer-junior.jpg",
+      "./assets/certificates/ai/aliyun-vision-design-advanced.jpg",
+      "./assets/certificates/ai/aliyun-artlab-aigc.jpg"
     ];
 
     const mcConfig = { collapsedWidth: 80, hoverWidth: 180, collapsedHeight: 56, hoverHeight: 126, openSize: 600, gap: 12, influence: 200, blur: 2 };
@@ -637,7 +656,7 @@
     
     function createParticle() {
       if(!plane) return; const rect = plane.getBoundingClientRect(); const p = document.createElement("div"); p.className = "cyber-particle"; p.innerText = charsList[Math.floor(Math.random() * charsList.length)];
-      if(Math.random() > 0.5) { p.style.color = '#DD201B'; p.style.textShadow = '0 0 5px #EDA634'; }
+      if(Math.random() > 0.5) { p.style.color = '#FFFFFF'; p.style.textShadow = '0 0 5px #1A1A1A'; }
       p.style.left = (rect.left + rect.width / 2 + (Math.random() * 20 - 10)) + "px"; p.style.top = (rect.top - 10) + "px"; p.style.fontSize = (Math.random() * 10 + 10) + "px";
       container.appendChild(p);
       gsap.to(p, { y: "-=" + (Math.random() * 80 + 40), x: "+=" + (Math.random() * 60 - 30), opacity: 1, rotation: Math.random() * 360, duration: 0.2, onComplete: () => { gsap.to(p, { opacity: 0, duration: 0.6, onComplete: () => p.remove() }); } });
@@ -705,7 +724,7 @@
           const targetId = btn.getAttribute(btnSelector === '.tab-btn' ? 'data-target' : 'data-subtarget');
           btn.parentElement.querySelectorAll(btnSelector).forEach(b => {
             if(btnSelector === '.tab-btn') { 
-                b.classList.remove('active', 'bg-brand-red', 'text-brand-cream', 'shadow-[6px_6px_0px_0px_#145A8F]'); 
+                b.classList.remove('active', 'bg-brand-red', 'text-brand-cream', 'shadow-[6px_6px_0px_0px_#111111]'); 
                 b.classList.add('bg-white', 'dark:bg-[#1A1A1A]'); 
             } 
             else { 
@@ -714,7 +733,7 @@
             }
           });
           if(btnSelector === '.tab-btn') { 
-              btn.classList.add('active', 'bg-brand-red', 'text-brand-cream', 'shadow-[6px_6px_0px_0px_#145A8F]'); 
+              btn.classList.add('active', 'bg-brand-red', 'text-brand-cream', 'shadow-[6px_6px_0px_0px_#111111]'); 
               btn.classList.remove('bg-white', 'dark:bg-[#1A1A1A]'); 
           } 
           else { 
