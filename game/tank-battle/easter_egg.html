@@ -120,6 +120,66 @@
   .menu-btn:hover { background: var(--color-cyan); color: #000; box-shadow: 0 0 15px var(--color-cyan); transform: translateX(-4px); }
   .menu-btn:active { transform: translateX(2px); }
 
+  /* 移动端专属响应式适配 */
+  @media (max-width: 768px) {
+    .egg-top-bar {
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .btn-acid {
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+    .egg-message-box {
+      font-size: 18px;
+      padding: 14px 18px;
+      line-height: 1.5;
+      max-width: 92%;
+    }
+    #come-out-btn {
+      font-size: 16px;
+      padding: 10px 24px;
+      margin-top: 20px;
+    }
+    #companion-panel {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #companion-panel.corner {
+      right: 16px;
+      bottom: 16px;
+      left: auto;
+      top: auto;
+      transform: translate(0, 0);
+    }
+    .companion-img {
+      width: 180px;
+      max-width: 60vw;
+    }
+    #companion-panel.corner .companion-img {
+      width: 90px;
+    }
+    .companion-dialog {
+      font-size: 14px;
+      padding: 10px 14px;
+      max-width: 85vw;
+      margin-bottom: 12px;
+    }
+    .companion-menu {
+      padding: 12px;
+      gap: 8px;
+      right: 0;
+    }
+    .menu-btn {
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -131,11 +191,13 @@
   <div class="egg-ui-layer">
     <!-- 顶部全屏与返回控制 -->
     <div class="egg-top-bar">
-      <!-- 保证跳转回主游戏，如果你的主游戏不是 index.html 请自行修改 -->
-      <button class="btn-acid btn-gold" onclick="window.location.href='index.html'">🏛 载誉凯旋 · 返回社区大厅</button>
-      <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: flex-end;">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn-acid btn-gold" onclick="window.location.href='index.html'">🏛 载誉凯旋 · 返回社区大厅</button>
+        <button class="btn-acid btn-pink" onclick="window.location.href='../../index.html'">🏠 返回个人主页</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;">
         <button id="egg-music-toggle" class="btn-acid" onclick="toggleEggMusic()">🔊 彩蛋音乐: ON</button>
-        <span style="font-size: 15px; font-weight: 700; color: #B5F800; background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 6px; border: 1px solid #B5F800;">长按鼠标/触屏可驱动星轨</span>
+        <span style="font-size: 13px; font-weight: 700; color: #B5F800; background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px; border: 1px solid #B5F800;">长按/触屏驱动星轨</span>
         <button class="btn-acid" onclick="toggleFullScreen()">⛶ 全屏沉浸</button>
       </div>
     </div>
@@ -470,11 +532,14 @@ document.getElementById('companion-img').addEventListener('click', function(e) {
 });
 
 // 点击空白处关闭超大控制菜单
-document.addEventListener('mousedown', (e) => {
+const closeMenuIfOutside = (e) => {
   if(!e.target.closest('#companion-panel')) {
-    document.getElementById('companion-menu').classList.remove('show');
+    const m = document.getElementById('companion-menu');
+    if (m) m.classList.remove('show');
   }
-});
+};
+document.addEventListener('pointerdown', closeMenuIfOutside);
+document.addEventListener('mousedown', closeMenuIfOutside);
 </script>
 </body>
 </html>

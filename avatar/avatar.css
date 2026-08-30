@@ -1,0 +1,732 @@
+/* ================= 极客数字分身 Fylen [ˈfaɪlən] 专属样式与 Kimi 风圆球智能体表情系统 ================= */
+:root {
+    --avatar-bg-dark: #070D18;
+    --fylen-neon-green: #00FF88;
+    --fylen-neon-bright: #39FF14;
+    --fylen-neon-glow: rgba(0, 255, 136, 0.45);
+    --fylen-neon-border: rgba(0, 255, 136, 0.3);
+    --fylen-neon-subtle: rgba(0, 255, 136, 0.08);
+    --fylen-radar-cyan: #00F0FF;
+    --terminal-panel-bg: linear-gradient(165deg, rgba(11, 20, 36, 0.96) 0%, rgba(5, 10, 20, 0.98) 100%);
+    --terminal-header-bg: rgba(14, 25, 45, 0.9);
+}
+
+/* ================= 0. 全屏荧光绿流光拖尾画布 (Neon Green Trail Canvas) ================= */
+.fylen-trail-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 998;
+    background: transparent;
+}
+
+/* ================= 1. 悬浮吉祥物：荧光绿量子圆球 Fylen [ˈfaɪlən] ================= */
+.quantum-core {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    touch-action: none;
+    will-change: transform;
+    pointer-events: auto;
+    filter: drop-shadow(0 4px 16px rgba(0, 255, 136, 0.5));
+}
+
+.quantum-core.is-moving {
+    filter: drop-shadow(0 6px 26px rgba(0, 255, 136, 0.85));
+}
+
+.quantum-core:active,
+.quantum-core.is-dragging {
+    cursor: grabbing;
+    filter: drop-shadow(0 8px 32px rgba(0, 255, 136, 0.95));
+}
+
+.quantum-core:hover:not(.is-dragging) {
+    filter: drop-shadow(0 6px 26px rgba(0, 255, 136, 0.8));
+}
+
+/* 雷达外层能量环 */
+.core-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--fylen-neon-green);
+    border-radius: 50%;
+    box-shadow: 0 0 16px var(--fylen-neon-green), inset 0 0 14px rgba(0, 255, 136, 0.5);
+    animation: fylenSpin 4.5s linear infinite;
+    pointer-events: none;
+}
+
+/* 环形卫星光标 */
+.core-ring::before {
+    content: '';
+    position: absolute;
+    top: -3px; 
+    left: 50%;
+    width: 8px; 
+    height: 8px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #FFFFFF, 0 0 18px var(--fylen-neon-green);
+    transform: translateX(-50%);
+}
+
+/* 环形辅助逆向虚线层 */
+.core-ring::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px dashed rgba(0, 255, 136, 0.45);
+    border-radius: 50%;
+    animation: fylenSpinRev 3s linear infinite;
+}
+
+/* 圆球中心智能视窗舱 (Kimi 风格微光黑晶球体) */
+.core-center {
+    width: 38px;
+    height: 38px;
+    background: radial-gradient(circle at 35% 30%, #102A36 0%, #050E18 70%, #02060C 100%);
+    border: 1.5px solid var(--fylen-neon-green);
+    border-radius: 50%;
+    box-shadow: 0 0 16px rgba(0, 255, 136, 0.6), inset 0 0 12px rgba(0, 255, 136, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.quantum-core:hover .core-center {
+    box-shadow: 0 0 22px rgba(0, 255, 136, 0.85), inset 0 0 14px rgba(0, 255, 136, 0.5);
+    border-color: #FFFFFF;
+}
+
+/* 呆萌互动提示气泡 */
+.fylen-mood-badge {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: rgba(6, 13, 24, 0.92);
+    border: 1px solid var(--fylen-neon-green);
+    color: var(--fylen-neon-green);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-family: inherit;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 8px rgba(0, 255, 136, 0.3);
+    z-index: 1002;
+}
+
+.quantum-core:hover .fylen-mood-badge,
+.fylen-mood-badge.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+
+/* ================= 2. Kimi 风格极简胶囊胶质眼表情系统 (Kimi-style Digital Eyes) ================= */
+.radar-face {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.radar-face path,
+.radar-face rect,
+.radar-face text {
+    transform-origin: center;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Kimi 风格胶囊像素眼 */
+.face-eye {
+    fill: var(--fylen-neon-green);
+    filter: drop-shadow(0 0 3.5px var(--fylen-neon-green));
+}
+
+/* 简约弧线眼睛 */
+.face-stroke-bold {
+    fill: none;
+    stroke: var(--fylen-neon-green);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 3.5px var(--fylen-neon-green));
+}
+
+/* 表情分组显隐控制 */
+.expr-group {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+    display: none;
+    transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 对应激活状态显示 */
+[data-expr="idle"] .expr-idle,
+[data-expr="happy"] .expr-happy,
+[data-expr="wink"] .expr-wink,
+[data-expr="think"] .expr-think,
+[data-expr="curious"] .expr-curious,
+[data-expr="dizzy"] .expr-dizzy,
+[data-expr="sleep"] .expr-sleep {
+    opacity: 1;
+    transform: scale(1);
+    display: inline;
+}
+
+/* --- Kimi 胶囊表情微动动画 --- */
+
+/* 1. Idle 胶囊双眼 眨眼呼吸 */
+[data-expr="idle"] .expr-idle .eye-capsule {
+    animation: kimiBlink 3.8s ease-in-out infinite;
+}
+
+@keyframes kimiBlink {
+    0%, 88%, 100% { transform: scaleY(1); }
+    92% { transform: scaleY(0.12); }
+}
+
+/* 2. Happy 眯眼月牙笑 */
+[data-expr="happy"] .expr-happy {
+    animation: kimiHappyBob 1.5s ease-in-out infinite;
+}
+@keyframes kimiHappyBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1.5px) scale(1.05); }
+}
+
+/* 3. Think 思考检索 左右扫动 */
+[data-expr="think"] .expr-think {
+    animation: kimiThinkScan 1.6s ease-in-out infinite alternate;
+}
+@keyframes kimiThinkScan {
+    0% { transform: translateX(-1.8px); }
+    100% { transform: translateX(1.8px); }
+}
+
+/* 4. Curious 好奇歪头探视 */
+[data-expr="curious"] .expr-curious {
+    animation: kimiTilt 2s ease-in-out infinite alternate;
+}
+@keyframes kimiTilt {
+    0% { transform: rotate(-6deg) translateY(0.5px); }
+    100% { transform: rotate(6deg) translateY(-0.5px); }
+}
+
+/* 5. Dizzy 晕圈交叉眼 抖动 */
+[data-expr="dizzy"] .expr-dizzy {
+    animation: kimiDizzyShake 0.35s ease-in-out infinite alternate;
+}
+@keyframes kimiDizzyShake {
+    0% { transform: translateX(-1.2px) rotate(-3deg); }
+    100% { transform: translateX(1.2px) rotate(3deg); }
+}
+
+/* 6. Sleep 休眠小憩 缓慢呼吸浮动 */
+[data-expr="sleep"] .expr-sleep .sleep-z1 {
+    animation: kimiSleepZ 2s ease-in-out infinite;
+}
+[data-expr="sleep"] .expr-sleep .sleep-z2 {
+    animation: kimiSleepZ 2s ease-in-out infinite 0.7s;
+}
+@keyframes kimiSleepZ {
+    0% { opacity: 0; transform: translate(0, 2px) scale(0.6); }
+    50% { opacity: 0.9; transform: translate(2px, -3px) scale(1); }
+    100% { opacity: 0; transform: translate(4px, -7px) scale(1.2); }
+}
+
+
+/* ================= 3. 首页 Section 1 头像框内的 Fylen 专属雷达动态效果 ================= */
+.fylen-avatar-radar-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #060D18;
+    border-radius: 14px;
+}
+
+/* 雷达背景坐标网格 */
+.fylen-radar-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(0, 255, 136, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 136, 0.08) 1px, transparent 1px);
+    background-size: 14px 14px;
+    background-position: center center;
+    opacity: 0.8;
+}
+
+/* 十字准星准线 */
+.fylen-radar-crosshair-h {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.45), transparent);
+    transform: translateY(-50%);
+}
+
+.fylen-radar-crosshair-v {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(0, 255, 136, 0.45), transparent);
+    transform: translateX(-50%);
+}
+
+/* 雷达同心圆环 */
+.fylen-radar-circle-outer {
+    position: absolute;
+    width: 84%;
+    height: 84%;
+    border: 1.5px solid rgba(0, 255, 136, 0.7);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.3), inset 0 0 8px rgba(0, 255, 136, 0.2);
+    animation: fylenSpin 8s linear infinite;
+    pointer-events: none;
+}
+
+.fylen-radar-circle-mid {
+    position: absolute;
+    width: 62%;
+    height: 62%;
+    border: 1px dashed rgba(0, 255, 136, 0.5);
+    border-radius: 50%;
+    animation: fylenSpinRev 5s linear infinite;
+    pointer-events: none;
+}
+
+/* 360° 扫描光锥 */
+.fylen-radar-sweep {
+    position: absolute;
+    width: 86%;
+    height: 86%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(0, 255, 136, 0.38) 0deg, rgba(0, 255, 136, 0.12) 30deg, transparent 70deg);
+    animation: fylenSpin 3s linear infinite;
+    pointer-events: none;
+}
+
+/* 核心能量光珠 & 表情视窗 */
+.fylen-radar-energy-core {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    background: radial-gradient(circle at 35% 30%, #102A36 0%, #050E18 70%, #02060C 100%);
+    border: 1.5px solid var(--fylen-neon-green);
+    border-radius: 50%;
+    box-shadow: 0 0 16px var(--fylen-neon-green), 0 0 30px var(--fylen-neon-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.digital-avatar-frame:hover .fylen-radar-energy-core {
+    transform: scale(1.12);
+}
+
+/* 轨道探测信标 */
+.fylen-radar-blip {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #FFFFFF, 0 0 14px var(--fylen-neon-green);
+    top: 18%;
+    right: 24%;
+    animation: fylenBlip 2s ease-in-out infinite;
+    z-index: 6;
+    pointer-events: none;
+}
+
+/* 科技 HUD 四角标 */
+.fylen-hud-bracket {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-color: var(--fylen-neon-green);
+    border-style: solid;
+    pointer-events: none;
+    opacity: 0.8;
+}
+.fylen-hud-tl { top: 3px; left: 3px; border-width: 1.5px 0 0 1.5px; }
+.fylen-hud-tr { top: 3px; right: 3px; border-width: 1.5px 1.5px 0 0; }
+.fylen-hud-bl { bottom: 3px; left: 3px; border-width: 0 0 1.5px 1.5px; }
+.fylen-hud-br { bottom: 3px; right: 3px; border-width: 0 1.5px 1.5px 0; }
+
+
+/* ================= 4. 全息终端面板 ================= */
+.holo-terminal {
+    position: fixed;
+    bottom: 110px;
+    right: 36px;
+    width: 370px;
+    max-width: calc(100vw - 32px);
+    height: 520px;
+    max-height: calc(100vh - 140px);
+    background: var(--terminal-panel-bg);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    border: 1px solid var(--fylen-neon-border);
+    border-radius: 16px;
+    box-shadow: 
+        0 24px 60px -12px rgba(0, 0, 0, 0.85),
+        0 0 35px rgba(0, 255, 136, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 0 25px rgba(0, 255, 136, 0.03);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 999;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', Courier, monospace;
+}
+
+.holo-terminal.is-dragging {
+    transition: none !important;
+    box-shadow: 
+        0 30px 70px -10px rgba(0, 0, 0, 0.95),
+        0 0 45px rgba(0, 255, 136, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 255, 136, 0.55);
+}
+
+.holo-terminal.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.terminal-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0, 255, 136, 0.18);
+    color: var(--fylen-neon-green);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--terminal-header-bg);
+    user-select: none;
+    cursor: grab;
+    touch-action: none;
+    position: relative;
+}
+
+.terminal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 5%, var(--fylen-neon-green) 50%, transparent 95%);
+    opacity: 0.8;
+}
+
+.terminal-header:active,
+.holo-terminal.is-dragging .terminal-header {
+    cursor: grabbing;
+}
+
+.header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--fylen-neon-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--fylen-neon-green), 0 0 16px var(--fylen-neon-green);
+    animation: blinkDot 1.6s ease-in-out infinite;
+}
+
+.terminal-title-text {
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.terminal-title-text span {
+    color: var(--fylen-neon-green);
+    margin-right: 4px;
+}
+
+.terminal-title-phonetic {
+    font-size: 10.5px;
+    color: #94A3B8;
+    margin-left: 4px;
+    font-weight: 400;
+}
+
+.term-close-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #94A3B8;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.term-close-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #FF6B6B;
+    transform: scale(1.08);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+.term-close-btn:active {
+    transform: scale(0.95);
+}
+
+.chat-stream {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.chat-msg {
+    color: #CBD5E1;
+    font-size: 12.5px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    font-family: inherit;
+}
+
+.chat-msg.user {
+    color: #F8FAFC;
+    align-self: flex-end;
+    background: linear-gradient(135deg, rgba(31, 79, 255, 0.28) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border: 1px solid rgba(31, 79, 255, 0.45);
+    padding: 9px 14px;
+    border-radius: 12px 12px 2px 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    max-width: 85%;
+}
+
+.chat-msg.ai {
+    align-self: flex-start;
+    position: relative;
+    padding: 10px 14px;
+    background: rgba(0, 255, 136, 0.05);
+    border: 1px solid rgba(0, 255, 136, 0.18);
+    border-left: 3px solid var(--fylen-neon-green);
+    border-radius: 2px 12px 12px 12px;
+    color: #E2E8F0;
+    max-width: 90%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+}
+
+.cursor {
+    display: inline-block;
+    width: 6px; 
+    height: 13px;
+    background: var(--fylen-neon-green);
+    vertical-align: middle;
+    margin-left: 4px;
+    box-shadow: 0 0 6px var(--fylen-neon-green);
+    animation: blinkCursor 0.8s step-end infinite;
+}
+
+.terminal-input-area {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(0, 255, 136, 0.18);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(8, 14, 26, 0.95);
+}
+
+.cmd-prefix { 
+    color: var(--fylen-neon-green); 
+    font-size: 13px;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+    user-select: none;
+}
+
+.terminal-input-area input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+.terminal-input-area input::placeholder {
+    color: rgba(148, 163, 184, 0.5);
+}
+
+.terminal-input-area button {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.18) 0%, rgba(31, 79, 255, 0.18) 100%);
+    border: 1px solid rgba(0, 255, 136, 0.45);
+    color: var(--fylen-neon-green);
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.terminal-input-area button:hover {
+    background: var(--fylen-neon-green);
+    color: #060D18;
+    box-shadow: 0 0 16px rgba(0, 255, 136, 0.45);
+    transform: translateY(-1px);
+}
+
+.terminal-input-area button:active {
+    transform: translateY(0);
+}
+
+@keyframes fylenSpin { 100% { transform: rotate(360deg); } }
+@keyframes fylenSpinRev { 100% { transform: rotate(-360deg); } }
+@keyframes fylenBlip {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.3); }
+}
+@keyframes blinkDot { 
+    0%, 100% { opacity: 1; transform: scale(1); } 
+    50% { opacity: 0.4; transform: scale(0.85); } 
+}
+@keyframes blinkCursor { 
+    0%, 100% { opacity: 1; } 
+    50% { opacity: 0; } 
+}
+
+/* ================= 6. HUD 全息通知提示 Toast (HUD Notification) ================= */
+.fylen-hud-toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
+    background: rgba(7, 13, 24, 0.92);
+    border: 1px solid rgba(0, 255, 136, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 136, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 10px 20px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1002;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'JetBrains Mono', monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #F1F5F9;
+    white-space: nowrap;
+}
+
+.fylen-hud-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.fylen-hud-toast .toast-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--fylen-neon-green);
+    filter: drop-shadow(0 0 6px var(--fylen-neon-green));
+    flex-shrink: 0;
+}
+
+.fylen-hud-toast .toast-accent {
+    color: var(--fylen-neon-green);
+    font-weight: 700;
+}
+
+/* ================= 7. 移动端自适应优化 (Mobile Rules) ================= */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+    .fylen-trail-canvas {
+        display: none !important;
+    }
+
+    .quantum-core {
+        position: fixed !important;
+        top: auto !important;
+        left: auto !important;
+        bottom: 24px !important;
+        right: 20px !important;
+        width: 58px !important;
+        height: 58px !important;
+        transform: none !important;
+    }
+
+    .quantum-core.is-moving {
+        filter: drop-shadow(0 4px 16px rgba(0, 255, 136, 0.5));
+    }
+
+    .fylen-hud-toast {
+        bottom: 90px;
+        width: calc(100% - 32px);
+        max-width: 360px;
+        border-radius: 12px;
+        white-space: normal;
+        text-align: center;
+        justify-content: center;
+    }
+}
+

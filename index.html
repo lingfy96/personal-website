@@ -16,6 +16,20 @@
     body { background-color: #111111; color: #FFFFFF; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     img, video, svg, canvas, iframe { max-width: 100%; height: auto; display: block; }
   </style>
+  <!-- 关键错误防护：拦截良性 ResizeObserver 警告 -->
+  <script>
+    window.addEventListener('error', function(e) {
+      if (e && e.message && (
+        e.message.indexOf('ResizeObserver') !== -1 ||
+        e.message.indexOf('undelivered notifications') !== -1 ||
+        e.message.indexOf('limit exceeded') !== -1
+      )) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
   <!-- 引入字体 -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
   <!-- 引入 Tailwind CSS（保持同步，确保内联配置可用） -->
@@ -66,6 +80,8 @@
 </script>
 <link rel="preload" href="./style.css" as="style">
 <link rel="stylesheet" href="./style.css">
+<!-- AURA 数字分身专属样式表 -->
+<link rel="stylesheet" href="./avatar/avatar.css">
 </head>
 <body class="font-sans transition-colors duration-300 relative overflow-x-hidden">
   <!-- 呼吸感弥散光斑（屏幕漏光） -->
@@ -238,34 +254,134 @@
             </a>
           </div>
           <div class="flex gap-6 mt-12 no-print" id="contact-info"></div>
-          <div class="marquee-container lux-marquee mt-12 no-print">
+          <div class="marquee-container lux-marquee mt-12 no-print" id="hero-marquee-container" title="探索 AI 与创意的跨界新航线">
             <div class="marquee-track py-2" id="hero-marquee">
               <span class="marquee-text text-sm font-bold tracking-[0.3em] uppercase">探索 AI 与创意的跨界新航线</span>
             </div>
           </div>
         </div>
         <div class="lg:col-span-5">
-          <div class="lux-feature-card">
-            <div class="flex items-center gap-3 mb-6">
-              <span class="lux-feature-dot"><i data-feather="message-square" class="w-4 h-4"></i></span>
-              <span class="lux-feature-label">FEATURED&nbsp;&nbsp;//&nbsp;&nbsp;重点推荐</span>
+          <!-- 符榆翎 · 数字分身卡片 (Digital Twin Avatar) -->
+          <div class="lux-feature-card lux-avatar-card group relative overflow-hidden" id="digital-avatar-card">
+            <!-- 背景流光与科技网格微光 -->
+            <div class="avatar-card-glow pointer-events-none" aria-hidden="true"></div>
+            
+            <!-- 卡片顶栏：身份状态与在线指示灯 -->
+            <div class="flex items-center justify-between mb-5">
+              <div class="flex items-center gap-3">
+                <span class="lux-feature-dot">
+                  <i data-feather="cpu" class="w-4 h-4"></i>
+                </span>
+                <span class="lux-feature-label">FYLEN [ˈfaɪlən] // 数字分身</span>
+              </div>
+              <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 text-[11px] font-mono text-emerald-600 dark:text-[#00FF88] font-bold">
+                <span class="w-2 h-2 rounded-full bg-[#00FF88] animate-ping"></span>
+                <span>RADAR SYNC 99.8%</span>
+              </div>
             </div>
-            <h3 class="lux-feature-title">明禾陪伴：<br>高共情心理健康 Agent</h3>
-            <p class="lux-feature-desc">自主规划的 AI 实践项目。基于 RAG 架构接入专业心理学知识库，通过 Prompt Engineering 实现极高共情能力的对话体验……</p>
-            <a href="#skills" class="lux-feature-link">查看项目详情 <i data-feather="arrow-up-right" class="w-4 h-4 inline ml-1"></i></a>
+
+            <!-- 数字分身核心全息展示区 -->
+            <div class="relative flex flex-col sm:flex-row items-center gap-5 my-4 p-4 rounded-2xl bg-slate-50/80 dark:bg-[#070D18]/90 border border-slate-200/80 dark:border-[#00FF88]/30 transition-all group-hover:border-[#00FF88]/60 shadow-[0_0_25px_rgba(0,255,136,0.1)]">
+              <!-- 分身头像：Fylen 专属荧光绿量子雷达全景动效 -->
+              <div class="relative flex-none">
+                <div class="digital-avatar-frame relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-br from-[#00FF88]/40 via-emerald-500/20 to-[#00FF88]/60 shadow-[0_0_25px_rgba(0,255,136,0.3)] flex items-center justify-center cursor-pointer group/avatar" onclick="document.getElementById('core-trigger') && document.getElementById('core-trigger').click()" title="点击唤醒 Fylen [ˈfaɪlən] 全息终端">
+                  <div class="fylen-avatar-radar-container">
+                    <!-- 背景坐标网格 -->
+                    <div class="fylen-radar-grid"></div>
+                    <!-- 十字准星 -->
+                    <div class="fylen-radar-crosshair-h"></div>
+                    <div class="fylen-radar-crosshair-v"></div>
+                    <!-- 360度扫描光锥 -->
+                    <div class="fylen-radar-sweep"></div>
+                    <!-- 多层同心圆 -->
+                    <div class="fylen-radar-circle-outer"></div>
+                    <div class="fylen-radar-circle-mid"></div>
+                    <div class="fylen-radar-circle-inner"></div>
+                    <!-- 探测信标 -->
+                    <div class="fylen-radar-blip"></div>
+                    <!-- 核心发光表情视窗 (Kimi 风格微光黑晶球体) -->
+                    <div class="fylen-radar-energy-core" id="avatar-face-wrap" data-expr="idle">
+                      <svg class="radar-face" viewBox="0 0 36 36">
+                        <g class="expr-group expr-idle">
+                          <rect class="face-eye eye-capsule" x="10.5" y="13" width="4.5" height="10" rx="2.25" />
+                          <rect class="face-eye eye-capsule" x="21" y="13" width="4.5" height="10" rx="2.25" />
+                        </g>
+                        <g class="expr-group expr-happy">
+                          <path class="face-stroke-bold" d="M 9.5 19.5 Q 12.75 14 16 19.5" />
+                          <path class="face-stroke-bold" d="M 20 19.5 Q 23.25 14 26.5 19.5" />
+                        </g>
+                        <g class="expr-group expr-wink">
+                          <rect class="face-eye" x="10" y="17" width="5.5" height="2.5" rx="1.25" />
+                          <rect class="face-eye" x="21" y="13" width="4.5" height="10" rx="2.25" />
+                        </g>
+                        <g class="expr-group expr-think">
+                          <rect class="face-eye" x="9.5" y="16" width="6.5" height="4" rx="2" />
+                          <rect class="face-eye" x="20" y="16" width="6.5" height="4" rx="2" />
+                        </g>
+                        <g class="expr-group expr-curious">
+                          <rect class="face-eye" x="10.5" y="14.5" width="4.5" height="7" rx="2.25" />
+                          <rect class="face-eye" x="21" y="12" width="4.5" height="11" rx="2.25" />
+                        </g>
+                        <g class="expr-group expr-dizzy">
+                          <path class="face-stroke-bold" d="M 10 15 L 15 20 M 15 15 L 10 20" />
+                          <path class="face-stroke-bold" d="M 21 15 L 26 20 M 26 15 L 21 20" />
+                        </g>
+                        <g class="expr-group expr-sleep">
+                          <rect class="face-eye" x="10" y="17" width="5.5" height="2.5" rx="1.25" />
+                          <rect class="face-eye" x="20.5" y="17" width="5.5" height="2.5" rx="1.25" />
+                          <text class="face-eye sleep-z1" x="22" y="10" font-size="7" font-family="monospace" font-weight="bold">z</text>
+                          <text class="face-eye sleep-z2" x="26" y="6" font-size="8" font-family="monospace" font-weight="bold">Z</text>
+                        </g>
+                      </svg>
+                    </div>
+                    <!-- 四角科技 HUD 标 -->
+                    <div class="fylen-hud-bracket fylen-hud-tl"></div>
+                    <div class="fylen-hud-bracket fylen-hud-tr"></div>
+                    <div class="fylen-hud-bracket fylen-hud-bl"></div>
+                    <div class="fylen-hud-bracket fylen-hud-br"></div>
+                  </div>
+                </div>
+                <!-- 科技角标 -->
+                <span class="absolute -bottom-2.5 -right-2 px-2 py-0.5 rounded-md bg-[#070D18] border border-[#00FF88] text-[9.5px] font-mono font-bold text-[#00FF88] shadow-[0_0_12px_rgba(0,255,136,0.4)]">
+                  FYLEN RADAR
+                </span>
+              </div>
+
+              <!-- 分身档案与交互状态 -->
+              <div class="flex-1 text-center sm:text-left">
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1.5">
+                  <h4 class="text-xl font-black text-slate-900 dark:text-white font-sans tracking-wide">
+                    符榆翎 · <span class="text-emerald-600 dark:text-[#00FF88]">Fylen</span> <span class="text-xs font-mono font-normal text-slate-500 dark:text-slate-400">[ˈfaɪlən]</span>
+                  </h4>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono mb-3">
+                  AI+ 创新实践者 · 创意策展 · 跨界架构
+                </p>
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 text-[11px] font-mono">
+                  <span class="px-2 py-0.5 rounded bg-emerald-100/80 dark:bg-emerald-950/50 text-emerald-700 dark:text-[#00FF88] font-medium border border-emerald-300/40 dark:border-[#00FF88]/40">⚡ 深度共情</span>
+                  <span class="px-2 py-0.5 rounded bg-blue-100/80 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-medium border border-blue-300/40">🧠 敏捷架构</span>
+                  <span class="px-2 py-0.5 rounded bg-purple-100/80 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 font-medium border border-purple-300/40">🎨 视觉赋能</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 分身实时动态互动台词/状态 -->
+            <div class="mt-4 pt-3 border-t border-slate-200/70 dark:border-slate-800/80 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-mono flex-1 min-w-0">
+                <span class="w-2 h-2 rounded-full bg-[#00FF88] shadow-[0_0_8px_#00FF88] flex-shrink-0 animate-pulse"></span>
+                <span id="digital-twin-speech" class="truncate">“你好！ 我是榆翎的数字分身助手，我叫 Fylen [ˈfaɪlən]，你也可以叫我小雷达。 我为你解答我知道的全部！”</span>
+              </div>
+              <div class="flex items-center gap-3 flex-shrink-0">
+                <button type="button" onclick="document.getElementById('core-trigger') && document.getElementById('core-trigger').click()" class="inline-flex items-center gap-1 text-[11px] font-mono font-bold px-2.5 py-1 rounded-md bg-[#00FF88]/15 text-[#00FF88] border border-[#00FF88]/40 hover:bg-[#00FF88] hover:text-black transition-all shadow-[0_0_12px_rgba(0,255,136,0.25)]" title="唤醒 Fylen 全息终端">
+                  <i data-feather="terminal" class="w-3.5 h-3.5"></i> 唤醒终端
+                </button>
+                <a href="#about" class="lux-feature-link text-xs whitespace-nowrap hidden sm:inline-flex">关于我 <i data-feather="arrow-up-right" class="w-3.5 h-3.5 inline ml-0.5"></i></a>
+              </div>
+            </div>
           </div>
           <div class="lux-status">符榆翎&nbsp;&nbsp;//&nbsp;&nbsp;系统已就绪 _ V 2.0</div>
         </div>
       </div>
-    </div>
-  </section>
-  <!-- 座右铭：极简高级感 -->
-  <section class="lux-motto section-trigger" style="width: calc(100vw - 10px); margin-left: calc(50% - 50vw + 5px);">
-    <div class="px-6 md:px-16 lg:px-24 py-24 md:py-32 relative">
-      <span class="lux-motto-mark" aria-hidden="true"></span>
-      <span class="lux-motto-mark-close" aria-hidden="true"></span>
-      <h2 id="motto-text" class="lux-motto-text">自洽而内求，达观而内醒</h2>
-      <div class="lux-motto-meta">MOTTO&nbsp;&nbsp;//&nbsp;&nbsp;自持 · 自省 · 自达</div>
     </div>
   </section>
 <!-- 关于我 -->
@@ -452,7 +568,7 @@
     </div>
     <div class="skills-sub-annotation flex items-center justify-center gap-3 mt-1">
       <span class="w-8 h-[1px] bg-gradient-to-r from-transparent to-[#1F4FFF]"></span>
-      <span class="text-sm md:text-base font-bold tracking-wider text-slate-700 dark:text-slate-200">我能为你做什么</span>
+      <span class="text-sm md:text-base font-bold tracking-wider text-slate-700 dark:text-slate-200">我能为你做这些</span>
       <span class="text-xs font-mono tracking-widest text-[#1F4FFF] dark:text-[#00C88C] opacity-85">// WHAT I CAN DO FOR YOU</span>
       <span class="w-8 h-[1px] bg-gradient-to-l from-transparent to-[#00C88C]"></span>
     </div>
@@ -726,26 +842,71 @@
   <iframe class="timeline-frame" src="./pages/resume-timeline/index.html" title="实践经历" loading="lazy"></iframe>
 </section>
 </main>
-<!-- Footer 页脚 -->
-<footer id="footer" class="bg-[#0B1120] text-slate-200 py-16 mt-20 no-print border-t border-blue-500/20 relative z-10">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center mb-12 border-b border-slate-800 pb-12">
-      <div>
-        <h3 class="text-4xl font-playfair font-black text-white mb-3">FYL</h3>
-      <p class="text-xs font-mono font-bold tracking-widest bg-gradient-to-r from-[#1F4FFF] to-[#00C88C] text-white inline-block px-3 py-1 rounded-full">PORTFOLIO © 2026</p>
+<!-- Footer 页脚：典雅高级书籍腰封设计 (Book Obi-Band) · 真实排版双引号与极简微排版 -->
+<footer id="footer" class="lux-obi-footer section-trigger relative overflow-hidden no-print z-10 w-full mt-24">
+  <!-- 腰封顶部装饰细线与状态标尺 -->
+  <div class="lux-obi-top-bar w-full border-b border-black/10 dark:border-white/10 py-3 px-6 sm:px-12 max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3 font-mono text-[11px] tracking-[0.22em] text-slate-500 dark:text-slate-400 uppercase">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#00FF88] inline-block animate-pulse"></span>
+      <span>EDITION // 2026 · MANIFESTO</span>
+    </div>
+    <div class="flex items-center gap-2.5" id="footer-contact">
+      <!-- 右上角 3 个联系图标注入容器 -->
+    </div>
   </div>
-  <div class="flex justify-center gap-8 font-black text-sm tracking-widest uppercase">
-    <a href="#about" class="text-slate-400 hover:text-[#00C88C] transition-colors">ABOUT</a>
-  <a href="#skills" class="text-slate-400 hover:text-[#00C88C] transition-colors">SKILLS</a>
-<a href="#experience" class="text-slate-400 hover:text-[#00C88C] transition-colors">EXP</a>
-</div>
-<div class="flex justify-end gap-4" id="footer-contact"></div>
-</div>
-<div class="text-center font-mono text-xs font-semibold text-slate-400 tracking-wider flex flex-col items-center gap-2">
-  <span>LAST UPDATED: AUG 2026</span>
-<span class="flex items-center gap-2">DESIGNED WITH <i data-feather="heart" class="w-4 h-4 text-[#00C88C] fill-[#00C88C]"></i> BY 符榆翎</span>
-</div>
-</div>
+
+  <!-- 腰封核心展示区：居中典雅排版，左右配以清晰明确的经典排版双引号 -->
+  <div class="max-w-5xl mx-auto px-6 sm:px-12 py-16 sm:py-24 flex flex-col items-center justify-center relative">
+    
+    <!-- 核心座右铭与引号组合：紧凑连贯、富有文学腰封韵味 -->
+    <div class="relative flex items-center justify-center gap-3 sm:gap-6 md:gap-8 my-2">
+      <!-- 经典实体排版开双引号 “ (Opening Double Quote) -->
+      <span class="lux-editorial-quote-mark font-serif select-none" aria-hidden="true">“</span>
+      
+      <!-- 核心座右铭大字 -->
+      <h2 id="motto-text" class="lux-obi-motto-heading">
+        自洽而内求，达观而内醒
+      </h2>
+      
+      <!-- 经典实体排版闭双引号 ” (Closing Double Quote) -->
+      <span class="lux-editorial-quote-mark font-serif select-none" aria-hidden="true">”</span>
+    </div>
+
+    <!-- 腰封副标与核心理念胶囊：自持 · 自省 · 自达 -->
+    <div class="lux-obi-sub-pills mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 font-mono text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">
+      <span class="lux-obi-pill">自持 · САМООБЛАДАНИЕ</span>
+      <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">/</span>
+      <span class="lux-obi-pill">自省 · САМОАНАЛИЗ</span>
+      <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">/</span>
+      <span class="lux-obi-pill">自达 · САМОРЕАЛИЗАЦИЯ</span>
+    </div>
+
+    <!-- 极简署名微注标 -->
+    <div class="mt-8 font-mono text-[10px] tracking-[0.25em] text-slate-400 dark:text-slate-500 uppercase">
+      YULING FU · PORTFOLIO CURATION
+    </div>
+  </div>
+
+  <!-- 腰封底部极简收口细标尺 -->
+  <div class="w-full border-t border-black/10 dark:border-white/10 py-4 px-6 sm:px-12 max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-500 uppercase select-none">
+    <div class="flex items-center gap-3">
+      <!-- 极简微条形码 -->
+      <span class="inline-flex items-center h-3.5 gap-[2px] opacity-60">
+        <span class="w-[2px] h-full bg-current"></span>
+        <span class="w-[1px] h-full bg-current"></span>
+        <span class="w-[3px] h-full bg-current"></span>
+        <span class="w-[1px] h-full bg-current"></span>
+        <span class="w-[2px] h-full bg-current"></span>
+        <span class="w-[4px] h-full bg-current"></span>
+      </span>
+      <span>№ 01-2026 // DIGITAL MANIFEST</span>
+    </div>
+    <div class="flex items-center gap-2 font-medium">
+      <span>DESIGNED WITH</span>
+      <i data-feather="heart" class="w-3.5 h-3.5 text-[#00C88C] fill-[#00C88C]"></i>
+      <span>BY 符榆翎 // ALL RIGHTS RESERVED</span>
+    </div>
+  </div>
 </footer>
 <!-- Lightbox 模态框 -->
 <div id="lightbox" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden no-print" onclick="closeLightbox()">
@@ -756,6 +917,76 @@
   </button>
 </div>
 </div>
+<!-- 荧光绿量子流光拖尾画布 (随着鼠标滑过渲染霓虹光轨) -->
+<canvas id="fylen-trail-canvas" class="fylen-trail-canvas"></canvas>
+
+<!-- 悬浮吉祥物：荧光绿量子圆球 Fylen [ˈfaɪlən] -->
+<div class="quantum-core" id="core-trigger" title="Fylen [ˈfaɪlən] · 荧光绿量子球 (电脑端双击左键开关跟随 / 右键唤醒终端 / 单击打开终端)">
+    <div class="fylen-mood-badge" id="core-mood-badge">| | 待命中</div>
+    <div class="core-ring"></div>
+    <div class="core-center" id="core-face-wrap" data-expr="idle">
+        <svg class="radar-face" viewBox="0 0 36 36">
+            <g class="expr-group expr-idle">
+                <rect class="face-eye eye-capsule" x="10.5" y="13" width="4.5" height="10" rx="2.25" />
+                <rect class="face-eye eye-capsule" x="21" y="13" width="4.5" height="10" rx="2.25" />
+            </g>
+            <g class="expr-group expr-happy">
+                <path class="face-stroke-bold" d="M 9.5 19.5 Q 12.75 14 16 19.5" />
+                <path class="face-stroke-bold" d="M 20 19.5 Q 23.25 14 26.5 19.5" />
+            </g>
+            <g class="expr-group expr-wink">
+                <rect class="face-eye" x="10" y="17" width="5.5" height="2.5" rx="1.25" />
+                <rect class="face-eye" x="21" y="13" width="4.5" height="10" rx="2.25" />
+            </g>
+            <g class="expr-group expr-think">
+                <rect class="face-eye" x="9.5" y="16" width="6.5" height="4" rx="2" />
+                <rect class="face-eye" x="20" y="16" width="6.5" height="4" rx="2" />
+            </g>
+            <g class="expr-group expr-curious">
+                <rect class="face-eye" x="10.5" y="14.5" width="4.5" height="7" rx="2.25" />
+                <rect class="face-eye" x="21" y="12" width="4.5" height="11" rx="2.25" />
+            </g>
+            <g class="expr-group expr-dizzy">
+                <path class="face-stroke-bold" d="M 10 15 L 15 20 M 15 15 L 10 20" />
+                <path class="face-stroke-bold" d="M 21 15 L 26 20 M 26 15 L 21 20" />
+            </g>
+            <g class="expr-group expr-sleep">
+                <rect class="face-eye" x="10" y="17" width="5.5" height="2.5" rx="1.25" />
+                <rect class="face-eye" x="20.5" y="17" width="5.5" height="2.5" rx="1.25" />
+                <text class="face-eye sleep-z1" x="22" y="10" font-size="7" font-family="monospace" font-weight="bold">z</text>
+                <text class="face-eye sleep-z2" x="26" y="6" font-size="8" font-family="monospace" font-weight="bold">Z</text>
+            </g>
+        </svg>
+    </div>
+</div>
+
+<!-- 全息终端面板 -->
+<div class="holo-terminal" id="terminal">
+    <div class="terminal-header">
+        <div class="header-title-group">
+            <div class="status-dot"></div>
+            <div class="terminal-title-text"><span>></span>FYLEN<span class="terminal-title-phonetic">[ˈfaɪlən]</span> // AVATAR_SYS</div>
+        </div>
+        <button id="term-close-btn" class="term-close-btn" title="关闭终端 (ESC)" aria-label="关闭终端">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+    
+    <div class="chat-stream" id="chat-stream">
+        <div class="chat-msg ai">你好！ 我是榆翎的数字分身助手，我叫 Fylen [ˈfaɪlən]，你也可以叫我小雷达。 我为你解答我知道的全部！</div>
+    </div>
+
+    <div class="terminal-input-area">
+        <span class="cmd-prefix">~$</span>
+        <input type="text" id="cmd-input" placeholder="输入指令或提问..." autocomplete="off">
+        <button id="send-btn">SEND</button>
+    </div>
+</div>
+
+<script src="./avatar/avatar.js" defer></script>
 <script src="./js/main.js" defer></script>
 </body>
 </html>

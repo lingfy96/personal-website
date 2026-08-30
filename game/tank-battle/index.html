@@ -647,7 +647,303 @@
   .surv-footer {
     display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 12px; border-top: 1px dashed currentColor;
   }
-</style>
+
+  /* ================= 移动端专属虚拟触控与 HUD 响应式布局 ================= */
+  .mobile-controls-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    display: none;
+  }
+  @media (max-width: 992px), (pointer: coarse) {
+    .mobile-controls-layer { display: block; }
+  }
+
+  /* 虚拟摇杆 */
+  .joystick-base {
+    position: absolute;
+    left: 28px;
+    bottom: 28px;
+    width: 130px;
+    height: 130px;
+    background: radial-gradient(circle, rgba(0, 54, 255, 0.3) 0%, rgba(7, 8, 20, 0.75) 100%);
+    border: 2px solid var(--color-cyan);
+    border-radius: 50%;
+    pointer-events: auto;
+    touch-action: none;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.35), inset 0 0 15px rgba(0, 54, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .joystick-stick {
+    width: 52px;
+    height: 52px;
+    background: radial-gradient(circle, var(--color-lime) 0%, #00a854 100%);
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    box-shadow: 0 0 14px var(--color-lime);
+    pointer-events: none;
+    transform: translate(0, 0);
+    transition: transform 0.05s ease-out;
+  }
+  .joystick-guide-arrows {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .j-arrow {
+    position: absolute;
+    font-size: 10px;
+    color: var(--color-cyan);
+    opacity: 0.6;
+  }
+  .j-up { top: 6px; left: 50%; transform: translateX(-50%); }
+  .j-down { bottom: 6px; left: 50%; transform: translateX(-50%); }
+  .j-left { left: 6px; top: 50%; transform: translateY(-50%); }
+  .j-right { right: 6px; top: 50%; transform: translateY(-50%); }
+
+  /* 右侧操作集群 */
+  .mobile-action-cluster {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 14px;
+    pointer-events: auto;
+    touch-action: none;
+  }
+  .mobile-skills-row {
+    display: flex;
+    gap: 12px;
+  }
+  .mobile-btn-skill {
+    width: 56px;
+    height: 56px;
+    background: rgba(10, 13, 30, 0.9);
+    border: 2px solid var(--color-lime);
+    border-radius: 50%;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(181, 248, 0, 0.4);
+    touch-action: manipulation;
+  }
+  .mobile-btn-skill:active {
+    transform: scale(0.92);
+    box-shadow: 0 0 25px var(--color-lime);
+  }
+  .m-skill-icon { font-size: 18px; line-height: 1; }
+  .m-skill-name { font-size: 9px; font-weight: 900; color: var(--color-lime); margin-top: 1px; }
+  .m-skill-cd {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--color-pink);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .m-skill-cd.active { opacity: 1; }
+
+  /* 开火大按键 */
+  .mobile-fire-button {
+    width: 84px;
+    height: 84px;
+    background: radial-gradient(circle, #ff2a55 0%, #4a000f 100%);
+    border: 3px solid var(--color-cyan);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(255, 42, 85, 0.6);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  .mobile-fire-button:active, .mobile-fire-button.firing {
+    transform: scale(0.94);
+    box-shadow: 0 0 35px #00f0ff, 0 0 45px #ff2a55;
+    border-color: var(--color-lime);
+  }
+  .fire-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .fire-icon { font-size: 26px; line-height: 1; }
+  .fire-text { font-size: 11px; font-weight: 900; color: #ffffff; letter-spacing: 1px; margin-top: 2px; }
+
+  /* 移动端断点适配 (CSS Media Queries) */
+  @media (max-width: 768px) {
+    #lobby-view {
+      padding: 12px 14px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      justify-content: flex-start;
+      gap: 12px;
+    }
+    .lobby-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding-bottom: 8px;
+    }
+    .lobby-title {
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
+    .lobby-stats {
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .npc-court {
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex: none;
+      justify-content: center;
+    }
+    .npc-card {
+      padding: 4px;
+    }
+    .npc-avatar-wrap {
+      width: 80px;
+      height: 100px;
+    }
+    .npc-name-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+    }
+    .npc-role {
+      font-size: 10px;
+    }
+    .dialogue-bubble {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      top: auto;
+      bottom: 90px;
+      width: auto;
+      max-width: 92vw;
+      font-size: 13px;
+      padding: 10px 14px;
+      z-index: 100;
+    }
+    .dialogue-bubble::after { display: none; }
+    .lobby-bottom-bar {
+      flex-direction: column;
+      gap: 12px;
+      padding: 10px 12px;
+      width: 100%;
+    }
+    .level-picker {
+      width: 100%;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .level-btn {
+      padding: 6px 8px;
+      font-size: 11px;
+      flex: 1;
+    }
+    .level-btn div:last-child {
+      display: none;
+    }
+    .player-status-card {
+      min-width: 180px;
+      max-width: 220px;
+      padding: 6px 10px;
+    }
+    .boss-health-bar-wrap {
+      top: 10px;
+      width: 90%;
+      padding: 4px 8px;
+    }
+    .skills-hud {
+      display: none; /* 移动端使用屏幕右侧的触控技能按钮 */
+    }
+    .acid-dialog-box {
+      padding: 20px 16px;
+      max-width: 94%;
+    }
+    .vn-title { font-size: 18px; }
+    .vn-content { font-size: 13px; line-height: 1.6; }
+    .vn-actions { flex-direction: column; gap: 8px; }
+    .vn-actions button { width: 100%; }
+
+    .mvp-surveillance-container, .defeat-surveillance-container {
+      padding: 14px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .surv-header { font-size: 11px; }
+    .surv-body {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .surv-target-frame {
+      width: 100%;
+      height: 120px;
+      flex-direction: row;
+      gap: 16px;
+    }
+    .surv-target-box-head, .surv-target-box-body { display: none; }
+    .surv-info-title { font-size: 16px; }
+    .surv-footer {
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+    }
+    .surv-footer div:last-child {
+      flex-direction: column;
+      width: 100%;
+      gap: 8px;
+    }
+    .surv-footer button {
+      width: 100%;
+    }
+    .joystick-base {
+      left: 16px;
+      bottom: 16px;
+      width: 110px;
+      height: 110px;
+    }
+    .joystick-stick {
+      width: 44px;
+      height: 44px;
+    }
+    .mobile-action-cluster {
+      right: 16px;
+      bottom: 16px;
+      gap: 10px;
+    }
+    .mobile-btn-skill {
+      width: 48px;
+      height: 48px;
+    }
+    .mobile-fire-button {
+      width: 72px;
+      height: 72px;
+    }
+  }
 </head>
 <body>
 
@@ -850,6 +1146,44 @@
         <div class="skill-icon">🛡️</div>
         <div class="skill-key">[E] 圣光铁幕</div>
         <div id="skill2-cd" class="skill-cd-mask">0s</div>
+      </div>
+    </div>
+
+    <!-- 移动端专属虚拟触控系统 -->
+    <div id="mobile-controls-container" class="mobile-controls-layer">
+      <!-- 左侧移动摇杆 -->
+      <div id="virtual-joystick-base" class="joystick-base">
+        <div id="virtual-joystick-stick" class="joystick-stick"></div>
+        <div class="joystick-guide-arrows">
+          <span class="j-arrow j-up">▲</span>
+          <span class="j-arrow j-down">▼</span>
+          <span class="j-arrow j-left">◀</span>
+          <span class="j-arrow j-right">▶</span>
+        </div>
+      </div>
+
+      <!-- 右侧战斗操作集群 -->
+      <div class="mobile-action-cluster">
+        <!-- 移动端技能按键 -->
+        <div class="mobile-skills-row">
+          <button class="mobile-btn-skill" id="m-skill-1" onclick="castSkill(1)" aria-label="呼叫战机空袭">
+            <span class="m-skill-icon">✈️</span>
+            <span class="m-skill-name">空袭</span>
+            <span id="m-skill1-cd" class="m-skill-cd">0s</span>
+          </button>
+          <button class="mobile-btn-skill" id="m-skill-2" onclick="castSkill(2)" aria-label="启动圣光铁幕">
+            <span class="m-skill-icon">🛡️</span>
+            <span class="m-skill-name">圣盾</span>
+            <span id="m-skill2-cd" class="m-skill-cd">0s</span>
+          </button>
+        </div>
+        <!-- 移动端开火大按键 -->
+        <div id="mobile-fire-pad" class="mobile-fire-button" aria-label="开火">
+          <div class="fire-inner">
+            <span class="fire-icon">🔥</span>
+            <span class="fire-text">开火</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1293,7 +1627,9 @@ let currentLevelConfig = null;
 
 const Input = {
   keys: {},
-  mouse: { x: 0, y: 0, isDown: false }
+  mouse: { x: window.innerWidth / 2, y: window.innerHeight / 4, isDown: false },
+  joystick: { active: false, dx: 0, dy: 0 },
+  touchAim: { active: false, x: 0, y: 0 }
 };
 
 window.addEventListener('resize', resizeCanvas);
@@ -1323,6 +1659,164 @@ window.addEventListener('mousedown', (e) => {
 window.addEventListener('mouseup', () => {
   Input.mouse.isDown = false;
 });
+
+/* ================= 移动端触控与摇杆底层驱动 ================= */
+function initMobileControlsEngine() {
+  const joyBase = document.getElementById('virtual-joystick-base');
+  const joyStick = document.getElementById('virtual-joystick-stick');
+  const firePad = document.getElementById('mobile-fire-pad');
+  let joystickTouchId = null;
+  let fireTouchId = null;
+
+  if (joyBase && joyStick) {
+    const handleJoyTouch = (e) => {
+      e.preventDefault();
+      audio.init();
+      const rect = joyBase.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const maxRadius = rect.width * 0.38;
+
+      for (let i = 0; i < e.touches.length; i++) {
+        const t = e.touches[i];
+        if (joystickTouchId === null || t.identifier === joystickTouchId) {
+          joystickTouchId = t.identifier;
+          const diffX = t.clientX - centerX;
+          const diffY = t.clientY - centerY;
+          const dist = Math.hypot(diffX, diffY);
+          const angle = Math.atan2(diffY, diffX);
+
+          const clampedDist = Math.min(dist, maxRadius);
+          const stickX = Math.cos(angle) * clampedDist;
+          const stickY = Math.sin(angle) * clampedDist;
+
+          joyStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+
+          if (dist > 6) {
+            Input.joystick.active = true;
+            Input.joystick.dx = (stickX / maxRadius);
+            Input.joystick.dy = (stickY / maxRadius);
+          } else {
+            Input.joystick.active = false;
+            Input.joystick.dx = 0;
+            Input.joystick.dy = 0;
+          }
+          break;
+        }
+      }
+    };
+
+    const resetJoy = (e) => {
+      let isJoyActive = false;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === joystickTouchId) {
+          isJoyActive = true;
+          break;
+        }
+      }
+      if (!isJoyActive) {
+        joystickTouchId = null;
+        joyStick.style.transform = 'translate(0px, 0px)';
+        Input.joystick.active = false;
+        Input.joystick.dx = 0;
+        Input.joystick.dy = 0;
+      }
+    };
+
+    joyBase.addEventListener('touchstart', handleJoyTouch, { passive: false });
+    joyBase.addEventListener('touchmove', handleJoyTouch, { passive: false });
+    joyBase.addEventListener('touchend', resetJoy, { passive: false });
+    joyBase.addEventListener('touchcancel', resetJoy, { passive: false });
+  }
+
+  if (firePad) {
+    const handleFireTouch = (e) => {
+      e.preventDefault();
+      audio.init();
+      Input.mouse.isDown = true;
+      firePad.classList.add('firing');
+      for (let i = 0; i < e.touches.length; i++) {
+        const t = e.touches[i];
+        if (fireTouchId === null || t.identifier === fireTouchId) {
+          fireTouchId = t.identifier;
+          // 若有敌人则辅助瞄准，若没有则朝战车朝向或当前鼠标位置射击
+          if (player) {
+            let nearestDist = Infinity;
+            let targetEnemy = null;
+            enemies.forEach(en => {
+              if (en.hp > 0) {
+                const d = Math.hypot(en.x - player.x, en.y - player.y);
+                if (d < nearestDist) { nearestDist = d; targetEnemy = en; }
+              }
+            });
+            if (targetEnemy) {
+              Input.mouse.x = targetEnemy.x;
+              Input.mouse.y = targetEnemy.y;
+            }
+          }
+          break;
+        }
+      }
+    };
+
+    const resetFire = (e) => {
+      let isFireActive = false;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === fireTouchId) {
+          isFireActive = true;
+          break;
+        }
+      }
+      if (!isFireActive) {
+        fireTouchId = null;
+        Input.mouse.isDown = false;
+        firePad.classList.remove('firing');
+      }
+    };
+
+    firePad.addEventListener('touchstart', handleFireTouch, { passive: false });
+    firePad.addEventListener('touchmove', handleFireTouch, { passive: false });
+    firePad.addEventListener('touchend', resetFire, { passive: false });
+    firePad.addEventListener('touchcancel', resetFire, { passive: false });
+  }
+
+  // 允许在全战场任何区域直接触控点击瞄准射击 (除了摇杆与UI操作按钮区域)
+  canvas.addEventListener('touchstart', (e) => {
+    if (gameState !== 'PLAYING') return;
+    audio.init();
+    const touch = e.touches[0];
+    if (touch && touch.clientX > 150) { // 避开左下角摇杆默认触控区域
+      Input.mouse.x = touch.clientX;
+      Input.mouse.y = touch.clientY;
+      Input.mouse.isDown = true;
+      Input.touchAim.active = true;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (gameState !== 'PLAYING') return;
+    const touch = e.touches[0];
+    if (touch && touch.clientX > 150) {
+      Input.mouse.x = touch.clientX;
+      Input.mouse.y = touch.clientY;
+      Input.touchAim.active = true;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+      Input.mouse.isDown = false;
+      Input.touchAim.active = false;
+    }
+  }, { passive: true });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initMobileControlsEngine();
+});
+setTimeout(() => {
+  initMobileControlsEngine();
+}, 300);
 
 let player = null;
 let enemies = [];
@@ -1487,12 +1981,16 @@ class PlayerTank {
 
   update() {
     let dx = 0, dy = 0;
-    if (Input.keys['KeyW'] || Input.keys['ArrowUp']) dy -= 1;
-    if (Input.keys['KeyS'] || Input.keys['ArrowDown']) dy += 1;
-    if (Input.keys['KeyA'] || Input.keys['ArrowLeft']) dx -= 1;
-    if (Input.keys['KeyD'] || Input.keys['ArrowRight']) dx += 1;
-
-    if (dx !== 0 && dy !== 0) { dx *= 0.7071; dy *= 0.7071; }
+    if (Input.joystick && Input.joystick.active) {
+      dx = Input.joystick.dx;
+      dy = Input.joystick.dy;
+    } else {
+      if (Input.keys['KeyW'] || Input.keys['ArrowUp']) dy -= 1;
+      if (Input.keys['KeyS'] || Input.keys['ArrowDown']) dy += 1;
+      if (Input.keys['KeyA'] || Input.keys['ArrowLeft']) dx -= 1;
+      if (Input.keys['KeyD'] || Input.keys['ArrowRight']) dx += 1;
+      if (dx !== 0 && dy !== 0) { dx *= 0.7071; dy *= 0.7071; }
+    }
 
     if (dx !== 0 || dy !== 0) {
       this.angle = Math.atan2(dy, dx);
@@ -1524,7 +2022,28 @@ class PlayerTank {
 
     this.x = Math.max(30, Math.min(canvas.width - 30, this.x));
     this.y = Math.max(30, Math.min(canvas.height - 30, this.y));
-    this.turretAngle = Math.atan2(Input.mouse.y - this.y, Input.mouse.x - this.x);
+
+    // 移动端辅助锁敌或触控/鼠标瞄准
+    if (Input.mouse.isDown && enemies.length > 0 && ('ontouchstart' in window || navigator.maxTouchPoints > 0) && !Input.touchAim.active) {
+      let nearestDist = Infinity;
+      let targetEnemy = null;
+      enemies.forEach(e => {
+        if (e.hp > 0) {
+          const d = Math.hypot(e.x - this.x, e.y - this.y);
+          if (d < nearestDist) {
+            nearestDist = d;
+            targetEnemy = e;
+          }
+        }
+      });
+      if (targetEnemy) {
+        this.turretAngle = Math.atan2(targetEnemy.y - this.y, targetEnemy.x - this.x);
+      } else {
+        this.turretAngle = Math.atan2(Input.mouse.y - this.y, Input.mouse.x - this.x);
+      }
+    } else {
+      this.turretAngle = Math.atan2(Input.mouse.y - this.y, Input.mouse.x - this.x);
+    }
 
     const cy = canvas.height / 2;
     const isLevel3 = GlobalState.selectedLevel === 3;
@@ -1574,18 +2093,30 @@ class PlayerTank {
 
     if (this.skill1CD > 0) {
       this.skill1CD--;
-      document.getElementById('skill1-cd').innerText = Math.ceil(this.skill1CD / 60) + 's';
-      document.getElementById('skill1-cd').classList.add('active');
+      const cd1Text = Math.ceil(this.skill1CD / 60) + 's';
+      const s1 = document.getElementById('skill1-cd');
+      const ms1 = document.getElementById('m-skill1-cd');
+      if (s1) { s1.innerText = cd1Text; s1.classList.add('active'); }
+      if (ms1) { ms1.innerText = cd1Text; ms1.classList.add('active'); }
     } else {
-      document.getElementById('skill1-cd').classList.remove('active');
+      const s1 = document.getElementById('skill1-cd');
+      const ms1 = document.getElementById('m-skill1-cd');
+      if (s1) s1.classList.remove('active');
+      if (ms1) ms1.classList.remove('active');
     }
 
     if (this.skill2CD > 0) {
       this.skill2CD--;
-      document.getElementById('skill2-cd').innerText = Math.ceil(this.skill2CD / 60) + 's';
-      document.getElementById('skill2-cd').classList.add('active');
+      const cd2Text = Math.ceil(this.skill2CD / 60) + 's';
+      const s2 = document.getElementById('skill2-cd');
+      const ms2 = document.getElementById('m-skill2-cd');
+      if (s2) { s2.innerText = cd2Text; s2.classList.add('active'); }
+      if (ms2) { ms2.innerText = cd2Text; ms2.classList.add('active'); }
     } else {
-      document.getElementById('skill2-cd').classList.remove('active');
+      const s2 = document.getElementById('skill2-cd');
+      const ms2 = document.getElementById('m-skill2-cd');
+      if (s2) s2.classList.remove('active');
+      if (ms2) ms2.classList.remove('active');
     }
 
     if (this.exp >= this.nextExp && this.level < 10) {

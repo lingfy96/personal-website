@@ -1,3 +1,17 @@
+    // =============== 全局捕获并忽略良性 ResizeObserver 循环提醒 ===============
+    window.addEventListener('error', (e) => {
+      if (
+        e.message &&
+        (e.message.includes('ResizeObserver') ||
+         e.message.includes('undelivered notifications') ||
+         e.message.includes('limit exceeded'))
+      ) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+      }
+    });
+
     // 基础交互统一初始化
     feather.replace();
 
@@ -53,17 +67,35 @@
     // =============== 实践经历 iframe：高度自适应，消除内部滚动 ===============
     const timelineFrame = document.querySelector('.timeline-frame');
     if (timelineFrame) {
+      let rAFId = null;
+      let lastHeight = 0;
       const fitFrame = () => {
-        const doc = timelineFrame.contentDocument;
-        if (!doc || !doc.body) return;
-        timelineFrame.style.height = doc.body.scrollHeight + 'px';
+        if (rAFId) cancelAnimationFrame(rAFId);
+        rAFId = requestAnimationFrame(() => {
+          try {
+            const doc = timelineFrame.contentDocument;
+            if (!doc || !doc.body) return;
+            const newHeight = Math.max(doc.body.scrollHeight, doc.documentElement ? doc.documentElement.scrollHeight : 0);
+            if (newHeight > 0 && Math.abs(newHeight - lastHeight) > 2) {
+              lastHeight = newHeight;
+              timelineFrame.style.height = newHeight + 'px';
+            }
+          } catch (e) {
+            // 忽略跨域或未就绪异常
+          }
+        });
       };
       timelineFrame.addEventListener('load', () => {
         fitFrame();
-        const doc = timelineFrame.contentDocument;
-        if (doc) {
-          new ResizeObserver(fitFrame).observe(doc.body);
-        }
+        try {
+          const doc = timelineFrame.contentDocument;
+          if (doc && doc.body) {
+            const ro = new ResizeObserver(() => {
+              fitFrame();
+            });
+            ro.observe(doc.body);
+          }
+        } catch (e) {}
       });
     }
 
@@ -113,10 +145,53 @@
     const marqueeTrack = document.getElementById('hero-marquee');
     if (marqueeContainer && marqueeTrack) {
         const textSpan = marqueeTrack.querySelector('span');
-        for(let i=0; i<5; i++) { marqueeTrack.appendChild(textSpan.cloneNode(true)); }
-        let marqueeTween = gsap.to(marqueeTrack, { xPercent: -50, repeat: -1, duration: 5, ease: "none", paused: true });
-        marqueeContainer.addEventListener('mouseenter', () => { marqueeContainer.classList.add('is-active'); marqueeTween.play(); });
-        marqueeContainer.addEventListener('mouseleave', () => { marqueeContainer.classList.remove('is-active'); marqueeTween.pause(); gsap.to(marqueeTrack, { xPercent: 0, duration: 0.5, ease: "power2.out" }); });
+        // 克隆足够数量保证无缝连贯滚动
+        for(let i=0; i<8; i++) { 
+          marqueeTrack.appendChild(textSpan.cloneNode(true)); 
+        }
+        // 设为始终不间断自动平滑滑动 (Always auto-sliding)
+        let marqueeTween = gsap.to(marqueeTrack, { 
+          xPercent: -50, 
+          repeat: -1, 
+          duration: 18, 
+          ease: "none" 
+        });
+        // 鼠标悬停微速缓速或略微互动，不完全停滞保持丝滑感
+        marqueeContainer.addEventListener('mouseenter', () => { 
+          marqueeContainer.classList.add('is-active'); 
+          gsap.to(marqueeTween, { timeScale: 0.6, duration: 0.5 });
+        });
+        marqueeContainer.addEventListener('mouseleave', () => { 
+          marqueeContainer.classList.remove('is-active'); 
+          gsap.to(marqueeTween, { timeScale: 1, duration: 0.5 });
+        });
+    }
+
+    // 数字分身交互台词动态循环
+    const digitalSpeech = document.getElementById('digital-twin-speech');
+    const avatarCard = document.getElementById('digital-avatar-card');
+    if (digitalSpeech && avatarCard) {
+      const speeches = [
+        "系统初始化完毕。你好，我是专属数字分身。输入问题调取我的知识库记录。",
+        "QUANTUM CORE // 核心架构已部署，WebGL 渲染引擎就绪",
+        ">> 检索日志：AI 智能体架构 · 沉浸式前端 · 跨界策展",
+        ">> 实践沉淀：语文科代表教务统筹（连续三年独任）",
+        ">> CONNECT：点击右下角量子核心唤醒全息终端"
+      ];
+      let speechIndex = 0;
+      setInterval(() => {
+        speechIndex = (speechIndex + 1) % speeches.length;
+        gsap.to(digitalSpeech, { opacity: 0, y: -4, duration: 0.25, onComplete: () => {
+          digitalSpeech.innerText = speeches[speechIndex];
+          gsap.to(digitalSpeech, { opacity: 1, y: 0, duration: 0.3 });
+        }});
+      }, 4000);
+
+      avatarCard.addEventListener('click', (e) => {
+        if (e.target.closest('a') || e.target.closest('button')) return;
+        const trigger = document.getElementById('core-trigger');
+        if (trigger) trigger.click();
+      });
     }
 
     document.querySelectorAll('.liquid-btn').forEach(btn => {
@@ -853,7 +928,7 @@
       if(isHeader) {
         return `<button data-val="${phone}" onclick="${copyFn}" class="flex items-center gap-2 font-mono font-bold px-4 py-2 border-4 border-brand-dark bg-white text-brand-dark hover:bg-brand-yellow shadow-[4px_4px_0px_0px_#1A1A1A] transition-all"><i data-feather="phone" class="w-5 h-5"></i> ${phone}</button><button data-val="${email}" onclick="${copyFn}" class="flex items-center gap-2 font-mono font-bold px-4 py-2 border-4 border-brand-dark bg-white text-brand-dark hover:bg-brand-blue hover:text-white shadow-[4px_4px_0px_0px_#1A1A1A] transition-all"><i data-feather="mail" class="w-5 h-5"></i> ${email}</button>`;
       } else {
-        return `<button data-val="wechat_id" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors" title="复制微信"><i data-feather="message-circle" class="w-6 h-6"></i></button><button data-val="${email}" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors" title="复制邮箱"><i data-feather="mail" class="w-6 h-6"></i></button><button data-val="${phone}" onclick="${copyFn}" class="w-14 h-14 bg-brand-cream dark:bg-[#1A1A1A] border-4 border-brand-cream dark:border-brand-cream text-brand-dark dark:text-brand-cream flex items-center justify-center hover:bg-brand-red hover:border-brand-red hover:text-white transition-colors" title="复制电话"><i data-feather="phone" class="w-6 h-6"></i></button>`;
+        return `<button data-val="wechat_id" onclick="${copyFn}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-black/15 dark:border-white/15 bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 flex items-center justify-center hover:bg-[#00FF88] hover:border-[#00FF88] hover:text-black transition-all shadow-sm" title="复制微信"><i data-feather="message-circle" class="w-5 h-5"></i></button><button data-val="${email}" onclick="${copyFn}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-black/15 dark:border-white/15 bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 flex items-center justify-center hover:bg-[#00FF88] hover:border-[#00FF88] hover:text-black transition-all shadow-sm" title="复制邮箱"><i data-feather="mail" class="w-5 h-5"></i></button><button data-val="${phone}" onclick="${copyFn}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-black/15 dark:border-white/15 bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 flex items-center justify-center hover:bg-[#00FF88] hover:border-[#00FF88] hover:text-black transition-all shadow-sm" title="复制电话"><i data-feather="phone" class="w-5 h-5"></i></button>`;
       }
     }
     document.getElementById('contact-info').innerHTML = createContactHtml(true);

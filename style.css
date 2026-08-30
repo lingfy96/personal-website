@@ -361,42 +361,70 @@
       opacity: 0.08;
     }
 
-    /* 亮光模式下：极简优雅的纯白光韵与墨黑微颤闪烁 (Minimal White-Luminescence Strobe) */
+    /* 亮光模式下：极具层次感的“里白外黑”高定简约美学闪烁 (Layered Inner-White Outer-Black Monolithic Strobe) */
     @keyframes lightModeWhiteGlowGlitch {
       0% {
         color: #000000;
+        -webkit-text-stroke: 0px transparent;
         text-shadow: 0 0 0 transparent;
-        transform: translate(0, 0);
+        transform: translate(0, 0) scale(1);
         opacity: 0.035;
       }
-      18% {
-        color: #111111;
-        text-shadow: 0 0 25px rgba(255, 255, 255, 0.95), 0 0 50px rgba(255, 255, 255, 0.8), -3px 0 0 rgba(255, 255, 255, 0.9);
-        transform: translate(-3px, 1px);
-        opacity: 0.45;
+      14% {
+        color: #FFFFFF;
+        -webkit-text-stroke: 2px #000000;
+        text-shadow: 
+          2px 2px 0px #000000,
+          -2px -2px 0px #000000,
+          0 6px 18px rgba(0, 0, 0, 0.28);
+        transform: translate(-3px, -2px) scale(1.01);
+        opacity: 0.78;
       }
-      38% {
-        color: #000000;
-        text-shadow: 0 0 45px rgba(255, 255, 255, 1), 0 0 80px rgba(255, 255, 255, 0.9), 3px -1px 0 rgba(255, 255, 255, 0.95);
-        transform: translate(3px, -1px);
-        opacity: 0.65;
+      30% {
+        color: #FFFFFF;
+        -webkit-text-stroke: 3.5px #000000;
+        text-shadow: 
+          3.5px 3.5px 0px #000000,
+          -3.5px -3.5px 0px #000000,
+          3.5px -3.5px 0px #000000,
+          -3.5px 3.5px 0px #000000,
+          0 14px 35px rgba(0, 0, 0, 0.55),
+          0 28px 70px rgba(0, 0, 0, 0.25);
+        transform: translate(4px, 2px) scale(1.025);
+        opacity: 0.95;
       }
-      55% {
-        color: #1A1A1A;
-        text-shadow: 0 0 30px rgba(255, 255, 255, 0.9), 0 0 60px rgba(255, 255, 255, 0.7);
-        transform: translate(-2px, 0);
-        opacity: 0.5;
+      48% {
+        color: #FFFFFF;
+        -webkit-text-stroke: 3px #000000;
+        text-shadow: 
+          -5px 0 0 #000000,
+          5px 0 0 rgba(0, 0, 0, 0.75),
+          0 10px 30px rgba(0, 0, 0, 0.4);
+        transform: translate(-3px, 1px) skewX(-1.5deg) scale(1.015);
+        opacity: 0.9;
       }
-      75% {
-        color: #000000;
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-        transform: translate(1px, 1px);
-        opacity: 0.25;
+      68% {
+        color: #FFFFFF;
+        -webkit-text-stroke: 2.2px #000000;
+        text-shadow: 
+          2px 2px 0px #000000,
+          -2px -2px 0px #000000,
+          0 8px 24px rgba(0, 0, 0, 0.3);
+        transform: translate(2px, -1px) scale(1.008);
+        opacity: 0.68;
+      }
+      84% {
+        color: rgba(255, 255, 255, 0.85);
+        -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.45);
+        text-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        transform: translate(0, 0) scale(1);
+        opacity: 0.32;
       }
       100% {
         color: #000000;
+        -webkit-text-stroke: 0px transparent;
         text-shadow: 0 0 0 transparent;
-        transform: translate(0, 0);
+        transform: translate(0, 0) scale(1);
         opacity: 0.035;
       }
     }
@@ -461,11 +489,11 @@
       }
     }
 
-    /* 亮光模式下触发极简白光微颤 */
+    /* 亮光模式下触发“里白外黑”层次闪烁 */
     .glitch-active {
-       animation: lightModeWhiteGlowGlitch 0.42s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+       animation: lightModeWhiteGlowGlitch 0.44s cubic-bezier(0.16, 1, 0.3, 1) both !important;
        z-index: 10 !important;
-       will-change: transform, text-shadow, opacity;
+       will-change: transform, text-shadow, opacity, -webkit-text-stroke;
     }
 
     /* 暗光模式下触发赛博全息闪烁 */
@@ -1197,6 +1225,47 @@
     .dark .lux-feature-card:hover {
       border-color: rgba(0,200,140,0.5); box-shadow: 12px 12px 0 rgba(0,0,0,0.28), 0 0 0 1px rgba(0,200,140,0.18), 0 0 30px rgba(31,79,255,0.16);
     }
+    /* 数字分身卡片特色特效 */
+    .lux-avatar-card {
+      position: relative;
+    }
+    .avatar-card-glow {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 75% 25%, rgba(31,79,255,0.08) 0%, rgba(0,200,140,0.04) 35%, transparent 70%);
+      opacity: 0.8;
+      transition: opacity 0.4s ease;
+    }
+    .dark .avatar-card-glow {
+      background: radial-gradient(circle at 75% 25%, rgba(0,200,140,0.12) 0%, rgba(31,79,255,0.08) 35%, transparent 70%);
+    }
+    .digital-scanline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.9), transparent);
+      box-shadow: 0 0 8px #00F0FF;
+      animation: digitalScan 3s linear infinite;
+    }
+    @keyframes digitalScan {
+      0% { top: -10%; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { top: 110%; opacity: 0; }
+    }
+    .digital-avatar-frame {
+      box-shadow: 0 0 25px rgba(31,79,255,0.2);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .lux-avatar-card:hover .digital-avatar-frame {
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(0,200,140,0.35), 0 0 15px rgba(31,79,255,0.3);
+    }
     .lux-feature-dot { width: 2.2rem; height: 2.2rem; border-radius: 50%; background: #1F4FFF; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex: none; box-shadow: 0 0 18px rgba(31,79,255,0.22); }
     .lux-feature-label { color: #1F4FFF; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.25em; }
     .lux-feature-title { font-size: 1.6rem; font-weight: 900; line-height: 1.35; margin-bottom: 1.2rem; }
@@ -1267,20 +1336,77 @@
     .lux-marquee .marquee-text { color: #8a8a8a; }
     .dark .lux-marquee .marquee-text { color: rgba(255,255,255,0.5); }
 
-    /* ========== 极简高级感：座右铭 ========== */
-    .lux-motto { background: #FFFFFF; color: #141414; border-top: 1px solid rgba(20,20,20,0.08); }
-    .dark .lux-motto { background: #0F0F0F; color: #FFFFFF; border-top-color: rgba(255,255,255,0.1); }
-    /* 几何实心引号：圆弧+方块构成，亮黑暗白自适应 */
-    .lux-motto-mark, .lux-motto-mark-close { position: absolute; width: clamp(3.2rem, 7vw, 6.2rem); height: clamp(4.8rem, 10.5vw, 9.2rem); pointer-events: none; }
-    .lux-motto-mark { top: 2.5rem; left: clamp(1.5rem, 5vw, 5rem); }
-    .lux-motto-mark-close { bottom: 2.5rem; right: clamp(1.5rem, 5vw, 5rem); transform: rotate(180deg); }
-    .lux-motto-mark::before, .lux-motto-mark-close::before { content: ''; position: absolute; left: 0; top: 0; width: 62%; height: 100%; border-radius: 999px 999px 0 0; background: #141414; }
-    .lux-motto-mark::after, .lux-motto-mark-close::after { content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 42%; background: #141414; }
-    .dark .lux-motto-mark::before, .dark .lux-motto-mark::after,
-    .dark .lux-motto-mark-close::before, .dark .lux-motto-mark-close::after { background: #FFFFFF; }
-    .lux-motto-text { font-size: clamp(1.8rem, 4.5vw, 4rem); font-weight: 900; letter-spacing: 0.35em; text-align: center; line-height: 1.8; }
-    .lux-motto-meta { margin-top: 2rem; text-align: center; font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.3em; color: #9a9a9a; }
-    .dark .lux-motto-meta { color: rgba(255,255,255,0.4); }
+    /* ========== 极简高级感 · 典雅书籍腰封 (Book Obi-Band) 风格页脚 ========== */
+    .lux-obi-footer {
+      background: #F4F4F0;
+      color: #1A1A1A;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.02);
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    .dark .lux-obi-footer {
+      background: #0D0E12;
+      color: #FFFFFF;
+      border-top-color: rgba(255, 255, 255, 0.08);
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.4);
+    }
+
+    /* 经典排版双引号：高雅、纯粹、极具书卷与人文设计感 */
+    .lux-editorial-quote-mark {
+      font-size: clamp(2.6rem, 5.5vw, 4.8rem);
+      line-height: 1;
+      color: #71717A;
+      font-weight: 300;
+      vertical-align: middle;
+      display: inline-block;
+      transform: translateY(-0.15em);
+      opacity: 0.85;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .dark .lux-editorial-quote-mark {
+      color: #A1A1AA;
+      opacity: 0.9;
+    }
+    .lux-obi-footer:hover .lux-editorial-quote-mark {
+      color: #00C88C;
+    }
+
+    .lux-obi-motto-heading {
+      font-size: clamp(1.4rem, 3.4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-align: center;
+      line-height: 1.4;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+      color: #09090B;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      transition: color 0.3s ease;
+    }
+    .dark .lux-obi-motto-heading {
+      color: #FAFAFA;
+      text-shadow: 0 0 24px rgba(255,255,255,0.08);
+    }
+
+    .lux-obi-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .dark .lux-obi-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    .lux-obi-pill:hover {
+      border-color: #00C88C;
+      color: #00C88C;
+    }
 
     /* ========== 实践经历：iframe 无缝嵌入 ========== */
     .timeline-frame { display: block; border: none; width: 100%; min-height: 100vh; }
