@@ -682,20 +682,51 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #1A1A1A; border-radius: 3px; }
 
-    /* ========== Originkit 级纯 JS 磁吸画廊 (Magnetic Carousel) ========== */
-    #magnetic-carousel-container {
-      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
-      gap: 12px; position: relative; overflow: visible;
+    /* ========== 资质证书响应式网格墙：PC 3 列 / 移动 2 列 ========== */
+    .cert-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      width: 100%;
     }
-    .mc-backdrop {
-      position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: opacity 0.3s;
+    .cert-cell {
+      position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 2px solid #1A1A1A;
+      background: rgba(0, 0, 0, 0.04);
+      cursor: pointer;
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      padding: 0;
     }
-    .mc-card {
-      flex: none; overflow: hidden; cursor: pointer; will-change: width, height; position: relative; 
-      background-size: cover; background-position: center; background-repeat: no-repeat; 
-      border: 4px solid #1A1A1A; box-shadow: 8px 8px 0px rgba(0,0,0,0.3); 
+    .cert-cell:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
     }
-    .mc-card:hover { border-color: #1A1A1A; } 
+    .cert-cell:focus-visible {
+      outline: 3px solid #1F4FFF;
+      outline-offset: 2px;
+    }
+    .cert-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.3s ease;
+    }
+    .cert-cell:hover .cert-img { transform: scale(1.04); }
+
+    @media (max-width: 767px) {
+      .cert-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .cert-cell { box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15); }
+      .cert-cell:hover { transform: none; box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18); }
+      .cert-cell:hover .cert-img { transform: none; }
+    }
 
     /* 打印样式 */
     @media print {
@@ -703,8 +734,9 @@
       body { background: white !important; color: black !important; }
       .comic-card, .slider-album { border: 1px solid #000; box-shadow: none !important; background: white; color: black; transform: none !important;}
       .tab-content, .sub-tab-content { display: block !important; opacity: 1 !important; margin-bottom: 2rem; }
-      .mc-backdrop { display: none !important; }
-      .mc-card { position: relative !important; transform: none !important; margin-bottom: 20px; display: inline-block; width: 100px !important; height: 100px !important; }
+      .cert-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+      .cert-cell { box-shadow: none !important; transform: none !important; border: 1px solid #000 !important; }
+      .cert-img { filter: none !important; }
       .dock-item { width: auto !important; height: auto !important; padding: 10px; }
     }
 
@@ -724,7 +756,7 @@
       .mobile-degrade .vinyl-sleeve,
       .mobile-degrade .ppt-card,
       .mobile-degrade .folder-front,
-      .mobile-degrade .mc-card,
+      .mobile-degrade .cert-cell,
       .mobile-degrade .dock-item,
       .mobile-degrade .hover-float {
         transform: none !important;
@@ -759,31 +791,6 @@
         width: 130% !important;
         height: 130% !important;
         transform: translate(-50%, -50%) translateY(-20px) scale(1.08) !important;
-      }
-
-      /* 证书轮播改为水平滑动 */
-      .mobile-degrade #magnetic-carousel-container,
-      #magnetic-carousel-container.mc-static {
-        display: flex !important;
-        flex-direction: row;
-        gap: 0.75rem;
-        align-items: center;
-        justify-content: flex-start;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 1rem 0.75rem 1.25rem;
-        height: auto !important;
-        scroll-snap-type: x proximity;
-        -webkit-overflow-scrolling: touch;
-      }
-      .mobile-degrade #magnetic-carousel-container .mc-card,
-      #magnetic-carousel-container.mc-static .mc-card {
-        width: 72vw !important;
-        height: auto !important;
-        min-width: 72vw;
-        aspect-ratio: 4 / 3;
-        box-shadow: 2px 2px 0 rgba(0,0,0,0.15) !important;
-        scroll-snap-align: center;
       }
 
       /* PPT 展开图组在窄屏纵向滑动浏览 */

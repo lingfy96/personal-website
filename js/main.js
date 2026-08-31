@@ -583,7 +583,7 @@
 
         data.images.forEach((src, i) => {
             const el = document.createElement('div');
-            el.className = 'absolute inset-0 bg-cover bg-center border-[3px] sm:border-[4px] border-[#1A1A1A] cursor-pointer shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-xl sm:rounded-lg overflow-hidden';
+            el.className = 'absolute inset-0 bg-contain bg-no-repeat bg-center border-[3px] sm:border-[4px] border-[#1A1A1A] cursor-pointer shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-xl sm:rounded-lg overflow-hidden bg-slate-100/70 dark:bg-slate-900/40';
             el.style.backgroundImage = `url(${src})`;
             el.style.transformStyle = 'preserve-3d';
             el.style.transformOrigin = 'center center'; 
@@ -709,10 +709,11 @@
         });
     }
 
-    // =============== 资质证书 Framer-like Cover Flow ===============
+    // =============== 资质证书响应式网格墙 ===============
     // 证书统计：共 27 张，按机构分组排列：阿里云/AIT(10) · 科大讯飞(3) · 华为云(6) · Datawhale联合生态(8)
     // 🔁 检查结果：0 张重复（所有主题相近证书均来自不同发证机构/不同批次）
-    const certImages = [
+    // 用 var 声明以避免 defer 脚本在某些环境下被提前 evaluate 时触发 TDZ
+    var certImages = [
       // ===== 阿里云 / AIT 人工智能训练师体系 — 10 张 =====
       "./assets/certificates/ai/aliyun-bailian-agent.jpg",              // 阿里云 · 百炼智能体构建
       "./assets/certificates/ai/aliyun-llm-content.jpg",                // 阿里云 · 大模型内容创作
@@ -749,81 +750,31 @@
       "./assets/certificates/ai/datawhale-marscode-ai-coding.png"               // Datawhale×豆包MarsCode · AI+编程能力
     ];
 
-    const mcConfig = { collapsedWidth: 80, hoverWidth: 180, collapsedHeight: 56, hoverHeight: 126, openSize: 600, gap: 12, influence: 200, blur: 2 };
-    let mcOpenIndex = null; let mcTarget = Array(certImages.length).fill(0); let mcCur = Array(certImages.length).fill(0);
-    let mcLoopId = 0; let isClosing = false; let mcCloseTimer = null; const mcCards = [];
-
+    // 保留函数名 initMagneticCarousel 以兼容 setupTabs 调用点；内部实现已重写为响应式网格
     function initMagneticCarousel() {
-       const mcContainer = document.getElementById('magnetic-carousel-container');
-       if (!mcContainer) return;
-       if (mcContainer.getBoundingClientRect().width === 0) return; 
-       if (mcCards.length > 0) {
-           if (!isTouch) { mcTarget = certImages.map(() => 0); startMcLoop(); }
-           return;
-       }
+       const grid = document.getElementById('cert-grid');
+       if (!grid || grid.children.length > 0) return;
+       if (typeof certImages === 'undefined' || !certImages || !certImages.length) return;
 
+       const frag = document.createDocumentFragment();
        certImages.forEach((src, i) => {
-          const card = document.createElement('div'); card.className = "mc-card"; card.style.backgroundImage = `url(${src})`;
-          card.onclick = (e) => { e.stopPropagation(); if (mcOpenIndex === i) closeMc(); else openMc(i); };
-          mcContainer.appendChild(card); mcCards.push(card);
+          const cell = document.createElement('button');
+          cell.type = 'button';
+          cell.className = 'cert-cell group';
+          cell.setAttribute('aria-label', `证书 ${i + 1} / ${certImages.length}`);
+          cell.onclick = (e) => { e.stopPropagation(); window.openLightbox(src); };
+
+          const img = document.createElement('img');
+          img.className = 'cert-img';
+          img.src = src;
+          img.alt = `AI 资质证书 ${i + 1}`;
+          img.loading = 'lazy';
+          img.decoding = 'async';
+
+          cell.appendChild(img);
+          frag.appendChild(cell);
        });
-
-       if (isTouch) {
-          mcContainer.classList.add('mc-static');
-          return;
-       }
-
-       mcContainer.addEventListener('mousemove', (e) => {
-          if (mcOpenIndex !== null) return;
-          const rect = mcContainer.getBoundingClientRect(); const cx = e.clientX - rect.left;
-          const n = certImages.length; const totalBase = n * mcConfig.collapsedWidth + (n - 1) * mcConfig.gap;
-          const startX = (rect.width - totalBase) / 2;
-          mcTarget = certImages.map((_, i) => {
-             const center = startX + i * (mcConfig.collapsedWidth + mcConfig.gap) + mcConfig.collapsedWidth / 2;
-             const dist = Math.abs(cx - center); const f = Math.max(0, 1 - dist / mcConfig.influence); return f * f * (3 - 2 * f);
-          });
-          startMcLoop();
-       });
-       mcContainer.addEventListener('mouseleave', () => { if (mcOpenIndex !== null) return; mcTarget = certImages.map(() => 0); startMcLoop(); });
-       renderMcCards();
-    }
-
-    function startMcLoop() {
-       if (mcLoopId) return;
-       const step = () => {
-          let moving = false;
-          for (let i = 0; i < mcCur.length; i++) {
-             const d = mcTarget[i] - mcCur[i];
-             if (Math.abs(d) > 0.001) { mcCur[i] += d * 0.2; moving = true; } else { mcCur[i] = mcTarget[i]; }
-          }
-          renderMcCards(); mcLoopId = moving ? requestAnimationFrame(step) : 0;
-       };
-       mcLoopId = requestAnimationFrame(step);
-    }
-
-    function renderMcCards() {
-       const backdrop = document.querySelector('.mc-backdrop');
-       if (backdrop) backdrop.style.pointerEvents = mcOpenIndex !== null ? "auto" : "none";
-       mcCards.forEach((card, i) => {
-          let w, h, isBlurred = false, z = 2; let transition = "none";
-          if (mcOpenIndex !== null) {
-             transition = "all 0.3s cubic-bezier(0.44, 0, 0.56, 1)";
-             if (i === mcOpenIndex) { w = mcConfig.openSize; h = mcConfig.openSize; z = 3; } 
-             else { w = mcConfig.collapsedWidth; h = mcConfig.collapsedHeight; isBlurred = true; }
-          } else {
-             const f = mcCur[i]; w = mcConfig.collapsedWidth + (mcConfig.hoverWidth - mcConfig.collapsedWidth) * f;
-             h = mcConfig.collapsedHeight + (mcConfig.hoverHeight - mcConfig.collapsedHeight) * f;
-             if (isClosing) transition = "all 0.3s cubic-bezier(0.44, 0, 0.56, 1)";
-          }
-          card.style.width = w + "px"; card.style.height = h + "px"; card.style.zIndex = z;
-          card.style.transition = transition; card.style.filter = isBlurred ? `blur(${mcConfig.blur}px)` : "none"; card.style.opacity = isBlurred ? "0.6" : "1";
-       });
-    }
-
-    function openMc(i) { mcTarget = mcTarget.map(() => 0); mcOpenIndex = i; openLightbox(certImages[i]); setTimeout(closeMc, 100); }
-    function closeMc() {
-       mcTarget = certImages.map(() => 0); mcCur = certImages.map(() => 0); mcOpenIndex = null; isClosing = true; renderMcCards();
-       clearTimeout(mcCloseTimer); mcCloseTimer = setTimeout(() => { isClosing = false; renderMcCards(); startMcLoop(); }, 300);
+       grid.appendChild(frag);
     }
 
     // =============== GSAP 音乐贴纸物理抓取交互 (动态全域置顶) ===============

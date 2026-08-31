@@ -812,7 +812,7 @@
 </div>
 <div id="ai-certs" class="sub-tab-content hidden w-full">
   <!-- 资质证书 · 高级排列容器：机构分组 + 数目标注 + 统计徽章 + 磁性动效卡片流（动效保持不变） -->
-  <div class="bg-white/95 dark:bg-[#0E1628]/95 border-2 border-slate-200 dark:border-blue-500/30 rounded-3xl shadow-lg relative overflow-hidden h-[560px] md:h-[540px]">
+  <div class="bg-white/95 dark:bg-[#0E1628]/95 border-2 border-slate-200 dark:border-blue-500/30 rounded-3xl shadow-lg relative overflow-hidden">
     <!-- 背景巨型水印（版式装饰） -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 font-black text-[12vw] text-slate-200 dark:text-slate-800/40 pointer-events-none whitespace-nowrap select-none tracking-widest">AWARDS</div>
 
@@ -866,9 +866,9 @@
     <!-- 分割装饰线：机构分组排列视觉分界 -->
     <div class="relative z-20 mx-5 sm:mx-8 h-px bg-gradient-to-r from-transparent via-slate-300/80 dark:via-blue-500/40 to-transparent"></div>
 
-    <!-- ========== 磁性动效卡片流容器（动效逻辑完全保持不变） ========== -->
-    <div class="relative z-10 flex items-center justify-center h-[360px] md:h-[350px]">
-      <div id="magnetic-carousel-container"><div class="mc-backdrop"></div></div>
+    <!-- ========== 响应式证书网格容器：PC 3 列 / 移动 2 列 ========== -->
+    <div class="relative z-10 px-5 sm:px-8 pt-2 pb-6">
+      <div id="cert-grid" class="cert-grid"></div>
     </div>
 
     <!-- ========== 底部：高级排列分隔与机构分组图例索引 ========== -->
