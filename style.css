@@ -1761,3 +1761,134 @@
         border-radius: 1rem !important;
       }
     }
+
+    /* ==========================================================================
+       数字分身量子弹射动效 (Anime.js Ejection Trajectory & Hologram Card)
+       ========================================================================== */
+    .avatar-eject-launcher {
+      position: relative;
+      z-index: 15;
+      transition: all 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .avatar-eject-launcher:hover {
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.6), 0 0 10px rgba(31, 79, 255, 0.4);
+    }
+    .avatar-eject-launcher:active {
+      transform: scale(0.96);
+    }
+
+    /* 数字分身卡片折叠/收起完全消失态 */
+    #digital-avatar-card {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, filter 0.4s ease, border-color 0.4s ease;
+      will-change: transform, opacity, filter;
+    }
+
+    #digital-avatar-card.avatar-card-collapsed {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transform: scale(0.85) translateY(16px) !important;
+      filter: blur(8px) !important;
+    }
+
+    .avatar-flight-projectile {
+      position: fixed;
+      z-index: 99999;
+      pointer-events: none;
+      box-sizing: border-box;
+      overflow: hidden;
+      border: 2px solid #00FF88;
+      box-shadow: 0 0 35px rgba(0, 255, 136, 0.65), 0 0 15px rgba(249, 246, 64, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transform-origin: center center;
+      will-change: transform, left, top, width, height, border-radius, background-color, filter, opacity;
+    }
+
+    .projectile-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .projectile-glow {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(249, 246, 64, 0.25), rgba(0, 255, 136, 0.25), rgba(31, 79, 255, 0.2));
+      pointer-events: none;
+    }
+
+    .projectile-core-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #070D18;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .dark .projectile-core-icon {
+      color: #00FF88;
+    }
+
+    .projectile-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00FF88;
+      box-shadow: 0 0 10px #00FF88;
+      animation: ping-wave 1s infinite;
+    }
+
+    .projectile-badge {
+      align-self: flex-start;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(7, 13, 24, 0.85);
+      border: 1px solid #00FF88;
+      color: #00FF88;
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+    }
+
+    /* 弹射尾迹粒子 */
+    .eject-trail-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99998;
+      border-radius: 50%;
+      background: #00FF88;
+      box-shadow: 0 0 10px #00FF88, 0 0 20px #F9F640;
+      transform: translate(-50%, -50%);
+      opacity: 0.85;
+      will-change: transform, opacity;
+    }
+
+    /* 卡牌落地点锁定高能冲击波 */
+    .card-landed-impact {
+      animation: cardImpactPulse 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) both !important;
+    }
+
+    @keyframes cardImpactPulse {
+      0% {
+        transform: scale(0.96);
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.9), 0 0 45px rgba(249, 246, 64, 0.85);
+        border-color: #F9F640;
+      }
+      40% {
+        transform: scale(1.035);
+        box-shadow: 0 0 40px 10px rgba(0, 255, 136, 0.65), 0 0 65px rgba(31, 79, 255, 0.5);
+        border-color: #00FF88;
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+        border-color: rgba(0, 255, 136, 0.3);
+      }
+    }
+

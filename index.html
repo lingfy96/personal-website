@@ -210,51 +210,130 @@
         <div class="lg:col-span-7">
           <p class="lux-lead">探索极致的跨界表达。<br>在设计、内容与 AI 的交汇处，重构无限可能。</p>
           <!-- 特长标签（保留原交互） -->
-          <div class="flex flex-wrap gap-3 mt-10 no-print" id="lux-tags">
+          <div class="flex flex-wrap gap-2.5 mt-8 no-print" id="lux-tags">
             <button class="liquid-btn lux-tag"><span>PPT 设计</span></button>
             <button class="liquid-btn lux-tag"><span>AI 编程</span></button>
             <button class="liquid-btn lux-tag"><span>写作</span></button>
             <button class="liquid-btn lux-tag"><span>视频剪辑</span></button>
           </div>
-          <div class="flex flex-col items-start gap-5 mt-12">
-            <!-- 主按钮：开启探索 -->
-            <a href="#about" class="kinetic-btn lux-btn-dark">
-              <span class="text-part">开启探索<span class="text-[#00C88C] mx-2.5 font-mono text-xs opacity-90">//</span>发现更多</span>
-              <span class="arrow-part ml-3 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center border border-white/20"><i data-feather="arrow-right" class="w-3.5 h-3.5 text-white"></i></span>
-            </a>
-            <!-- 次级错落按钮：一键查看我能为你做什么（醒目、高级、动效炫酷） -->
-            <a href="#skills" class="lux-skills-portal-btn group ml-4 sm:ml-8 md:ml-12" aria-label="一键查看我能为你做什么">
-              <!-- 流光边框背景与粒子波纹 -->
-              <span class="portal-border-beam" aria-hidden="true"></span>
-              <span class="portal-inner-glow" aria-hidden="true"></span>
-              
-              <!-- 核心内容区 -->
-              <div class="relative z-10 flex items-center gap-3">
-                <!-- 左侧炫酷脉冲能量徽章 -->
-                <span class="portal-icon-box">
-                  <i data-feather="zap" class="w-3.5 h-3.5 text-white fill-white animate-pulse"></i>
-                  <span class="portal-ping"></span>
-                </span>
-                
-                <!-- 清晰立体的核心文本 -->
-                <div class="flex items-center gap-2">
-                  <span class="portal-main-text font-black text-sm md:text-base tracking-wide">
-                    一键查看我能为你做什么
-                  </span>
-                  <span class="hidden sm:inline-block font-mono text-xs font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-[#1F4FFF] dark:text-[#00C88C] border border-blue-200/60 dark:border-blue-800/40">
-                    SKILLS
-                  </span>
+
+          <!-- 首屏核心控制区：分身微发射舱 + 行动按钮组 -->
+          <div class="flex flex-col items-start gap-4 mt-8 relative" id="hero-actions-container">
+            <!-- 数字分身量子发射舱 (极简高定硬件风格正方形雷达微舱) -->
+            <div id="avatar-launcher-dock" class="inline-flex items-center gap-3 py-1.5 px-3 rounded-2xl bg-slate-100/80 dark:bg-[#0E1628]/80 border border-slate-200/80 dark:border-slate-800/90 shadow-sm backdrop-blur-md cursor-pointer select-none transition-all duration-300 hover:border-[#00C88C]/60 hover:shadow-md group" title="点击召唤 / 收起数字分身卡片" onclick="window.toggleAvatarCard && window.toggleAvatarCard(true)">
+              <!-- 精致正方形雷达头像发射盒 -->
+              <div id="avatar-launch-pad" class="avatar-eject-launcher relative flex-none w-11 h-11 sm:w-12 sm:h-12 rounded-xl p-0.5 bg-gradient-to-br from-[#00FF88] via-blue-500 to-[#00FF88] shadow-[0_0_15px_rgba(0,255,136,0.35)] transition-transform duration-300 group-hover:scale-105">
+                <div class="fylen-avatar-radar-container !rounded-[10px] relative w-full h-full overflow-hidden">
+                  <div class="fylen-radar-grid"></div>
+                  <div class="fylen-radar-crosshair-h"></div>
+                  <div class="fylen-radar-crosshair-v"></div>
+                  <div class="fylen-radar-sweep"></div>
+                  <div class="fylen-radar-circle-outer !w-[90%] !h-[90%]"></div>
+                  <div class="fylen-radar-circle-mid !w-[68%] !h-[68%]"></div>
+                  <div class="fylen-radar-blip !w-1.5 !h-1.5"></div>
+                  <!-- 发光表情核心晶球 -->
+                  <div class="fylen-radar-energy-core !w-6 !h-6" id="launcher-face-wrap" data-expr="idle">
+                    <svg class="radar-face" viewBox="0 0 36 36">
+                      <g class="expr-group expr-idle">
+                        <rect class="face-eye eye-capsule" x="10.5" y="13" width="4.5" height="10" rx="2.25" />
+                        <rect class="face-eye eye-capsule" x="21" y="13" width="4.5" height="10" rx="2.25" />
+                      </g>
+                      <g class="expr-group expr-happy">
+                        <path class="face-stroke-bold" d="M 9.5 19.5 Q 12.75 14 16 19.5" />
+                        <path class="face-stroke-bold" d="M 20 19.5 Q 23.25 14 26.5 19.5" />
+                      </g>
+                      <g class="expr-group expr-wink">
+                        <rect class="face-eye" x="10" y="17" width="5.5" height="2.5" rx="1.25" />
+                        <rect class="face-eye" x="21" y="13" width="4.5" height="10" rx="2.25" />
+                      </g>
+                      <g class="expr-group expr-think">
+                        <rect class="face-eye" x="9.5" y="16" width="6.5" height="4" rx="2" />
+                        <rect class="face-eye" x="20" y="16" width="6.5" height="4" rx="2" />
+                      </g>
+                      <g class="expr-group expr-curious">
+                        <rect class="face-eye" x="10.5" y="14.5" width="4.5" height="7" rx="2.25" />
+                        <rect class="face-eye" x="21" y="12" width="4.5" height="11" rx="2.25" />
+                      </g>
+                      <g class="expr-group expr-sleep">
+                        <rect class="face-eye" x="10" y="17" width="5.5" height="2.5" rx="1.25" />
+                        <rect class="face-eye" x="20.5" y="17" width="5.5" height="2.5" rx="1.25" />
+                        <text class="face-eye sleep-z1" x="22" y="10" font-size="7" font-family="monospace" font-weight="bold">z</text>
+                        <text class="face-eye sleep-z2" x="26" y="6" font-size="8" font-family="monospace" font-weight="bold">Z</text>
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="fylen-hud-bracket fylen-hud-tl"></div>
+                  <div class="fylen-hud-bracket fylen-hud-tr"></div>
+                  <div class="fylen-hud-bracket fylen-hud-bl"></div>
+                  <div class="fylen-hud-bracket fylen-hud-br"></div>
                 </div>
-                
-                <!-- 右侧高级交互导向箭头 -->
-                <span class="portal-arrow-box">
-                  <i data-feather="arrow-right" class="w-4 h-4 text-[#1F4FFF] dark:text-[#00C88C] group-hover:translate-x-1 transition-transform"></i>
+                <!-- 呼吸能量信号指示灯 -->
+                <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                  <span id="launcher-ping-beacon" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF88] opacity-80"></span>
+                  <span id="launcher-dot-beacon" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00FF88] border border-black/80"></span>
                 </span>
               </div>
-            </a>
+
+              <!-- 极简高雅文字标识 -->
+              <div class="flex items-center gap-3 pr-1">
+                <div class="flex flex-col">
+                  <span class="text-xs font-mono font-bold tracking-wider text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                    <span>FYLEN // 量子分身</span>
+                  </span>
+                  <span id="launcher-sub-tip" class="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
+                    点击召唤 / 收起分身卡片
+                  </span>
+                </div>
+                <span id="launcher-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#00FF88]/15 text-emerald-600 dark:text-[#00FF88] border border-[#00FF88]/30 transition-colors">
+                  ONLINE
+                </span>
+              </div>
+            </div>
+
+            <!-- 核心行动按钮行 (横向舒展呼应) -->
+            <div class="flex flex-wrap items-center gap-3.5 pt-1 w-full">
+              <!-- 主按钮：开启探索 -->
+              <a href="#about" class="kinetic-btn lux-btn-dark">
+                <span class="text-part">开启探索<span class="text-[#00C88C] mx-2 font-mono text-xs opacity-90">//</span>发现更多</span>
+                <span class="arrow-part ml-2.5 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center border border-white/20"><i data-feather="arrow-right" class="w-3.5 h-3.5 text-white"></i></span>
+              </a>
+
+              <!-- 次级错落按钮：一键查看我能为你做什么 -->
+              <a href="#skills" class="lux-skills-portal-btn group" aria-label="一键查看我能为你做什么">
+                <span class="portal-border-beam" aria-hidden="true"></span>
+                <span class="portal-inner-glow" aria-hidden="true"></span>
+                
+                <div class="relative z-10 flex items-center gap-2.5">
+                  <span class="portal-icon-box">
+                    <i data-feather="zap" class="w-3 h-3 text-white fill-white animate-pulse"></i>
+                    <span class="portal-ping"></span>
+                  </span>
+                  
+                  <div class="flex items-center gap-1.5">
+                    <span class="portal-main-text font-black text-xs sm:text-sm tracking-wide">
+                      一键查看我能为你做什么
+                    </span>
+                    <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-[#1F4FFF] dark:text-[#00C88C] border border-blue-200/60 dark:border-blue-800/40">
+                      SKILLS
+                    </span>
+                  </div>
+                  
+                  <span class="portal-arrow-box">
+                    <i data-feather="arrow-right" class="w-3.5 h-3.5 text-[#1F4FFF] dark:text-[#00C88C] group-hover:translate-x-1 transition-transform"></i>
+                  </span>
+                </div>
+              </a>
+            </div>
           </div>
-          <div class="flex gap-6 mt-12 no-print" id="contact-info"></div>
-          <div class="marquee-container lux-marquee mt-12 no-print" id="hero-marquee-container" title="探索 AI 与创意的跨界新航线">
+          <!-- 联系方式专属区域：高定通透胶囊、充足留白与精致呼吸感 -->
+          <div class="mt-11 sm:mt-13 pt-5 border-t border-slate-200/60 dark:border-slate-800/70 flex flex-wrap items-center gap-3 sm:gap-4 no-print" id="contact-info-wrapper">
+            <span class="text-[11px] font-mono font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase flex items-center gap-1.5 mr-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00C88C]"></span>
+              CONNECT
+            </span>
+            <div class="flex flex-wrap gap-2.5 sm:gap-3" id="contact-info"></div>
+          </div>
+          <div class="marquee-container lux-marquee mt-7 no-print" id="hero-marquee-container" title="探索 AI 与创意的跨界新航线">
             <div class="marquee-track py-2" id="hero-marquee">
               <span class="marquee-text text-sm font-bold tracking-[0.3em] uppercase">探索 AI 与创意的跨界新航线</span>
             </div>

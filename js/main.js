@@ -950,7 +950,18 @@
       const email = 'wyyt1339@163.com'; const phone = '18289400309';
       const copyFn = `navigator.clipboard.writeText(this.dataset.val); if(window.showCyberToast) { window.showCyberToast('已复制: ' + this.dataset.val); }`;
       if(isHeader) {
-        return `<button data-val="${phone}" onclick="${copyFn}" class="flex items-center gap-2 font-mono font-bold px-4 py-2 border-4 border-brand-dark bg-white text-brand-dark hover:bg-brand-yellow shadow-[4px_4px_0px_0px_#1A1A1A] transition-all"><i data-feather="phone" class="w-5 h-5"></i> ${phone}</button><button data-val="${email}" onclick="${copyFn}" class="flex items-center gap-2 font-mono font-bold px-4 py-2 border-4 border-brand-dark bg-white text-brand-dark hover:bg-brand-blue hover:text-white shadow-[4px_4px_0px_0px_#1A1A1A] transition-all"><i data-feather="mail" class="w-5 h-5"></i> ${email}</button>`;
+        return `
+          <button data-val="${phone}" onclick="${copyFn}" class="group/contact flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100/80 dark:bg-[#0E1628]/80 border border-slate-200/80 dark:border-slate-800/90 shadow-sm backdrop-blur-md hover:border-[#00C88C] hover:text-[#00C88C] dark:hover:border-[#00FF88] dark:hover:text-[#00FF88] transition-all duration-200 cursor-pointer select-none" title="点击复制电话">
+            <span class="w-5 h-5 rounded-md bg-slate-200/60 dark:bg-slate-800/80 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover/contact:bg-[#00C88C]/15 group-hover/contact:text-[#00C88C] dark:group-hover/contact:text-[#00FF88] transition-colors"><i data-feather="phone" class="w-3 h-3"></i></span>
+            <span>${phone}</span>
+            <span class="text-[9.5px] opacity-45 font-normal tracking-wide">COPY</span>
+          </button>
+          <button data-val="${email}" onclick="${copyFn}" class="group/contact flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100/80 dark:bg-[#0E1628]/80 border border-slate-200/80 dark:border-slate-800/90 shadow-sm backdrop-blur-md hover:border-blue-500 hover:text-blue-600 dark:hover:border-[#00C88C] dark:hover:text-[#00C88C] transition-all duration-200 cursor-pointer select-none" title="点击复制邮箱">
+            <span class="w-5 h-5 rounded-md bg-slate-200/60 dark:bg-slate-800/80 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover/contact:bg-blue-500/15 group-hover/contact:text-blue-600 dark:group-hover/contact:text-[#00C88C] transition-colors"><i data-feather="mail" class="w-3 h-3"></i></span>
+            <span>${email}</span>
+            <span class="text-[9.5px] opacity-45 font-normal tracking-wide">COPY</span>
+          </button>
+        `;
       } else {
         return `<button data-val="wechat_id" onclick="${copyFn}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-black/15 dark:border-white/15 bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 flex items-center justify-center hover:bg-[#00FF88] hover:border-[#00FF88] hover:text-black transition-all shadow-sm" title="复制微信"><i data-feather="message-circle" class="w-5 h-5"></i></button><button data-val="${email}" onclick="${copyFn}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-black/15 dark:border-white/15 bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 flex items-center justify-center hover:bg-[#00FF88] hover:border-[#00FF88] hover:text-black transition-all shadow-sm" title="复制邮箱"><i data-feather="mail" class="w-5 h-5"></i></button><button data-val="${phone}" onclick="${copyFn}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-black/15 dark:border-white/15 bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 flex items-center justify-center hover:bg-[#00FF88] hover:border-[#00FF88] hover:text-black transition-all shadow-sm" title="复制电话"><i data-feather="phone" class="w-5 h-5"></i></button>`;
       }
@@ -997,4 +1008,318 @@
     setTimeout(() => {
         initSliderDOM();
     }, 100);
+
+    // ================= 数字分身卡牌开屏弹射与交互收放引擎 (Anime.js Ejection & Retract Engine) =================
+    let isAvatarCardVisible = true;
+    let isAnimatingAvatar = false;
+
+    function toggleAvatarCard(userTriggered = true) {
+      const targetCard = document.getElementById('digital-avatar-card');
+      const launcher = document.getElementById('avatar-launch-pad');
+      const badge = document.getElementById('launcher-status-badge');
+      const subTip = document.getElementById('launcher-sub-tip');
+      const launcherFace = document.getElementById('launcher-face-wrap');
+      const pingBeacon = document.getElementById('launcher-ping-beacon');
+      const dotBeacon = document.getElementById('launcher-dot-beacon');
+
+      if (!targetCard || !launcher || isAnimatingAvatar) return;
+
+      if (isAvatarCardVisible) {
+        // ========== 1. 执行卡牌收回动效 (Retract / Complete Collapse) ==========
+        isAnimatingAvatar = true;
+        isAvatarCardVisible = false;
+
+        if (launcherFace) launcherFace.setAttribute('data-expr', 'curious');
+
+        // 收缩回缩动效
+        const startRect = targetCard.getBoundingClientRect();
+        const destRect = launcher.getBoundingClientRect();
+
+        // 倒放尾迹粒子
+        const trailInterval = setInterval(() => {
+          createEjectTrailParticle(
+            destRect.left + destRect.width / 2 + (Math.random() * 20 - 10),
+            destRect.top + destRect.height / 2 + (Math.random() * 20 - 10)
+          );
+        }, 40);
+
+        if (typeof anime !== 'undefined') {
+          anime({
+            targets: targetCard,
+            opacity: [1, 0],
+            scale: [1, 0.85],
+            translateY: [0, 16],
+            filter: ['blur(0px)', 'blur(8px)'],
+            duration: 380,
+            easing: 'easeInCubic',
+            complete: function() {
+              clearInterval(trailInterval);
+              targetCard.classList.add('avatar-card-collapsed');
+              targetCard.style.opacity = '0';
+              targetCard.style.visibility = 'hidden';
+              targetCard.style.pointerEvents = 'none';
+              isAnimatingAvatar = false;
+
+              // 更新发射坞状态
+              if (badge) {
+                badge.textContent = 'STANDBY';
+                badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 transition-colors';
+              }
+              if (subTip) {
+                subTip.textContent = '已入舱 · 点击发射';
+              }
+              if (launcherFace) launcherFace.setAttribute('data-expr', 'sleep');
+              if (pingBeacon) {
+                pingBeacon.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60';
+              }
+              if (dotBeacon) {
+                dotBeacon.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400 border border-black/80';
+              }
+            }
+          });
+        } else {
+          clearInterval(trailInterval);
+          targetCard.classList.add('avatar-card-collapsed');
+          targetCard.style.opacity = '0';
+          targetCard.style.visibility = 'hidden';
+          targetCard.style.pointerEvents = 'none';
+          isAnimatingAvatar = false;
+          if (badge) {
+            badge.textContent = 'STANDBY';
+            badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 transition-colors';
+          }
+          if (subTip) {
+            subTip.textContent = '已入舱 · 点击发射';
+          }
+        }
+
+      } else {
+        // ========== 2. 执行卡牌展开与高能弹射 (Eject / Deploy) ==========
+        isAvatarCardVisible = true;
+        targetCard.classList.remove('avatar-card-collapsed');
+        targetCard.style.visibility = 'visible';
+        targetCard.style.opacity = '0';
+        targetCard.style.filter = 'blur(0px)';
+
+        // 发射坞状态恢复
+        if (badge) {
+          badge.textContent = 'ONLINE';
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#00FF88]/15 text-emerald-600 dark:text-[#00FF88] border border-[#00FF88]/30 transition-colors';
+        }
+        if (subTip) {
+          subTip.textContent = '点击召唤 / 收起分身卡片';
+        }
+        if (pingBeacon) {
+          pingBeacon.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF88] opacity-80';
+        }
+        if (dotBeacon) {
+          dotBeacon.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00FF88] border border-black/80';
+        }
+
+        triggerAvatarEjectAnimation(true);
+      }
+    }
+
+    function triggerAvatarEjectAnimation(forceReplay = false) {
+      const launcher = document.getElementById('avatar-launch-pad');
+      const targetCard = document.getElementById('digital-avatar-card');
+      const launcherFace = document.getElementById('launcher-face-wrap');
+      if (!launcher || !targetCard) return;
+
+      // 确保目标卡片在动画前解除完全收缩态，以便计算位置
+      targetCard.classList.remove('avatar-card-collapsed');
+      targetCard.style.visibility = 'visible';
+      targetCard.style.pointerEvents = 'none';
+
+      const startRect = launcher.getBoundingClientRect();
+      const targetRect = targetCard.getBoundingClientRect();
+
+      // 如果目标或发射器尚未渲染或尺寸为0，则延后重试
+      if (startRect.width === 0 || targetRect.width === 0) {
+        setTimeout(() => triggerAvatarEjectAnimation(forceReplay), 200);
+        return;
+      }
+
+      isAnimatingAvatar = true;
+
+      // 发射台头像联动表情
+      if (launcherFace) {
+        launcherFace.setAttribute('data-expr', 'wink');
+        setTimeout(() => {
+          if (launcherFace) launcherFace.setAttribute('data-expr', 'idle');
+        }, 1200);
+      }
+
+      // 创建或获取弹射卡牌
+      let projectile = document.getElementById('avatar-flight-projectile');
+      if (!projectile) {
+        projectile = document.createElement('div');
+        projectile.id = 'avatar-flight-projectile';
+        projectile.className = 'avatar-flight-projectile';
+        projectile.innerHTML = `
+          <div class="projectile-inner">
+            <div class="projectile-glow"></div>
+            <div class="projectile-core-icon">
+              <span class="projectile-dot"></span>
+              <span class="projectile-label font-mono">FYLEN [ˈfaɪlən] // 量子分身</span>
+            </div>
+            <div class="flex items-center justify-between mt-auto">
+              <div class="projectile-badge">RADAR SYNC 99.8%</div>
+              <span class="text-[9px] font-mono font-bold text-[#00FF88]">LAUNCHING ▶</span>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(projectile);
+      }
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const startLeft = startRect.left;
+      const startTop = startRect.top;
+      const startW = startRect.width || 60;
+      const startH = startRect.height || 60;
+
+      const destLeft = targetRect.left;
+      const destTop = targetRect.top;
+      const destW = targetRect.width;
+      const destH = targetRect.height;
+
+      // 初始化弹射体初始状态 (与发射台一致的正方形高圆角、荧光黄、模糊)
+      projectile.style.display = 'block';
+      projectile.style.left = startLeft + 'px';
+      projectile.style.top = startTop + 'px';
+      projectile.style.width = startW + 'px';
+      projectile.style.height = startH + 'px';
+      projectile.style.borderRadius = '18px';
+      projectile.style.backgroundColor = '#F9F640';
+      projectile.style.filter = 'blur(4px)';
+      projectile.style.opacity = '0.95';
+      projectile.style.transform = 'rotate(-10deg) scale(0.85)';
+
+      // 弹射尾迹发光粒子
+      const trailInterval = setInterval(() => {
+        if (!projectile || projectile.style.display === 'none') {
+          clearInterval(trailInterval);
+          return;
+        }
+        const curRect = projectile.getBoundingClientRect();
+        if (curRect.width > 0) {
+          createEjectTrailParticle(curRect.left + curRect.width / 2, curRect.top + curRect.height / 2);
+        }
+      }, 40);
+
+      // 使用 Anime.js 驱动平滑弹射抛物线轨迹
+      if (typeof anime !== 'undefined') {
+        anime({
+          targets: projectile,
+          left: [startLeft, destLeft],
+          top: [startTop, destTop],
+          width: [startW, destW],
+          height: [startH, destH],
+          borderRadius: [18, 24],
+          backgroundColor: ['#F9F640', isDark ? '#161616' : '#FFFFFF'],
+          filter: ['blur(4px)', 'blur(0px)'],
+          rotate: [-10, 0],
+          scale: [0.85, 1],
+          opacity: [0.95, 1],
+          duration: 1050,
+          easing: 'cubicBezier(0.2, 0.9, 0.3, 1)',
+          complete: function() {
+            clearInterval(trailInterval);
+            isAnimatingAvatar = false;
+            
+            // 目标卡牌触发高能冲击波
+            targetCard.style.opacity = '1';
+            targetCard.style.transform = 'none';
+            targetCard.classList.remove('card-landed-impact');
+            void targetCard.offsetWidth; // 触发重绘
+            targetCard.classList.add('card-landed-impact');
+
+            // 联动数字分身表情闪烁
+            const avatarWrap = document.getElementById('avatar-face-wrap');
+            if (avatarWrap) {
+              avatarWrap.setAttribute('data-expr', 'wink');
+              setTimeout(() => {
+                if (avatarWrap) avatarWrap.setAttribute('data-expr', 'idle');
+              }, 1200);
+            }
+
+            // 弹射体淡出交接
+            anime({
+              targets: projectile,
+              opacity: [1, 0],
+              duration: 240,
+              easing: 'easeOutQuad',
+              complete: function() {
+                projectile.style.display = 'none';
+              }
+            });
+          }
+        });
+      } else {
+        // 降级支持
+        projectile.style.transition = 'all 1s cubic-bezier(0.2, 0.9, 0.3, 1)';
+        projectile.style.left = destLeft + 'px';
+        projectile.style.top = destTop + 'px';
+        projectile.style.width = destW + 'px';
+        projectile.style.height = destH + 'px';
+        projectile.style.borderRadius = '24px';
+        projectile.style.backgroundColor = isDark ? '#161616' : '#FFFFFF';
+        projectile.style.filter = 'blur(0px)';
+        projectile.style.transform = 'rotate(0deg) scale(1)';
+        setTimeout(() => {
+          clearInterval(trailInterval);
+          isAnimatingAvatar = false;
+          targetCard.classList.add('card-landed-impact');
+          projectile.style.display = 'none';
+        }, 1000);
+      }
+    }
+
+    function createEjectTrailParticle(x, y) {
+      const p = document.createElement('div');
+      p.className = 'eject-trail-particle';
+      const size = Math.floor(Math.random() * 8 + 6);
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = x + (Math.random() * 24 - 12) + 'px';
+      p.style.top = y + (Math.random() * 24 - 12) + 'px';
+      document.body.appendChild(p);
+
+      if (typeof anime !== 'undefined') {
+        anime({
+          targets: p,
+          scale: [1, 0],
+          opacity: [0.9, 0],
+          translateX: (Math.random() - 0.5) * 40,
+          translateY: (Math.random() - 0.5) * 40,
+          duration: 450 + Math.random() * 300,
+          easing: 'easeOutQuad',
+          complete: () => {
+            if (p.parentNode) p.parentNode.removeChild(p);
+          }
+        });
+      } else {
+        setTimeout(() => {
+          if (p.parentNode) p.parentNode.removeChild(p);
+        }, 500);
+      }
+    }
+
+    // 挂载全局调用，供点击重新弹射与控制显隐
+    window.toggleAvatarCard = toggleAvatarCard;
+    window.triggerAvatarEjectAnimation = triggerAvatarEjectAnimation;
+
+    // 页面初次打开自动触发弹射
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        triggerAvatarEjectAnimation();
+      }, 400);
+    });
+    // 兼容 DOMContentLoaded 下的极速加载
+    if (document.readyState === 'complete') {
+      setTimeout(() => {
+        triggerAvatarEjectAnimation();
+      }, 400);
+    }
+
   
