@@ -488,19 +488,13 @@
     // =============== PPT 现代水平画廊 (GSAP 极致平滑强控版) ===============
     const pptProjects = {
         'project1': {
-            title: '商业企划PPT',
-            desc: '为顶尖商业赛事设计的路演全套幻灯片，采用极简排版与高对比度色彩，提升数据可视化的信息传达效率。',
-            images: ['./ppt1.jpg', './ppt2.jpg', './ppt3.jpg']
-        },
-        'project2': {
-            title: '年终总结模板',
-            desc: '专为职场精英打造的年终汇报PPT模板，内置多种图表与逻辑动画，让年终复盘更具说服力。',
-            images: ['./ppt4.jpg', './ppt5.jpg', './ppt6.jpg']
-        },
-        'project3': {
-            title: '课程答辩演示',
-            desc: '大学期末核心课程的答辩展示，清晰梳理研究脉络，运用大图压屏与留白艺术，获得专业最高分。',
-            images: ['./ppt7.jpg', './ppt8.jpg', './ppt9.jpg']
+            title: '商业路演',
+            desc: '为商业路演设计的全套演示内容，采用强视觉冲击的版式与数据叙事，让核心卖点一目了然。',
+            images: [
+                './assets/photo/ppt/1.jpg',
+                './assets/photo/ppt/2.jpg',
+                './assets/photo/ppt/3.jpg'
+            ]
         }
     };
 

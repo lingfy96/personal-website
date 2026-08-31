@@ -65,35 +65,6 @@
       box-shadow: 0 20px 40px rgba(0, 200, 140, 0.16);
     }
 
-    .stat-card {
-      position: relative;
-      background: #FFFFFF;
-      color: #0F172A;
-      border: 2px solid #E2E8F0;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      border-radius: 1rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-      overflow: hidden;
-    }
-    .stat-card::before {
-      content: "";
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 4px;
-      background: linear-gradient(90deg, #1F4FFF, #00C88C);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s ease;
-    }
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(31, 79, 255, 0.12);
-      border-color: #1F4FFF;
-    }
-    .stat-card:hover::before { transform: scaleX(1); }
-    .stat-card:nth-child(2):hover { box-shadow: 0 20px 40px rgba(0, 200, 140, 0.12); border-color: #00C88C; }
-    .stat-card:nth-child(3):hover { box-shadow: 0 20px 40px rgba(31, 79, 255, 0.12); border-color: #1F4FFF; }
-
     .tech-tag {
       position: relative;
       display: inline-flex;
@@ -292,19 +263,7 @@
     }
 
     /* ========== 首屏：极简 AI 文字动效 ========== */
-    .cyber-slice { position: relative; pointer-events: auto; }
     .cyber-hover { cursor: crosshair; }
-    .cyber-slice::before, .cyber-slice::after {
-        content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-        opacity: 0; pointer-events: none;
-    }
-    .cyber-slice::before { clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%); color: #1F4FFF; z-index: -1; }
-    .cyber-slice::after { clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%); color: #1F4FFF; z-index: -1; }
-    .cyber-slice.is-active::before { transform: translate(-15px, -8px); opacity: 1; z-index: 10;}
-    .cyber-slice.is-active::after { transform: translate(15px, 8px); opacity: 1; z-index: 10;}
-    .cyber-slice.is-active { color: transparent !important; -webkit-text-stroke: 2px #1A1A1A; text-shadow: none !important; }
-    .dark .cyber-slice.is-active { -webkit-text-stroke: 2px #FFFFFF; }
 
     .scramble-title { cursor: pointer; display: flex; }
     .scramble-title .hero-char { display: inline-block; transform-origin: bottom; white-space: pre; }
@@ -613,23 +572,15 @@
     .ppt-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.5); transition: all 0.4s; }
     .ppt-card-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s; }
     .ppt-card.card1 .ppt-card-overlay { background-color: rgba(31, 79, 255, 0.85); }
-    .ppt-card.card2 .ppt-card-overlay { background-color: rgba(0, 200, 140, 0.85); }
-    .ppt-card.card3 .ppt-card-overlay { background-color: rgba(15, 23, 42, 0.85); }
     .ppt-card.card1 { bottom: 60px; z-index: 10; animation-delay: 0.1s; }
-    .ppt-card.card2 { bottom: 40px; z-index: 20; animation-delay: 0.2s; }
-    .ppt-card.card3 { bottom: 20px; z-index: 30; animation-delay: 0.3s; }
     .folder-front { position: absolute; bottom: 0; width: 100%; height: 130px; background: rgba(255, 255, 255, 0.95); border: 2px solid #E2E8F0; border-radius: 16px; z-index: 40; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 35px rgba(31, 79, 255, 0.1); backdrop-filter: blur(12px); }
     .dark .folder-front { background: rgba(19, 30, 53, 0.92); border-color: rgba(31, 79, 255, 0.4); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
     .folder-label { font-family: 'Space Mono', monospace; font-weight: 900; font-size: 1.8rem; color: #1F4FFF; text-transform: uppercase; letter-spacing: 3px; }
     .dark .folder-label { color: #00C88C; }
     .card-folder:hover { transform: translateY(-5px); }
     .card-folder:hover .card1 { transform: translateY(-130px) rotate(-6deg); }
-    .card-folder:hover .card2 { transform: translateY(-80px) rotate(4deg); }
-    .card-folder:hover .card3 { transform: translateY(-30px) rotate(-2deg); }
     .ppt-card:hover { z-index: 100 !important; transition-delay: 0s !important; }
     .card-folder:hover .card1:hover { transform: translateY(-140px) scale(1.05) rotate(0); box-shadow: 0 15px 35px rgba(31, 79, 255, 0.3); }
-    .card-folder:hover .card2:hover { transform: translateY(-90px) scale(1.05) rotate(0); box-shadow: 0 15px 35px rgba(0, 200, 140, 0.3); }
-    .card-folder:hover .card3:hover { transform: translateY(-40px) scale(1.05) rotate(0); box-shadow: 0 15px 35px rgba(31, 79, 255, 0.3); }
     .ppt-card:hover .ppt-card-img { filter: grayscale(0); }
     .ppt-card:hover .ppt-card-overlay { opacity: 1; }
 
@@ -752,25 +703,10 @@
       body { background: white !important; color: black !important; }
       .comic-card, .slider-album { border: 1px solid #000; box-shadow: none !important; background: white; color: black; transform: none !important;}
       .tab-content, .sub-tab-content { display: block !important; opacity: 1 !important; margin-bottom: 2rem; }
-      .mc-backdrop, .cyber-slice::before, .cyber-slice::after { display: none !important; }
+      .mc-backdrop { display: none !important; }
       .mc-card { position: relative !important; transform: none !important; margin-bottom: 20px; display: inline-block; width: 100px !important; height: 100px !important; }
       .dock-item { width: auto !important; height: auto !important; padding: 10px; }
     }
-
-    /* ========== 3D 宇宙面板 UI ========== */
-    #planet-info-panel {
-        position: absolute; right: 2rem; top: 50%; transform: translateY(-50%);
-        width: 320px; background: rgba(17, 17, 17, 0.85); backdrop-filter: blur(10px);
-        border: 2px solid #FFFFFF; box-shadow: 6px 6px 0px #1A1A1A;
-        color: #FFFFFF; padding: 1.5rem; z-index: 40;
-        opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
-        font-family: 'Space Mono', monospace;
-    }
-    #planet-info-panel.visible { opacity: 1; pointer-events: auto; }
-    .pi-title { font-size: 2rem; font-weight: 900; color: #FFFFFF; border-bottom: 2px solid #1A1A1A; margin-bottom: 1rem; padding-bottom: 0.5rem;}
-    .pi-stat { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
-    .pi-stat span:first-child { color: #888; }
-    .pi-desc { font-family: sans-serif; font-size: 0.85rem; line-height: 1.6; margin-top: 1rem; border-top: 1px border-dashed #555; padding-top: 1rem;}
 
     /* ========== 移动端/触控设备降级保护：禁用 3D 倾斜、硬阴影回退、防止溢出、触控滚动优化 ========== */
     @media (max-width: 767px), (pointer: coarse) {
@@ -790,8 +726,7 @@
       .mobile-degrade .folder-front,
       .mobile-degrade .mc-card,
       .mobile-degrade .dock-item,
-      .mobile-degrade .hover-float,
-      .mobile-degrade #planet-info-panel {
+      .mobile-degrade .hover-float {
         transform: none !important;
         box-shadow: 2px 2px 0 rgba(0,0,0,0.12) !important;
         transition: none !important;
@@ -852,26 +787,33 @@
       }
 
       /* PPT 展开图组在窄屏纵向滑动浏览 */
-      #ppt-stack-viewport {
+      .mobile-degrade #ppt-stack-viewport {
         width: 100vw !important;
         max-width: 100vw !important;
-        height: 240px !important;
-        padding: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 24px 0 0 !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        gap: 16px;
       }
-      #ppt-stack-scene {
+      .mobile-degrade #ppt-stack-scene {
         display: flex !important;
         align-items: center;
         justify-content: flex-start;
         gap: 12px;
         width: 100% !important;
-        height: 100% !important;
+        height: auto !important;
+        min-height: 54vw !important;
+        max-height: 240px;
         overflow-x: auto !important;
         overflow-y: hidden !important;
         padding: 0 12px !important;
         scroll-snap-type: x proximity;
         -webkit-overflow-scrolling: touch;
       }
-      #ppt-stack-scene > div {
+      .mobile-degrade #ppt-stack-scene > div {
         position: relative !important;
         inset: auto !important;
         width: 72vw !important;
@@ -882,6 +824,15 @@
         max-height: 220px;
         flex: 0 0 auto;
         scroll-snap-align: center;
+      }
+      /* 把移动端底部信息卡改为正常流，避免与图片重叠 */
+      .mobile-degrade #ppt-stack-viewport > .md\:hidden.absolute {
+        position: relative !important;
+        bottom: auto !important;
+        left: 16px !important;
+        right: 16px !important;
+        width: calc(100vw - 32px) !important;
+        margin: 8px 16px 24px !important;
       }
 
       /* PPT 画廊透视回退 */
@@ -1022,41 +973,6 @@
     .dark .lux-btn-dark:hover {
       border-color: #00C88C;
       box-shadow: 0 15px 40px rgba(0, 200, 140, 0.35), 0 0 25px rgba(31, 79, 255, 0.3);
-    }
-
-    .lux-btn-light {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(16px);
-      color: #0F172A;
-      padding: 0.95rem 2rem;
-      border-radius: 9999px;
-      border: 1.5px solid rgba(226, 232, 240, 0.9);
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 0.84rem;
-      letter-spacing: 0.16em;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
-    .lux-btn-light:hover {
-      transform: translateY(-2px);
-      border-color: #1F4FFF;
-      color: #1F4FFF;
-      box-shadow: 0 12px 30px rgba(31, 79, 255, 0.15);
-    }
-    .dark .lux-btn-light {
-      background: rgba(19, 30, 53, 0.85);
-      color: #F8FAFC;
-      border-color: rgba(31, 79, 255, 0.3);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-    .dark .lux-btn-light:hover {
-      border-color: #00C88C;
-      color: #00C88C;
-      box-shadow: 0 12px 30px rgba(0, 200, 140, 0.25);
     }
 
     /* ==========================================================================
@@ -1242,22 +1158,6 @@
     .dark .avatar-card-glow {
       background: radial-gradient(circle at 75% 25%, rgba(0,200,140,0.12) 0%, rgba(31,79,255,0.08) 35%, transparent 70%);
     }
-    .digital-scanline {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.9), transparent);
-      box-shadow: 0 0 8px #00F0FF;
-      animation: digitalScan 3s linear infinite;
-    }
-    @keyframes digitalScan {
-      0% { top: -10%; opacity: 0; }
-      15% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { top: 110%; opacity: 0; }
-    }
     .digital-avatar-frame {
       box-shadow: 0 0 25px rgba(31,79,255,0.2);
       transition: box-shadow 0.3s ease, transform 0.3s ease;
@@ -1268,9 +1168,6 @@
     }
     .lux-feature-dot { width: 2.2rem; height: 2.2rem; border-radius: 50%; background: #1F4FFF; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex: none; box-shadow: 0 0 18px rgba(31,79,255,0.22); }
     .lux-feature-label { color: #1F4FFF; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.25em; }
-    .lux-feature-title { font-size: 1.6rem; font-weight: 900; line-height: 1.35; margin-bottom: 1.2rem; }
-    .lux-feature-desc { color: #8a8a8a; font-size: 0.9rem; line-height: 1.9; margin-bottom: 1.8rem; }
-    .dark .lux-feature-desc { color: rgba(255,255,255,0.55); }
     .lux-feature-link { font-weight: 800; font-size: 0.8rem; letter-spacing: 0.2em; color: #141414; text-decoration: none; border-bottom: 2px solid #141414; padding-bottom: 2px; }
     .dark .lux-feature-link { color: #FFFFFF; border-color: #FFFFFF; }
     .lux-status { margin-top: 1.2rem; text-align: right; font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.25em; color: #9a9a9a; }
@@ -1451,15 +1348,13 @@
     .tab-btn:not(.active):hover { color: #00C88C; }
     .tab-btn:not(.active):hover i { color: #00C88C; }
     .sub-tab-btn:not(.active):hover { color: #00C88C; }
-    /* 节点霓虹呼吸灯（时间轴 iframe 内同步定义） */
-    .neon-node:hover { box-shadow: 0 0 10px rgba(0,200,140,0.6), 0 0 0 4px rgba(0,200,140,0.15); }
 
     @media (max-width: 767px) {
       .lux-rings { right: -40vw; }
     }
 
     /* ==========================================================================
-       渐进式懒加载与图片骨架屏体系 (Progressive Lazy Loading & Skeleton System)
+       渐进式懒加载体系 (Progressive Lazy Loading)
        ========================================================================== */
     .img-lazy-wrapper {
       position: relative;
@@ -1468,22 +1363,6 @@
     }
     .dark .img-lazy-wrapper {
       background: #0B1120;
-    }
-    
-    .img-skeleton {
-      position: relative;
-      background: linear-gradient(90deg, rgba(226, 232, 240, 0.6) 25%, rgba(241, 245, 249, 0.9) 50%, rgba(226, 232, 240, 0.6) 75%);
-      background-size: 200% 100%;
-      animation: imgSkeletonShimmer 1.8s infinite linear;
-    }
-    .dark .img-skeleton {
-      background: linear-gradient(90deg, rgba(14, 22, 40, 0.8) 25%, rgba(26, 38, 66, 0.9) 50%, rgba(14, 22, 40, 0.8) 75%);
-      background-size: 200% 100%;
-    }
-
-    @keyframes imgSkeletonShimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
     }
 
     .lazy-img {
@@ -1624,7 +1503,7 @@
         padding: 0.35rem 0.7rem !important;
       }
 
-      .liquid-btn, .kinetic-btn, .action-btn {
+      .liquid-btn, .kinetic-btn {
         min-height: 46px;
       }
 
@@ -1634,34 +1513,14 @@
         padding-bottom: 3.5rem !important;
       }
 
-      .about-avatar-card {
-        max-width: 280px;
-        margin: 0 auto 2rem auto;
-      }
-
       /* 教育背景与跑道 */
       #education {
         padding-top: 3rem !important;
         padding-bottom: 3rem !important;
       }
 
-      .runway-perspective-box {
-        perspective: 500px !important;
-      }
-
       .runway-text-column {
         display: none !important; /* 移动端精简两侧流光字，突出中央跑道 */
-      }
-
-      /* 技能与特长 Dock 栏 */
-      .dock-container {
-        padding: 0 0.5rem;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-      }
-      .dock-container::-webkit-scrollbar {
-        display: none;
       }
 
       .dock-panel {
