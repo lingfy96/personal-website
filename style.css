@@ -703,6 +703,17 @@
     }
     .mc-card:hover { border-color: #1A1A1A; }
 
+    /* 懒加载占位与淡入 */
+    .mc-card.mc-lazy { background-image: none !important; background-color: #e2e8f0; }
+    .dark .mc-card.mc-lazy { background-color: #1e293b; }
+    .mc-card.mc-loaded { animation: mcCardFade 0.35s ease both; }
+    @keyframes mcCardFade { from { opacity: 0.2 } to { opacity: 1 } }
+
+    /* 机构 chip 横向滚动时隐藏滚动条 */
+    .chip-scroll { scrollbar-width: none; }
+    .chip-scroll::-webkit-scrollbar { display: none; }
+    .chip-scroll > .group-chip { flex: 0 0 auto; white-space: nowrap; }
+
     /* 打印样式 */
     @media print {
       .no-print { display: none !important; }
@@ -784,13 +795,18 @@
       }
       .mobile-degrade #magnetic-carousel-container .mc-card,
       #magnetic-carousel-container.mc-static .mc-card {
-        width: 72vw !important;
+        width: min(52vw, 300px) !important;
         height: auto !important;
-        min-width: 72vw;
-        aspect-ratio: 4 / 3;
+        min-width: 0;
+        aspect-ratio: 3 / 2;
         box-shadow: 2px 2px 0 rgba(0,0,0,0.15) !important;
         scroll-snap-align: center;
       }
+      /* 移动端隐藏横向滚动条，保持卡片区干净 */
+      .mobile-degrade #magnetic-carousel-container::-webkit-scrollbar,
+      #magnetic-carousel-container.mc-static::-webkit-scrollbar { display: none; }
+      .mobile-degrade #magnetic-carousel-container,
+      #magnetic-carousel-container.mc-static { scrollbar-width: none; }
 
       /* PPT 展开图组在窄屏纵向滑动浏览 */
       .mobile-degrade #ppt-stack-viewport {

@@ -754,6 +754,26 @@
     const mcConfig = { collapsedWidth: 80, hoverWidth: 180, collapsedHeight: 56, hoverHeight: 126, openSize: 600, gap: 12, influence: 200, blur: 2, padX: 20 };
     let mcOpenIndex = null; let mcTarget = Array(certImages.length).fill(0); let mcCur = Array(certImages.length).fill(0);
     let mcLoopId = 0; let isClosing = false; let mcCloseTimer = null; const mcCards = [];
+    let mcObserver = null;
+
+    // 懒加载：仅当卡片进入（含 preload 余量）可视范围时才真正拉取图片
+    function loadMcCard(card) {
+       const src = card && card.dataset && card.dataset.certSrc;
+       if (!src) return;
+       card.style.backgroundImage = `url(${src})`;
+       delete card.dataset.certSrc;
+       card.classList.remove('mc-lazy');
+       card.classList.add('mc-loaded');
+       if (mcObserver) mcObserver.unobserve(card);
+    }
+
+    function initMcLazyLoad(mcContainer) {
+       if (!('IntersectionObserver' in window)) { mcCards.forEach(loadMcCard); return; }
+       mcObserver = new IntersectionObserver((entries) => {
+          entries.forEach(en => { if (en.isIntersecting) loadMcCard(en.target); });
+       }, { root: mcContainer, rootMargin: '0px 320px', threshold: 0 });
+       mcCards.forEach(c => mcObserver.observe(c));
+    }
 
     function initMagneticCarousel() {
        const mcContainer = document.getElementById('magnetic-carousel-container');
@@ -765,12 +785,16 @@
        }
 
        certImages.forEach((src, i) => {
-          const card = document.createElement('div'); card.className = "mc-card"; card.style.backgroundImage = `url(${src})`;
+          const card = document.createElement('div'); card.className = "mc-card mc-lazy";
+          card.dataset.certSrc = src;  // 先只存路径，进入视口才加载
           card.setAttribute('role', 'button');
           card.setAttribute('aria-label', `证书 ${i + 1} / ${certImages.length}`);
           card.onclick = (e) => { e.stopPropagation(); if (mcOpenIndex === i) closeMc(); else openMc(i); };
           mcContainer.appendChild(card); mcCards.push(card);
        });
+
+       // 挂载懒加载监听（容器为 root，横向滚动按需加载）
+       initMcLazyLoad(mcContainer);
 
        if (isTouch) {
           mcContainer.classList.add('mc-static');

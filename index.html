@@ -812,12 +812,12 @@
 </div>
 <div id="ai-certs" class="sub-tab-content hidden w-full">
   <!-- 资质证书 · 高级排列容器：机构分组 + 数目标注 + 统计徽章 + 磁性动效卡片流（动效保持不变） -->
-  <div class="bg-white/95 dark:bg-[#0E1628]/95 border-2 border-slate-200 dark:border-blue-500/30 rounded-3xl shadow-lg relative overflow-hidden h-[560px] md:h-[540px]">
+  <div class="bg-white/95 dark:bg-[#0E1628]/95 border-2 border-slate-200 dark:border-blue-500/30 rounded-3xl shadow-lg relative overflow-hidden h-auto md:h-[540px]">
     <!-- 背景巨型水印（版式装饰） -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 font-black text-[12vw] text-slate-200 dark:text-slate-800/40 pointer-events-none whitespace-nowrap select-none tracking-widest">AWARDS</div>
 
     <!-- ========== 顶部：高级统计标题栏 ========== -->
-    <div class="relative z-20 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 px-5 sm:px-8 pt-6 pb-4">
+    <div class="relative z-20 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 px-5 sm:px-8 pt-5 pb-3 md:pt-6 md:pb-4">
       <div class="flex items-start gap-4">
         <!-- 左侧：发光机构渐变标识 -->
         <div class="shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-[#1F4FFF] via-indigo-500 to-[#00C88C] text-white flex items-center justify-center shadow-[0_8px_24px_rgba(31,79,255,0.28)] dark:shadow-[0_8px_24px_rgba(0,200,140,0.22)]">
@@ -832,18 +832,18 @@
               共 <span class="text-base font-black tabular-nums">27</span> 张
             </span>
             <!-- 去重检查徽章 -->
-            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700/60 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-[10px]">
+            <span class="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700/60 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-[10px]">
               <i data-feather="check-circle" class="w-3 h-3"></i> 去重检查 · 0 重复
             </span>
           </div>
           <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium tracking-wide">
-            机构分组高级排列 · 4 大认证体系 · 横向滚动浏览 / 鼠标悬停展开 / 点击大图查看
+            4 大认证体系 · 横向滑动浏览 · 点击看大图
           </p>
         </div>
       </div>
 
       <!-- 右侧：机构分组统计（高级排列分组标注） -->
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-nowrap gap-2 overflow-x-auto md:flex-wrap chip-scroll">
         <span class="group-chip" data-group="aliyun">
           <span class="dot" style="background:#FF6A00"></span>阿里云 · AIT
           <b class="count">10</b>
@@ -867,7 +867,7 @@
     <div class="relative z-20 mx-5 sm:mx-8 h-px bg-gradient-to-r from-transparent via-slate-300/80 dark:via-blue-500/40 to-transparent"></div>
 
     <!-- ========== 磁性动效卡片流容器（原始小尺寸嵌入样式 + 动效，横向滚动浏览全部 27 张） ========== -->
-    <div class="relative z-10 flex items-center justify-center h-[360px] md:h-[350px]">
+    <div class="relative z-10 flex items-center justify-start h-auto md:h-[350px] py-5 md:py-0">
       <div id="magnetic-carousel-container"><div class="mc-backdrop"></div></div>
     </div>
 
