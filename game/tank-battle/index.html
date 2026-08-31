@@ -1566,7 +1566,7 @@ const NPC_DATA = {
   xifeng: [
     "第三关的【FUYULINGing】迷宫可是个好地方，在里面敌军会被大幅削弱！不过你要是迷路了，浩源肯定又要调侃你开坦克像是在逛街了。",
     "多收集经验晶石强化主炮！只要升到 Lv.3 就能解锁强劲的副炮。我刚才还看到浩源为了抢晶石，硬是把重型战车开出了跑车的速度！",
-    "浩源昨天给战机换了全新的炼金燃烧喷嘴，空袭范围扩大了整整两成！不得不承认，他在火力改装这方面确实是个天才。",
+    "浩源昨天给战机换了全新的炼金燃烧喷嘴，空袭范围扩大了整整五成！不得不承认，他在火力改装这方面确实是个天才。",
     "欢迎来到浪尖儿大学生社区！遇到密集的弹幕记得灵活使用掩体，当然，你也可以像浩源一样直接开着圣盾冲过去，战术灵活最重要！"
   ],
   haoyuan: [
@@ -1969,7 +1969,7 @@ class PlayerTank {
     
     this.maxHp = cfg.playerHp;
     this.hp = cfg.playerHp;
-    this.speed = 4.2;
+    this.speed = 5.0;
     this.attackPower = 65;
     this.angle = 0;
     this.turretAngle = 0;
@@ -2473,10 +2473,10 @@ class AirSupportPlane {
     if (!this.hasBombed && this.x >= this.targetX - 50) {
       this.hasBombed = true;
       const isL3 = GlobalState.selectedLevel === 3;
-      const spreadX = isL3 ? 180 * 1.2 : 180;
-      const spreadY = isL3 ? 60 * 1.2 : 60;
-      const blastRadius = isL3 ? 120 * 1.2 : 120;
-      const dmg = isL3 ? 400 * 1.5 : 400;
+      const spreadX = isL3 ? 180 * 1.5 : 180;
+      const spreadY = isL3 ? 60 * 1.5 : 60;
+      const blastRadius = isL3 ? 120 * 1.5 : 120;
+      const dmg = isL3 ? 400 * 1.8 : 400;
 
       for (let i = 0; i < 5; i++) {
         setTimeout(() => {
