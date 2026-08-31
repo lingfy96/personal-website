@@ -101,7 +101,7 @@
     </button>
     <!-- 极简现代的水平透视画廊容器 -->
     <div class="w-full md:w-[60vw] h-full flex items-center justify-center relative perspective-[1500px]" id="ppt-stack-viewport">
-      <div id="ppt-stack-scene" class="w-[280px] h-[210px] sm:w-[320px] sm:h-[240px] md:w-[600px] md:h-[450px] relative mx-auto" style="transform-style: preserve-3d;">
+      <div id="ppt-stack-scene" class="w-[280px] sm:w-[320px] md:w-[600px] aspect-video relative mx-auto" style="transform-style: preserve-3d;">
         <!-- Cards injected by JS -->
       </div>
       <!-- 移动端底部信息卡片 -->
@@ -812,7 +812,7 @@
 </div>
 <div id="ai-certs" class="sub-tab-content hidden w-full">
   <!-- 资质证书 · 高级排列容器：机构分组 + 数目标注 + 统计徽章 + 磁性动效卡片流（动效保持不变） -->
-  <div class="bg-white/95 dark:bg-[#0E1628]/95 border-2 border-slate-200 dark:border-blue-500/30 rounded-3xl shadow-lg relative overflow-hidden">
+  <div class="bg-white/95 dark:bg-[#0E1628]/95 border-2 border-slate-200 dark:border-blue-500/30 rounded-3xl shadow-lg relative overflow-hidden h-[560px] md:h-[540px]">
     <!-- 背景巨型水印（版式装饰） -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 font-black text-[12vw] text-slate-200 dark:text-slate-800/40 pointer-events-none whitespace-nowrap select-none tracking-widest">AWARDS</div>
 
@@ -837,7 +837,7 @@
             </span>
           </div>
           <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium tracking-wide">
-            机构分组高级排列 · 4 大认证体系 · 鼠标悬停展开 / 点击大图查看
+            机构分组高级排列 · 4 大认证体系 · 横向滚动浏览 / 鼠标悬停展开 / 点击大图查看
           </p>
         </div>
       </div>
@@ -866,9 +866,9 @@
     <!-- 分割装饰线：机构分组排列视觉分界 -->
     <div class="relative z-20 mx-5 sm:mx-8 h-px bg-gradient-to-r from-transparent via-slate-300/80 dark:via-blue-500/40 to-transparent"></div>
 
-    <!-- ========== 响应式证书网格容器：PC 3 列 / 移动 2 列 ========== -->
-    <div class="relative z-10 px-5 sm:px-8 pt-2 pb-6">
-      <div id="cert-grid" class="cert-grid"></div>
+    <!-- ========== 磁性动效卡片流容器（原始小尺寸嵌入样式 + 动效，横向滚动浏览全部 27 张） ========== -->
+    <div class="relative z-10 flex items-center justify-center h-[360px] md:h-[350px]">
+      <div id="magnetic-carousel-container"><div class="mc-backdrop"></div></div>
     </div>
 
     <!-- ========== 底部：高级排列分隔与机构分组图例索引 ========== -->
