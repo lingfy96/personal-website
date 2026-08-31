@@ -488,9 +488,9 @@
     // =============== PPT 现代水平画廊 (GSAP 极致平滑强控版) ===============
     const pptProjects = {
         'project1': {
-            title: '商业企划PPT',
+            title: '商业路演',
             desc: '为顶尖商业赛事设计的路演全套幻灯片，采用极简排版与高对比度色彩，提升数据可视化的信息传达效率。',
-            images: ['./ppt1.jpg', './ppt2.jpg', './ppt3.jpg']
+            images: ['./assets/ppt/1.jpg', './assets/ppt/2.jpg', './assets/ppt/3.jpg']
         },
         'project2': {
             title: '年终总结模板',
