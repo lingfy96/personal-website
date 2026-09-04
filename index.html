@@ -681,20 +681,23 @@
 </div>
 <!-- ================= Tab 1: PPT 设计 ================= -->
 <div id="tab-ppt" class="tab-content block animate-fade-in">
-  <div class="card-folder-wrapper">
-    <div class="card-folder">
-      <div class="folder-back"></div>
-      <div class="ppt-card card1" onclick="openPPTCarousel('project1')">
-        <picture class="img-lazy-wrapper w-full h-full block">
-          <source srcset="./assets/photo/ppt/1.webp" type="image/webp">
-          <img class="ppt-card-img lazy-img" src="./assets/photo/ppt/1.jpg" width="1600" height="900" loading="lazy" decoding="async" alt="商业路演">
-        </picture>
-        <div class="ppt-card-overlay">
-          <span class="font-black text-white text-xl border-2 border-white/80 rounded-xl px-5 py-2.5 backdrop-blur-md bg-black/40 shadow-lg">商业路演</span>
-        </div>
+  <div class="ppt-albums-grid">
+    <div class="ppt-card album-card" onclick="openPPTCarousel('project1')">
+      <picture class="img-lazy-wrapper w-full h-full block">
+        <source srcset="./assets/photo/ppt/1.webp" type="image/webp">
+        <img class="ppt-card-img lazy-img" src="./assets/photo/ppt/1.jpg" width="1600" height="900" loading="lazy" decoding="async" alt="商业路演">
+      </picture>
+      <div class="ppt-card-overlay">
+        <span class="album-card-title">商业路演</span>
       </div>
-      <div class="folder-front">
-        <div class="folder-label">PROJECTS</div>
+    </div>
+    <div class="ppt-card album-card" onclick="openPPTCarousel('project2')">
+      <picture class="img-lazy-wrapper w-full h-full block">
+        <source srcset="./assets/photo/ppt/课堂展示/屏幕截图 2026-09-04 194443.webp" type="image/webp">
+        <img class="ppt-card-img lazy-img" src="./assets/photo/ppt/课堂展示/屏幕截图 2026-09-04 194443.png" width="1886" height="1051" loading="lazy" decoding="async" alt="课堂展示">
+      </picture>
+      <div class="ppt-card-overlay">
+        <span class="album-card-title">课堂展示</span>
       </div>
     </div>
   </div>

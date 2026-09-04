@@ -510,22 +510,18 @@
   #education .relative.pl-8.md\:pl-12 { padding-left: var(--sp-6) !important; }
   #education .comic-card.ml-4 { margin-left: 0 !important; }
 
-  /* ⑤ PPT 卡包：原 padding-top:150px 留白过于空洞 */
-  .card-folder-wrapper {
-    padding-top: 72px !important;
-    padding-bottom: 16px !important;
-    min-height: 0 !important;
-  }
-  .card-folder {
-    width: min(86vw, 300px) !important;
-    height: 200px !important;
+  /* ⑤ PPT 专辑网格：移动端单列铺满，卡片间留呼吸 */
+  .ppt-albums-grid {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--sp-5, 20px) !important;
+    padding: 48px 12px 24px !important;
   }
   .ppt-card {
-    width: min(78vw, 272px) !important;
-    height: 168px !important;
+    width: min(88vw, 340px) !important;
+    max-width: 88vw !important;
+    aspect-ratio: 16 / 9 !important;
   }
-  .folder-front { height: 110px !important; }
-  .folder-label { font-size: 1.35rem !important; letter-spacing: 2px !important; }
 
   /* ⑥ 证书区：图例在窄屏换行居中，不再挤压 */
   #ai-certs .flex.items-center.justify-between { flex-direction: column !important; gap: var(--sp-3) !important; }

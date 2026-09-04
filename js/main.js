@@ -565,6 +565,15 @@
                 './assets/photo/ppt/2.jpg',
                 './assets/photo/ppt/3.jpg'
             ]
+        },
+        'project2': {
+            title: '课堂展示',
+            desc: '课堂延伸内容的视觉包装，独立制作的课程教学展示 PPT，注重知识点拆解与清晰直观的排版。',
+            images: [
+                './assets/photo/ppt/课堂展示/屏幕截图 2026-09-04 194443.png',
+                './assets/photo/ppt/课堂展示/屏幕截图 2026-09-04 195039.png',
+                './assets/photo/ppt/课堂展示/屏幕截图 2026-09-04 195235.png'
+            ]
         }
     };
 
