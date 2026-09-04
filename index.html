@@ -2,7 +2,10 @@
 <html lang="zh-CN" class="scroll-smooth dark">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- viewport-fit=cover：配合 env(safe-area-inset-*) 适配刘海屏与底部手势条 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
     <title>符榆翎 | 个人作品集 - 极客航线</title>
   <!-- 资源预连接 / DNS 预解析 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +19,10 @@
     body { background-color: #111111; color: #FFFFFF; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     img, video, svg, canvas, iframe { max-width: 100%; height: auto; display: block; }
   </style>
+  <!-- 性能守护：必须是全站第一个脚本。
+       它会把 scroll/touch/wheel 监听器默认改为 passive，并安装后台冻结逻辑，
+       后续脚本注册的监听器都能自动受益。体积约 4KB，同步执行无感。 -->
+  <script src="./js/perf.js"></script>
   <!-- 关键错误防护：拦截良性 ResizeObserver 警告 -->
   <script>
     window.addEventListener('error', function(e) {
@@ -82,6 +89,10 @@
 <link rel="stylesheet" href="./style.css">
 <!-- AURA 数字分身专属样式表 -->
 <link rel="stylesheet" href="./avatar/avatar.css">
+<!-- 移动端深度适配层：必须最后加载，用于统一断点、修复溢出、降级昂贵特效 -->
+<link rel="stylesheet" href="./mobile.css">
+<!-- 首屏 LCP 图片预加载：头像由 414KB PNG 压到 20KB WebP，提前拉取消除首屏空白 -->
+<link rel="preload" as="image" href="./assets/photo/avatar.webp" type="image/webp" fetchpriority="high">
 </head>
 <body class="font-sans transition-colors duration-300 relative overflow-x-hidden">
   <!-- 呼吸感弥散光斑（屏幕漏光） -->
@@ -492,7 +503,10 @@
 </div>
 <div class="w-full flex justify-center">
   <div class="avatar-portrait">
-    <img class="avatar-person" src="./assets/photo/avatar.png" alt="人物照片" loading="eager" decoding="async">
+    <picture>
+      <source srcset="./assets/photo/avatar.webp" type="image/webp">
+      <img class="avatar-person" src="./assets/photo/avatar.png" alt="人物照片" width="640" height="484" loading="eager" decoding="async" fetchpriority="high">
+    </picture>
   </div>
   </div>
   <div class="w-full mt-10">
@@ -678,7 +692,8 @@
       <div class="folder-back"></div>
       <div class="ppt-card card1" onclick="openPPTCarousel('project1')">
         <picture class="img-lazy-wrapper w-full h-full block">
-          <img class="ppt-card-img lazy-img" src="./assets/photo/ppt/1.jpg" loading="lazy" decoding="async" alt="商业路演">
+          <source srcset="./assets/photo/ppt/1.webp" type="image/webp">
+          <img class="ppt-card-img lazy-img" src="./assets/photo/ppt/1.jpg" width="1600" height="900" loading="lazy" decoding="async" alt="商业路演">
         </picture>
         <div class="ppt-card-overlay">
           <span class="font-black text-white text-xl border-2 border-white/80 rounded-xl px-5 py-2.5 backdrop-blur-md bg-black/40 shadow-lg">商业路演</span>
@@ -793,8 +808,9 @@
     <div class="comic-card bg-white/95 dark:bg-[#0E1628]/95 !text-slate-900 dark:!text-slate-100 border-2 border-slate-200 dark:border-blue-500/30 rounded-3xl p-0 flex flex-col group cursor-pointer relative hover:-translate-y-2 hover:border-[#00C88C] hover:shadow-[0_20px_50px_rgba(0,200,140,0.15)] transition-all overflow-hidden shadow-lg" onclick="window.location.assign('./game/tank-battle/index.html')" aria-label="进入坦克大战游戏">
       <div class="h-56 border-b border-slate-200 dark:border-slate-800 relative overflow-hidden img-lazy-wrapper">
         <picture>
+          <source srcset="./game/tank-battle/cover.webp" type="image/webp">
           <source srcset="./game/tank-battle/cover.jpg" type="image/jpeg">
-          <img class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 lazy-img" src="./game/tank-battle/cover.jpg" loading="lazy" decoding="async" alt="坦克大战游戏封面">
+          <img class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 lazy-img" src="./game/tank-battle/cover.jpg" width="1000" height="959" loading="lazy" decoding="async" alt="坦克大战游戏封面">
         </picture>
         <div class="absolute top-4 right-4 bg-gradient-to-r from-red-600 to-rose-500 text-white font-mono font-black px-4 py-1.5 rounded-full text-xs shadow-md">TANK BATTLE</div>
       </div>
@@ -988,7 +1004,7 @@
       <div class="relative bg-slate-900 h-64 overflow-hidden img-lazy-wrapper">
         <picture>
           <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F600%2F400%3Frandom%3D7&output=webp" type="image/webp">
-          <img class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500 lazy-img" src="https://picsum.photos/600/400?random=7" loading="lazy" decoding="async" alt="校园宣传片封面">
+          <img class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500 lazy-img" src="https://picsum.photos/600/400?random=7" width="600" height="400" loading="lazy" decoding="async" alt="校园宣传片封面">
         </picture>
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/60 flex items-center justify-center group-hover:bg-[#1F4FFF] group-hover:border-[#1F4FFF] group-hover:scale-110 transition-all shadow-lg">
@@ -1004,7 +1020,7 @@
       <div class="relative bg-slate-900 h-64 overflow-hidden img-lazy-wrapper">
         <picture>
           <source srcset="https://wsrv.nl/?url=https%3A%2F%2Fpicsum.photos%2F600%2F400%3Frandom%3D8&output=webp" type="image/webp">
-          <img class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500 lazy-img" src="https://picsum.photos/600/400?random=8" loading="lazy" decoding="async" alt="Vlog封面">
+          <img class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500 lazy-img" src="https://picsum.photos/600/400?random=8" width="600" height="400" loading="lazy" decoding="async" alt="Vlog封面">
         </picture>
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/60 flex items-center justify-center group-hover:bg-[#00C88C] group-hover:border-[#00C88C] group-hover:scale-110 transition-all shadow-lg">

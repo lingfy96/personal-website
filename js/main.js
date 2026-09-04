@@ -20,6 +20,50 @@
     const isMobile = window.innerWidth < 768 || isTouch;
     if (isMobile) document.documentElement.classList.add('mobile-degrade');
 
+    // =============== 性能档位判定（供后续动效分支使用） ===============
+    // 移动端、低端设备（核心数 ≤4）、或用户开启「减少动态效果」时，一律走省电档
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isLowEndDevice = (navigator.hardwareConcurrency || 8) <= 4;
+    const PERF_LITE = isMobile || prefersReducedMotion || isLowEndDevice;
+    document.documentElement.classList.toggle('perf-lite', PERF_LITE);
+
+    /**
+     * rAF 节流：把高频事件回调压缩到每帧最多执行一次。
+     * 滚动 / resize 期间不做任何同步布局读取，全部推迟到下一帧统一处理。
+     */
+    function rafThrottle(fn) {
+      let ticking = false;
+      return function (...args) {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          fn.apply(this, args);
+        });
+      };
+    }
+
+    /**
+     * WebP 能力检测（结果缓存）。
+     * CSS background-image 无法使用 <picture> 做降级，只能在 JS 侧改写路径。
+     */
+    const SUPPORTS_WEBP = (function () {
+      try {
+        const c = document.createElement('canvas');
+        if (!c.getContext || !c.getContext('2d')) return false;
+        return c.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+      } catch (e) {
+        return false;
+      }
+    })();
+
+    /** 把 jpg/png 路径改写成同目录同名 .webp（由 scripts/optimize_images.py 生成） */
+    function webpUrl(path) {
+      if (!SUPPORTS_WEBP || typeof path !== 'string') return path;
+      if (/^https?:/i.test(path)) return path;         // 外链不动
+      return path.replace(/\.(jpe?g|png)$/i, '.webp');
+    }
+
     // =============== 教育背景跑道文字无缝循环克隆 ===============
     document.querySelectorAll('.runway-text-column').forEach(col => {
         const track = col.querySelector('.runway-track');
@@ -153,9 +197,20 @@
         let marqueeTween = gsap.to(marqueeTrack, { 
           xPercent: -50, 
           repeat: -1, 
-          duration: 18, 
+          duration: PERF_LITE ? 28 : 18,   // 省电档放慢，降低每秒重绘次数
           ease: "none" 
         });
+
+        // 首屏滚出视口后暂停补间：后台持续跑的 tween 会一直占用主线程
+        if ('IntersectionObserver' in window) {
+          new IntersectionObserver((entries) => {
+            entries.forEach(en => {
+              if (en.isIntersecting) marqueeTween.resume();
+              else marqueeTween.pause();
+            });
+          }, { threshold: 0 }).observe(marqueeContainer);
+        }
+
         // 鼠标悬停微速缓速或略微互动，不完全停滞保持丝滑感
         marqueeContainer.addEventListener('mouseenter', () => { 
           marqueeContainer.classList.add('is-active'); 
@@ -179,13 +234,28 @@
         ">> CONNECT：点击右下角量子核心唤醒全息终端"
       ];
       let speechIndex = 0;
-      setInterval(() => {
+      const rotateSpeech = () => {
         speechIndex = (speechIndex + 1) % speeches.length;
         gsap.to(digitalSpeech, { opacity: 0, y: -4, duration: 0.25, onComplete: () => {
           digitalSpeech.innerText = speeches[speechIndex];
           gsap.to(digitalSpeech, { opacity: 1, y: 0, duration: 0.3 });
         }});
-      }, 4000);
+      };
+      let speechTimer = setInterval(rotateSpeech, 4000);
+
+      // 分身卡片滚出视口后停掉轮播定时器：离屏元素没必要继续跑动画
+      if ('IntersectionObserver' in window && avatarCard) {
+        new IntersectionObserver((entries) => {
+          entries.forEach(en => {
+            if (en.isIntersecting && !speechTimer) {
+              speechTimer = setInterval(rotateSpeech, 4000);
+            } else if (!en.isIntersecting && speechTimer) {
+              clearInterval(speechTimer);
+              speechTimer = null;
+            }
+          });
+        }, { threshold: 0 }).observe(avatarCard);
+      }
 
       avatarCard.addEventListener('click', (e) => {
         if (e.target.closest('a') || e.target.closest('button')) return;
@@ -498,35 +568,50 @@
         }
     };
 
+    // 画廊图片是 CSS background-image，无法用 <picture> 降级，
+    // 在 JS 侧统一改写为 WebP（原图仍作为不支持时的兜底保留在磁盘上）
+    Object.values(pptProjects).forEach(p => {
+        p.images = p.images.map(webpUrl);
+    });
+
     // ================= 智能极速懒加载与渐进加载系统 =================
+    /**
+     * 标记图片为已加载。
+     * 关键点：不依赖 img 的 load 事件——若脚本执行时图片早已从缓存命中，
+     * load 事件不会再次触发，图片会永远停留在 opacity:0。
+     * 这里用 complete + naturalHeight 双判定兜底，并在解码完成后释放 will-change。
+     */
+    function markImageLoaded(img) {
+      if (!img || img.dataset.lazySettled === '1') return;
+      img.dataset.lazySettled = '1';
+      img.classList.add('is-loaded');
+      // 动画结束后卸掉合成层，避免大量常驻 layer 拖垮移动端内存
+      img.style.willChange = 'auto';
+    }
+
     function initLazyImages() {
         const lazyImages = document.querySelectorAll('img.lazy-img');
-        
+
         lazyImages.forEach(img => {
             if (img.complete && img.naturalHeight !== 0) {
-                img.classList.add('is-loaded');
+                markImageLoaded(img);   // 已命中缓存：直接点亮，不等 load 事件
             } else {
-                img.addEventListener('load', () => {
-                    img.classList.add('is-loaded');
-                }, { once: true });
-                img.addEventListener('error', () => {
-                    img.classList.add('is-loaded');
-                }, { once: true });
+                img.addEventListener('load', () => markImageLoaded(img), { once: true });
+                img.addEventListener('error', () => markImageLoaded(img), { once: true });
             }
         });
 
+        // 真·懒加载：仅在需要时才把 data-src 写回 src
         if ('IntersectionObserver' in window) {
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
-                        if (img.dataset.src) {
-                            img.src = img.dataset.src;
-                        }
+                        if (img.dataset.src) { img.src = img.dataset.src; }
                         observer.unobserve(img);
                     }
                 });
-            }, { rootMargin: '100px 0px', threshold: 0.01 });
+            }, { rootMargin: '200px 0px', threshold: 0.01 });
 
             document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
         }
@@ -750,6 +835,12 @@
       "./assets/certificates/ai/datawhale-marscode-ai-coding.png"               // Datawhale×豆包MarsCode · AI+编程能力
     ];
 
+    // 证书墙用 background-image 渲染，统一改写为 WebP：
+    // 27 张合计从 5.2MB 降到 1.3MB，移动端横向滑动时效果最为明显
+    for (let ci = 0; ci < certImages.length; ci++) {
+      certImages[ci] = webpUrl(certImages[ci]);
+    }
+
     // =============== 资质证书磁性动效卡片流（原始实现恢复版 + 横向滚动支持） ===============
     const mcConfig = { collapsedWidth: 80, hoverWidth: 180, collapsedHeight: 56, hoverHeight: 126, openSize: 600, gap: 12, influence: 200, blur: 2, padX: 20 };
     let mcOpenIndex = null; let mcTarget = Array(certImages.length).fill(0); let mcCur = Array(certImages.length).fill(0);
@@ -769,9 +860,11 @@
 
     function initMcLazyLoad(mcContainer) {
        if (!('IntersectionObserver' in window)) { mcCards.forEach(loadMcCard); return; }
+       // 预取余量：移动端按 3G 思路收紧到 1.5 屏，避免横向滑动时一次性拉十几张
+       const preload = isMobile ? '0px 160px' : '0px 320px';
        mcObserver = new IntersectionObserver((entries) => {
           entries.forEach(en => { if (en.isIntersecting) loadMcCard(en.target); });
-       }, { root: mcContainer, rootMargin: '0px 320px', threshold: 0 });
+       }, { root: mcContainer, rootMargin: preload, threshold: 0 });
        mcCards.forEach(c => mcObserver.observe(c));
     }
 
@@ -922,10 +1015,16 @@
     const bgFyl = document.getElementById("bg-fyl"); 
     let glitchTimer = null;
     function triggerGlitch() { 
-        if(!bgFyl) return; 
+        // 省电档 / 减少动态效果偏好下，直接不触发：
+        // 这个动画同时驱动 text-shadow / -webkit-text-stroke / clip-path，
+        // 三者都是非合成属性，作用在 55vw 巨型文字上等于每帧全屏重绘。
+        if (!bgFyl || PERF_LITE) return;
         bgFyl.classList.remove('glitch-active'); 
-        void bgFyl.offsetWidth; // 强制回流以重新触发 CSS 动画
-        bgFyl.classList.add('glitch-active'); 
+        // 用双 rAF 代替 `void offsetWidth` 强制同步重排：
+        // 同样能重置 CSS 动画，但不会阻塞主线程、不触发 layout
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => bgFyl.classList.add('glitch-active'));
+        });
         if (glitchTimer) clearTimeout(glitchTimer);
         glitchTimer = setTimeout(() => { bgFyl.classList.remove('glitch-active'); }, 500); 
     }
@@ -942,14 +1041,36 @@
     }
 
     let lastGlitchScroll = window.pageYOffset || document.documentElement.scrollTop;
-    window.addEventListener('scroll', () => {
-        let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-        if (Math.abs(currentScroll - lastGlitchScroll) > 280) { 
+    let lastParticleAt = 0;
+
+    /**
+     * 滚动处理：passive + rAF 节流 + 帧预算控制。
+     * 原实现有两个问题：
+     *   1. 监听器未声明 passive，浏览器无法提前优化滚动路径；
+     *   2. 每次滚动事件有 60% 概率创建粒子，而每个粒子都要读
+     *      getBoundingClientRect()（强制同步布局）+ 新建 DOM + 启动 GSAP 补间，
+     *      快速滑动时一帧内可能触发十几次，直接把主线程打满。
+     * 现在：整段逻辑每帧最多跑一次，粒子额外按时间间隔限流。
+     */
+    const handleScroll = rafThrottle(() => {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (Math.abs(currentScroll - lastGlitchScroll) > 280) {
             triggerGlitch();
             lastGlitchScroll = currentScroll;
         }
-        if(Math.random() > 0.4) createParticle(); 
+
+        // 省电档：完全不生成粒子（移动端粒子层已在 CSS 中隐藏，生成纯属浪费）
+        if (PERF_LITE) return;
+
+        const now = performance.now();
+        if (now - lastParticleAt > 220) {          // 桌面端也限流到 ~4.5 个/秒
+            lastParticleAt = now;
+            if (Math.random() > 0.4) createParticle();
+        }
     });
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     document.querySelectorAll('.count-up').forEach(el => {
       const val = parseInt(el.getAttribute('data-val')); const numAnim = new countUp.CountUp(el, val, { duration: 2.5, useEasing: true });
@@ -961,8 +1082,9 @@
       text.split('').forEach((char, i) => { el.innerHTML += `<span class="inline-block char" data-line="${i}">${char}</span>`; });
       return document.querySelectorAll(`${selector} .char`);
     }
-    const charsAnim = splitTextForAnime('#motto-text');
+    const charsAnim = PERF_LITE ? null : splitTextForAnime('#motto-text');
     if (charsAnim) {
+      // 逐字位移动画在移动端是持续的主线程负担，省电档下保留静态排版
       const tl = anime.timeline({ loop: true });
       tl.add({ targets: charsAnim, translateY: [ (el) => parseInt(el.dataset.line) % 2 ? "100%" : "-100%", "0%" ], opacity: [0, 1], easing: "easeInOutExpo", duration: 800, delay: anime.stagger(80, {from: 'center'}) })
         .add({ targets: charsAnim, translateY: [ "0%", (el) => parseInt(el.dataset.line) % 2 ? "-100%" : "100%" ], opacity: [1, 0], easing: "easeInOutExpo", duration: 800, delay: anime.stagger(80, {from: 'center'}) }, '+=3000');

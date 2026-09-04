@@ -1,0 +1,314 @@
+{
+  "assets/certificates/ai/ait-trainer-advanced.jpg": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/ait-trainer-advanced.webp": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/ait-trainer-junior.jpg": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/ait-trainer-junior.webp": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/aliyun-artlab-aigc.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-artlab-aigc.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-bailian-agent.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-bailian-agent.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-lingma-coding.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-lingma-coding.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-llm-content.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-llm-content.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-rag.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-rag.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-spring-ai.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-spring-ai.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-vision-design-advanced.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-vision-design-advanced.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-vision-design-basic.jpg": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/aliyun-vision-design-basic.webp": {
+    "w": 1100,
+    "h": 733
+  },
+  "assets/certificates/ai/datawhale-antgroup-agent-engineer.jpg": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/datawhale-antgroup-agent-engineer.webp": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/datawhale-iflytek-finetuning-engineer.jpg": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/datawhale-iflytek-finetuning-engineer.webp": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/datawhale-marscode-ai-coding.png": {
+    "w": 1100,
+    "h": 791
+  },
+  "assets/certificates/ai/datawhale-marscode-ai-coding.webp": {
+    "w": 1100,
+    "h": 791
+  },
+  "assets/certificates/ai/datawhale-sensetime-ai-data-analysis.png": {
+    "w": 1100,
+    "h": 792
+  },
+  "assets/certificates/ai/datawhale-sensetime-ai-data-analysis.webp": {
+    "w": 1100,
+    "h": 792
+  },
+  "assets/certificates/ai/datawhale-spark-prompt-engineer.jpg": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/datawhale-spark-prompt-engineer.webp": {
+    "w": 1100,
+    "h": 777
+  },
+  "assets/certificates/ai/datawhale-virtai-cloud-llm-engineer.jpg": {
+    "w": 1100,
+    "h": 814
+  },
+  "assets/certificates/ai/datawhale-virtai-cloud-llm-engineer.webp": {
+    "w": 1100,
+    "h": 814
+  },
+  "assets/certificates/ai/huawei-ai-agent-poker-battle.png": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-ai-agent-poker-battle.webp": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-ai-intro-micro-certification.png": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-ai-intro-micro-certification.webp": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-ai-poster-enterprise-style.png": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-ai-poster-enterprise-style.webp": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-ai-voice-calculator.png": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-ai-voice-calculator.webp": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-codearts-quickstart.png": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-codearts-quickstart.webp": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-yolov8-object-detection-atlas.png": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/huawei-yolov8-object-detection-atlas.webp": {
+    "w": 1100,
+    "h": 775
+  },
+  "assets/certificates/ai/iflytek-agent-engineer.png": {
+    "w": 1100,
+    "h": 772
+  },
+  "assets/certificates/ai/iflytek-agent-engineer.webp": {
+    "w": 1100,
+    "h": 772
+  },
+  "assets/certificates/ai/iflytek-prompt-engineer.jpg": {
+    "w": 1100,
+    "h": 772
+  },
+  "assets/certificates/ai/iflytek-prompt-engineer.webp": {
+    "w": 1100,
+    "h": 772
+  },
+  "assets/certificates/ai/iflytek-rag-engineer.png": {
+    "w": 1100,
+    "h": 772
+  },
+  "assets/certificates/ai/iflytek-rag-engineer.webp": {
+    "w": 1100,
+    "h": 772
+  },
+  "assets/certificates/ai/inspur-datawhale-llm-dev-engineer.jpg": {
+    "w": 1100,
+    "h": 776
+  },
+  "assets/certificates/ai/inspur-datawhale-llm-dev-engineer.webp": {
+    "w": 1100,
+    "h": 776
+  },
+  "assets/certificates/ai/modelscope-datawhale-agent-engineer.jpg": {
+    "w": 1100,
+    "h": 767
+  },
+  "assets/certificates/ai/modelscope-datawhale-agent-engineer.webp": {
+    "w": 1100,
+    "h": 767
+  },
+  "assets/photo/ppt/1.jpg": {
+    "w": 1600,
+    "h": 900
+  },
+  "assets/photo/ppt/1.webp": {
+    "w": 1600,
+    "h": 900
+  },
+  "assets/photo/ppt/2.jpg": {
+    "w": 1600,
+    "h": 900
+  },
+  "assets/photo/ppt/2.webp": {
+    "w": 1600,
+    "h": 900
+  },
+  "assets/photo/ppt/3.jpg": {
+    "w": 1600,
+    "h": 900
+  },
+  "assets/photo/ppt/3.webp": {
+    "w": 1600,
+    "h": 900
+  },
+  "assets/photo/ppt/课堂展示/0f3550dc910db57baed77aa36c8c55ed.png": {
+    "w": 1080,
+    "h": 594
+  },
+  "assets/photo/ppt/课堂展示/0f3550dc910db57baed77aa36c8c55ed.webp": {
+    "w": 1080,
+    "h": 594
+  },
+  "assets/photo/ppt/课堂展示/561a8bab845fb7cf74c31beb03257606.png": {
+    "w": 1080,
+    "h": 600
+  },
+  "assets/photo/ppt/课堂展示/561a8bab845fb7cf74c31beb03257606.webp": {
+    "w": 1080,
+    "h": 600
+  },
+  "assets/photo/ppt/课堂展示/e93927acae70a519e32a4eca4a6b6bf4.png": {
+    "w": 1080,
+    "h": 612
+  },
+  "assets/photo/ppt/课堂展示/e93927acae70a519e32a4eca4a6b6bf4.webp": {
+    "w": 1080,
+    "h": 612
+  },
+  "assets/map/campus.jpg": {
+    "w": 1400,
+    "h": 1400
+  },
+  "assets/map/campus.webp": {
+    "w": 1400,
+    "h": 1400
+  },
+  "assets/map/future.jpg": {
+    "w": 1400,
+    "h": 1400
+  },
+  "assets/map/future.webp": {
+    "w": 1400,
+    "h": 1400
+  },
+  "assets/map/travel.jpg": {
+    "w": 1400,
+    "h": 1400
+  },
+  "assets/map/travel.webp": {
+    "w": 1400,
+    "h": 1400
+  },
+  "game/tank-battle/cover.jpg": {
+    "w": 1000,
+    "h": 959
+  },
+  "game/tank-battle/cover.webp": {
+    "w": 1000,
+    "h": 959
+  },
+  "assets/photo/avatar.png": {
+    "w": 640,
+    "h": 484
+  },
+  "assets/photo/avatar.webp": {
+    "w": 640,
+    "h": 484
+  },
+  "assets/photo/moon.jpg": {
+    "w": 1024,
+    "h": 768
+  },
+  "assets/photo/moon.webp": {
+    "w": 1024,
+    "h": 768
+  }
+}

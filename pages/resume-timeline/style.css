@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+/* 字体改由 index.html 用 <link> 加载：
+   CSS 里的 @import 会串行阻塞渲染——必须先下载完本文件，才能发现还有一个字体请求。
+   改成 <link> 后可与 CSS 并行下载，在弱网下能明显提前首屏文字渲染。 */
 
 :root {
     --bg: #FAFAFA;
@@ -65,9 +67,23 @@ body {
     padding: 0 5% 150px;
 }
 
-/* 核心聚焦交互：父容器Hover时，所有子项变暗 */
-.experience-list:hover .exp-row {
-    opacity: 0.2;
+/* ================= 焦点交互：仅对真正支持悬停的设备生效 =================
+   原实现直接写在全局：触屏上点击后 hover 状态会「粘住」，
+   整页经历会长期停留在 opacity:0.2 的变暗态，看起来像渲染出错。
+   用 @media (hover: hover) 隔离后，触屏设备完全不进入这些规则。 */
+@media (hover: hover) and (pointer: fine) {
+    .experience-list:hover .exp-row {
+        opacity: 0.2;
+    }
+    .experience-list .exp-row:hover {
+        opacity: 1;
+    }
+    .exp-row:hover .node {
+        border-color: #00C88C;
+        background: #00C88C;
+        transform: scale(1.4);
+        box-shadow: 0 0 10px rgba(0, 200, 140, 0.6), 0 0 0 4px rgba(0, 200, 140, 0.15);
+    }
 }
 
 /* 单行经历 (Grid 布局引入坐标轴) */
@@ -79,10 +95,7 @@ body {
     position: relative;
 }
 
-/* 悬停当前的经历时，恢复高亮 */
-.experience-list .exp-row:hover {
-    opacity: 1;
-}
+/* 悬停当前的经历时，恢复高亮（规则已并入上方的 @media (hover: hover) 块） */
 
 /* 左侧：吸顶年份与角色 */
 .meta-col {
@@ -160,13 +173,7 @@ body {
     transition: all 0.3s ease;
 }
 
-/* 节点霓虹呼吸灯：hover 变科技绿 + 外发光 */
-.exp-row:hover .node {
-    border-color: #00C88C;
-    background: #00C88C;
-    transform: scale(1.4);
-    box-shadow: 0 0 10px rgba(0,200,140,0.6), 0 0 0 4px rgba(0,200,140,0.15);
-}
+/* 节点霓虹呼吸灯：hover 变科技绿 + 外发光（规则已并入上方的 @media (hover: hover) 块） */
 
 /* 右侧：价值详情 */
 .detail-col {
@@ -232,18 +239,72 @@ body {
     margin-left: 20px;
 }
 
-/* 移动端适配：隐藏坐标轴，改为卡片堆叠 */
+/* ===== 移动端适配：隐藏坐标轴，改为卡片堆叠 + 中文阅读节奏调优 ===== */
 @media (max-width: 768px) {
-    .hero { padding: 60px 8% 20px; }
-    .hero h1 { font-size: 1.8rem; }
+    .hero {
+        padding: 48px 20px 16px;
+    }
+    .hero h1 {
+        font-size: 1.6rem;
+        letter-spacing: -0.01em;
+    }
+
+    .experience-list {
+        padding: 0 20px 64px;   /* 原 5% + 150px 底部留白，窄屏显得过于空旷 */
+    }
+
     .exp-row {
         grid-template-columns: 1fr;
-        gap: 15px;
-        padding: 40px 0;
+        gap: 14px;
+        padding: 32px 0;
         border-bottom: 1px solid var(--line);
     }
+    .exp-row:last-child { border-bottom: none; }
+
     .axis-col { display: none; }
     .meta-col { text-align: left; }
     .meta-sticky { position: relative; top: 0; }
-    .core-value { font-size: 1.15rem; }
+
+    /* 年份与角色：移动端作为卡片标题，拉开层级差 */
+    .year {
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+        margin-bottom: 4px;
+    }
+    .role {
+        font-size: 1.0625rem;
+        line-height: 1.45;
+    }
+
+    .core-value {
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        margin-bottom: 18px;
+    }
+
+    /* 中文长句需要更松的行高，1.6 在窄屏上会显得拥挤 */
+    .bullet-point {
+        font-size: 0.9375rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+        padding-left: 18px;
+    }
+
+    .boundary {
+        font-size: 0.6875rem;
+        letter-spacing: 2px;
+        margin: 12px 0;
+    }
+    .boundary::before { margin-right: 12px; }
+    .boundary::after  { margin-left: 12px; }
+}
+
+/* 极窄屏（≤390px）再收一档 */
+@media (max-width: 390px) {
+    .hero { padding: 40px 16px 12px; }
+    .hero h1 { font-size: 1.4rem; }
+    .experience-list { padding: 0 16px 48px; }
+    .role { font-size: 1rem; }
+    .core-value { font-size: 1rem; }
+    .bullet-point { font-size: 0.9rem; }
 }

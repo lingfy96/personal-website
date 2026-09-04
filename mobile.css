@@ -1,0 +1,754 @@
+/* ==========================================================================
+   mobile.css — 移动端深度适配层（Mobile Deep Adaptation Layer）
+   加载顺序：style.css → avatar/avatar.css → mobile.css
+   作用：统一断点、修复横向溢出、重排版阶、扩大触摸目标、降级昂贵视觉特效
+   作用域：仅 ≤768px 视口；≥769px 完全不生效，桌面端零影响
+   ========================================================================== */
+
+/* ==========================================================================
+   0. 设计令牌：移动端版阶 / 间距 / 行高（一次定义，全局复用）
+   ========================================================================== */
+:root {
+  /* 字号阶层：8 级，比例约 1.22，中文正文最小 15px */
+  --fs-display: clamp(2.25rem, 10.5vw, 3.5rem);   /* 36 → 56px 主标题 */
+  --fs-h2:      clamp(1.5rem, 6.2vw, 2rem);        /* 24 → 32px */
+  --fs-h3:      clamp(1.25rem, 5.2vw, 1.6rem);     /* 20 → 26px */
+  --fs-h4:      clamp(1.0625rem, 4.4vw, 1.25rem);  /* 17 → 20px */
+  --fs-body:    clamp(0.9375rem, 3.9vw, 1.0625rem);/* 15 → 17px 正文 */
+  --fs-sm:      clamp(0.875rem, 3.6vw, 0.9375rem); /* 14 → 15px */
+  --fs-xs:      0.8125rem;                          /* 13px 辅助 */
+  --fs-micro:   0.6875rem;                          /* 11px 标签 */
+
+  /* 行高：中文需要更松的呼吸感 */
+  --lh-display: 1.16;
+  --lh-heading: 1.35;
+  --lh-body: 1.75;
+  --lh-sm: 1.6;
+
+  /* 间距节奏：4px 基准 */
+  --sp-1: 0.25rem;  --sp-2: 0.5rem;   --sp-3: 0.75rem;
+  --sp-4: 1rem;     --sp-5: 1.25rem;  --sp-6: 1.5rem;
+  --sp-8: 2rem;     --sp-10: 2.5rem;  --sp-12: 3rem;
+
+  /* 页面安全边距 */
+  --gutter: 1.125rem;   /* 18px */
+  --touch: 44px;        /* 最小触摸目标 */
+}
+
+@media (max-width: 768px) {
+
+  /* ========================================================================
+     1. 基础重设：根除横向滚动 + 安全区适配
+     ======================================================================== */
+  html {
+    /* 100% 而非 100vw：100vw 含滚动条宽度，是横向抖动的元凶 */
+    width: 100%;
+    /* 先声明 hidden 兜底（Safari <16 不认 clip），再声明 clip：
+       clip 不会创建滚动容器，因此不会破坏 position:sticky，是更优解 */
+    overflow-x: hidden;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%; /* 禁止 iOS 横屏自动放大字号 */
+    text-size-adjust: 100%;
+  }
+
+  body {
+    width: 100%;
+    /* 用 safe-area 兜住刘海屏 / 手势条 */
+    overflow-x: hidden;
+    overflow-x: clip;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* 固定定位元素不继承 body 的 padding，需单独避让安全区 */
+  nav.fixed,
+  #toast-container {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  #toast-container {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+  /* 底部悬浮的量子核心避开手势条 */
+  .quantum-core {
+    bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+    right: calc(20px + env(safe-area-inset-right)) !important;
+  }
+
+  /* 所有元素默认不允许撑破视口 */
+  main, section, footer, header, nav, div, ul, ol, p, h1, h2, h3, h4 {
+    max-width: 100%;
+  }
+
+  /* 媒体元素兜底 */
+  img, video, svg, canvas, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 长英文 / 连续字符强制断行，防止撑破卡片 */
+  p, h1, h2, h3, h4, span, a, li, div {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* 全局统一触控反馈（去蓝框，加按压反馈） */
+  a, button, [role="button"], [onclick] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;   /* 禁掉双击缩放带来的 300ms 延迟 */
+  }
+
+  /* 横向滚动容器统一顺滑 */
+  #magnetic-carousel-container,
+  #ppt-stack-scene,
+  .chip-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain; /* 防止横向滑动冒泡触发页面返回手势 */
+  }
+
+
+  /* ========================================================================
+     2. 性能降级：拆掉移动端最昂贵的四笔渲染开销
+     ======================================================================== */
+
+  /* ① 固定定位的网格底层 → 停用。
+        position:fixed 的背景层会在每次滚动时强制全屏重绘，
+        改由 body 自带的滚动背景承担，视觉几乎无损。 */
+  body::before {
+    display: none !important;
+  }
+
+  /* ② 弥散光斑：120px 高斯模糊的全屏滤镜层 → 换成原生径向渐变。
+        radial-gradient 由 GPU 光栅化一次，成本约为 filter:blur 的 1/20。 */
+  .glow-spot {
+    filter: none !important;
+    animation: none !important;
+    background-image: radial-gradient(circle,
+      rgba(31, 79, 255, 0.55) 0%,
+      rgba(31, 79, 255, 0.22) 32%,
+      rgba(31, 79, 255, 0) 70%) !important;
+    background-color: transparent !important;
+    will-change: auto !important;
+    contain: strict;
+  }
+  .glow-blue {
+    width: 62vw !important; height: 62vw !important;
+    top: -22vw !important; right: -20vw !important;
+    opacity: 0.16 !important;
+  }
+  .glow-green {
+    width: 54vw !important; height: 54vw !important;
+    bottom: -20vw !important; left: -18vw !important;
+    background-image: radial-gradient(circle,
+      rgba(0, 200, 140, 0.5) 0%,
+      rgba(0, 200, 140, 0.18) 32%,
+      rgba(0, 200, 140, 0) 70%) !important;
+    opacity: 0.14 !important;
+  }
+  .dark .glow-blue  { opacity: 0.22 !important; }
+  .dark .glow-green { opacity: 0.18 !important; }
+
+  /* ③ 巨型 FYL 背景字的故障闪烁动画 → 停用。
+        该动画同时驱动 text-shadow / -webkit-text-stroke / clip-path，
+        三者都是非合成属性，作用在 55vw 的文字上等于每帧全屏重绘。 */
+  #bg-fyl {
+    font-size: 42vw !important;
+    opacity: 0.03 !important;
+    animation: none !important;
+    transform: none !important;
+    -webkit-text-stroke: 0 !important;
+    text-shadow: none !important;
+    will-change: auto !important;
+  }
+  .dark #bg-fyl { opacity: 0.055 !important; }
+  /* 彻底关闭触发源，避免 JS 侧继续强制重排 */
+  .glitch-active { animation: none !important; }
+
+  /* ④ 布局类动画（width/height/box-shadow）→ 改为 transform/opacity。
+        移动端 GPU 只对 transform / opacity 走合成层，其余全走主线程。 */
+  .comic-card,
+  .tech-tag,
+  .airport-sign,
+  .nav-tag,
+  .lux-feature-card,
+  .lux-btn-dark,
+  .lux-skills-portal-btn {
+    transition: transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1),
+                opacity 0.22s ease !important;
+  }
+  .comic-card:hover,
+  .lux-feature-card:hover {
+    transform: none !important;         /* 悬停位移在触屏上无意义 */
+    box-shadow: 0 8px 24px rgba(20, 20, 20, 0.07) !important;
+  }
+  .tech-tag:hover { transform: none !important; }
+
+  /* 长按/点按反馈：用 scale 表达，纯合成层 */
+  .comic-card:active,
+  .tech-tag:active,
+  .lux-tag:active {
+    transform: scale(0.975) !important;
+  }
+
+
+  /* ========================================================================
+     3. 排版重校：字号阶层 / 行高 / 留白
+     ======================================================================== */
+
+  /* --- 首屏 Hero --- */
+  .lux-hero {
+    /* 取消全屏破格：100vw + 负 margin 在移动端会与外层 px-4 打架 */
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-top: 5.5rem !important;
+    padding-bottom: 2.75rem !important;
+    border-radius: 1.25rem;
+  }
+
+  .lux-hero > .relative.z-10 {
+    padding-left: var(--gutter) !important;
+    padding-right: var(--gutter) !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* 主标题：单一 clamp 控制，描边随字号等比收细 */
+  .lux-display {
+    font-size: var(--fs-display) !important;
+    line-height: var(--lh-display) !important;
+    letter-spacing: 0.01em !important;
+    margin-bottom: 0.25rem !important;
+  }
+  .lux-line-outline {
+    -webkit-text-stroke-width: 1px !important;
+    margin-top: 0.02em !important;
+    text-shadow: none !important;      /* 大范围 text-shadow 在移动端很贵 */
+  }
+
+  .lux-brand {
+    font-size: 1.0625rem !important;
+    letter-spacing: 0.04em !important;
+  }
+  .lux-lead {
+    font-size: var(--fs-body) !important;
+    line-height: var(--lh-body) !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  /* 月球窗口：移动端缩为紧凑的视觉分隔 */
+  .lux-moon-window {
+    height: 170px !important;
+    margin-top: 1.25rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  .lux-moon-ripples { display: none !important; }   /* 仅桌面端存在，双保险 */
+
+  /* --- 章节标题（机场指示牌）--- */
+  .airport-sign {
+    font-size: var(--fs-h4) !important;
+    padding: 0.6rem 1.1rem !important;
+    letter-spacing: 0.04em !important;
+    max-width: calc(100vw - 2 * var(--gutter)) !important;
+    border-radius: 999px !important;
+  }
+  .airport-sign .sign-gate {
+    font-size: 0.6875rem !important;
+    padding: 0.15rem 0.5rem !important;
+    margin-left: 0.5rem !important;
+  }
+  .airport-sign::before { display: none !important; }  /* hover 下划线在触屏无意义 */
+
+  /* --- 正文与卡片 --- */
+  .comic-card {
+    border-radius: 1.125rem !important;
+    border-width: 1.5px !important;
+  }
+  #about .comic-card,
+  #skills .comic-card {
+    padding: var(--sp-5) !important;
+  }
+  .comic-card h3,
+  .comic-card .font-black.text-2xl {
+    font-size: var(--fs-h3) !important;
+    line-height: var(--lh-heading) !important;
+    margin-bottom: var(--sp-3) !important;
+  }
+  .comic-card p {
+    font-size: var(--fs-sm) !important;
+    line-height: var(--lh-body) !important;
+  }
+
+  /* --- 页脚腰封 --- */
+  .lux-obi-footer { margin-top: var(--sp-12) !important; }
+  .lux-obi-footer .max-w-5xl {
+    padding-left: var(--gutter) !important;
+    padding-right: var(--gutter) !important;
+    padding-top: var(--sp-10) !important;
+    padding-bottom: var(--sp-10) !important;
+  }
+  .lux-editorial-quote-mark {
+    font-size: 2rem !important;
+  }
+  .lux-obi-motto-heading {
+    font-size: var(--fs-h3) !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0.1em !important;
+  }
+  .lux-obi-sub-pills {
+    gap: var(--sp-2) !important;
+    margin-top: var(--sp-5) !important;
+  }
+  .lux-obi-pill {
+    font-size: var(--fs-micro) !important;
+    padding: 5px 10px !important;
+  }
+
+
+  /* ========================================================================
+     4. 触摸目标：全部拉到 ≥44px（WCAG 2.5.5 / iOS HIG）
+     ======================================================================== */
+
+  /* 顶部导航胶囊 —— 原 6px/12px padding ≈ 27px 高，严重偏小 */
+  .mobile-nav-pill {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--touch) !important;
+    padding: 0 0.875rem !important;
+    font-size: var(--fs-sm) !important;
+    border-radius: 999px !important;
+  }
+
+  /* 顶部图标按钮（打印 / 主题切换）—— 原 32px */
+  nav button,
+  nav a[onclick] {
+    min-width: var(--touch) !important;
+    min-height: var(--touch) !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 首屏标签按钮 */
+  .lux-tag {
+    min-height: 42px !important;
+    padding: 0.5rem 1.05rem 0.5rem 1.85rem !important;
+    font-size: var(--fs-xs) !important;
+    letter-spacing: 0.08em !important;
+  }
+  .lux-tag::before { left: 0.75rem !important; }
+
+  /* 首屏主/次按钮 */
+  .lux-btn-dark {
+    min-height: 48px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: var(--fs-sm) !important;
+    letter-spacing: 0.1em !important;
+    flex: 1 1 100%;                 /* 窄屏独占一行，避免挤压换行 */
+    justify-content: center;
+  }
+  .lux-skills-portal-btn {
+    min-height: 48px !important;
+    padding: 0.7rem 1.15rem !important;
+    flex: 1 1 100%;
+    justify-content: center;
+    animation: none !important;      /* 常驻呼吸动画在移动端纯耗电 */
+  }
+  #hero-actions-container .flex.flex-wrap { gap: var(--sp-3) !important; }
+  #hero-actions-container .flex.flex-wrap > a { width: 100%; }
+
+  /* 副 Tab 文字按钮 */
+  .sub-tab-btn {
+    min-height: var(--touch) !important;
+    padding: 0 var(--sp-2) !important;
+    font-size: var(--fs-sm) !important;
+  }
+  .sub-tabs {
+    gap: var(--sp-5) !important;
+    margin-bottom: var(--sp-8) !important;
+  }
+
+  /* Dock 图标（已是 52px，补安全边距） */
+  .dock-item {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    border-radius: 14px !important;
+  }
+  .dock-panel {
+    gap: var(--sp-3) !important;
+    height: auto !important;
+    min-height: 72px !important;
+    margin-bottom: var(--sp-8) !important;
+  }
+  /* 触屏无 hover，标签常驻显示更实用 */
+  .dock-label {
+    opacity: 1 !important;
+    transform: translateX(-50%) translateY(2px) !important;
+    top: -30px !important;
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+    border-width: 2px !important;
+  }
+
+  /* 证书机构 chip */
+  .group-chip {
+    min-height: 36px !important;
+    padding: 0.3rem 0.7rem !important;
+    font-size: var(--fs-xs) !important;
+  }
+
+  /* 播放列表行 */
+  .track-item-row {
+    min-height: var(--touch) !important;
+    padding: 10px 12px !important;
+  }
+
+  /* 页脚联系按钮 —— 原 40px */
+  #footer-contact button {
+    min-width: var(--touch) !important;
+    min-height: var(--touch) !important;
+  }
+
+  /* 首屏联系方式按钮 —— 原约 30px */
+  #contact-info button {
+    min-height: 40px !important;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+  }
+
+  /* PPT 画廊浮层按钮 —— 原 40px */
+  #ppt-carousel-overlay > button.md\:hidden {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* 证书卡片点击热区保持完整 */
+  .mc-card {
+    border-width: 2px !important;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.14) !important;
+  }
+
+
+  /* ========================================================================
+     5. 横向溢出定点修复
+     ======================================================================== */
+
+  /* ① 关于我：SVG 飞机原本 left:-20px 顶出视口 */
+  #about .absolute.top-\[-90px\] {
+    left: 0 !important;
+    right: auto !important;
+    top: -70px !important;
+    width: min(78%, 340px) !important;
+    transform: scale(0.86) !important;
+    transform-origin: left top !important;
+    opacity: 0.95;
+  }
+  #about .absolute.top-\[-90px\] svg { width: 100% !important; }
+
+  /* ② 头像圆形框：原 160px + 负 margin，移动端收窄居中 */
+  .avatar-portrait {
+    width: 116px !important;
+    height: 116px !important;
+    margin-top: -74px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .avatar-person {
+    width: 128% !important;
+    height: 128% !important;
+    transform: translate(-50%, -50%) translateY(-16px) scale(1.06) !important;
+  }
+
+  /* ③ 教育区：3D 跑道 1400px×300vh 的巨型变换层 → 收敛为轻量装饰 */
+  #education {
+    min-height: 0 !important;
+    padding-top: var(--sp-8) !important;
+    padding-bottom: var(--sp-8) !important;
+  }
+  #education .absolute.inset-0.pointer-events-none.z-0 {
+    perspective: none !important;
+  }
+  #education .w-\[1400px\] {
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;      /* 去掉 rotateX(72deg) 巨型 3D 层 */
+  }
+  #education .runway-bg {
+    width: min(78vw, 340px) !important;
+    height: 100% !important;
+    border-left-width: 2px !important;
+    border-right-width: 2px !important;
+    transform: none !important;
+  }
+  #education .runway-text-column { display: none !important; }
+  #education .animate-runway-dash-fast {
+    animation-duration: 1.6s !important;   /* 放慢，减少重绘频次 */
+  }
+  /* 跑道箭头：合成层动画，保留但缩小 */
+  #education .arrow-1,
+  #education .arrow-2,
+  #education .arrow-3 {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    margin-bottom: -1.25rem !important;
+  }
+
+  /* ④ 教育/技能 两栏 → 单栏，间距收紧 */
+  #education .flex.flex-col.md\:flex-row {
+    gap: var(--sp-8) !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+  }
+  #education .mt-16.md\:mt-0 { margin-top: 0 !important; }
+  #education .airport-sign { margin-bottom: var(--sp-6) !important; }
+  #education .comic-card { padding: var(--sp-5) !important; }
+  #education .comic-card h3 { font-size: var(--fs-h3) !important; }
+  #education .space-y-5 > div { padding: var(--sp-4) !important; }
+  #education .relative.pl-8.md\:pl-12 { padding-left: var(--sp-6) !important; }
+  #education .comic-card.ml-4 { margin-left: 0 !important; }
+
+  /* ⑤ PPT 卡包：原 padding-top:150px 留白过于空洞 */
+  .card-folder-wrapper {
+    padding-top: 72px !important;
+    padding-bottom: 16px !important;
+    min-height: 0 !important;
+  }
+  .card-folder {
+    width: min(86vw, 300px) !important;
+    height: 200px !important;
+  }
+  .ppt-card {
+    width: min(78vw, 272px) !important;
+    height: 168px !important;
+  }
+  .folder-front { height: 110px !important; }
+  .folder-label { font-size: 1.35rem !important; letter-spacing: 2px !important; }
+
+  /* ⑥ 证书区：图例在窄屏换行居中，不再挤压 */
+  #ai-certs .flex.items-center.justify-between { flex-direction: column !important; gap: var(--sp-3) !important; }
+  #ai-certs .legend-item { font-size: var(--fs-micro) !important; }
+  #ai-certs > div { border-radius: 1.25rem !important; }
+  #ai-certs .text-\[12vw\] { font-size: 18vw !important; }
+  #magnetic-carousel-container {
+    padding: 0 var(--gutter) 0.75rem !important;
+    gap: 0.625rem !important;
+  }
+  #magnetic-carousel-container .mc-card {
+    width: min(58vw, 260px) !important;
+    aspect-ratio: 4 / 3 !important;
+    border-radius: 10px !important;
+  }
+
+  /* ⑦ 音乐板块：容器高度统一由 CSS 说话（原 HTML/CSS/媒体查询三处打架） */
+  .music-container {
+    height: auto !important;
+    min-height: 480px !important;
+    border-width: 3px !important;
+    box-shadow: 6px 6px 0 rgba(26, 26, 26, 0.9) !important;
+    padding: 1.25rem 0.875rem 1rem !important;
+    border-radius: 1.25rem !important;
+  }
+  /* 贴纸：只保留两枚不遮挡播放控件的，其余隐藏 */
+  .music-sticker:nth-child(2),
+  .music-sticker:nth-child(4),
+  .music-sticker:nth-child(5) {
+    display: none !important;
+  }
+  /* 触屏上贴纸不可交互：
+     拖拽逻辑会设置 touch-action:none，手指落在贴纸上时页面将无法滚动，
+     这是移动端最常见的「假死」手感来源之一。 */
+  .music-sticker { pointer-events: none !important; }
+  .music-sticker:nth-child(1) {
+    top: 6% !important; left: 2% !important; bottom: auto !important;
+    transform: rotate(-8deg) scale(0.5) !important;
+    transform-origin: top left !important;
+  }
+  .music-sticker:nth-child(3) {
+    top: 8% !important; right: 2% !important;
+    transform: rotate(14deg) scale(0.62) !important;
+    transform-origin: top right !important;
+  }
+  .slider-album {
+    width: 168px !important;
+    height: 168px !important;
+    margin-left: -84px !important;
+    margin-top: -84px !important;
+  }
+  .vinyl-record-wrapper { width: 160px !important; height: 160px !important; }
+  .slider-album.active   { transform: scale(1) !important; opacity: 1 !important; }
+  .slider-album.prev     { transform: translateX(-52%) scale(0.62) !important; opacity: 0.35 !important; }
+  .slider-album.next     { transform: translateX(52%) scale(0.62) !important; opacity: 0.35 !important; }
+  .slider-album.active.is-playing { transform: translateX(0) scale(1) !important; }
+  .slider-album.active.is-playing .vinyl-record-wrapper { transform: translateX(30%) !important; }
+
+  /* ⑧ 飞行轨迹与飞机：窄屏收窄，避免压住内容 */
+  #flight-path { right: 0.625rem !important; border-right-width: 3px !important; }
+  #particles-container { display: none !important; }   /* 滚动粒子在移动端纯耗电 */
+  #plane-icon svg { width: 32px !important; height: 32px !important; }
+
+  /* ⑨ 实践经历 iframe */
+  #experience {
+    padding-top: var(--sp-8) !important;
+    padding-bottom: var(--sp-8) !important;
+  }
+  .timeline-frame { min-height: 640px !important; }
+
+  /* ⑩ 证书/PPT 全屏浮层：铺满并留安全边距 */
+  #lightbox { padding: var(--sp-4) !important; }
+  #lightbox img { max-height: 74vh !important; }
+
+  /* ⑪ 分身发射舱：移动端宽度自适应，不被截断 */
+  #avatar-launcher-dock {
+    max-width: 100% !important;
+    padding: 0.375rem 0.625rem !important;
+    gap: 0.5rem !important;
+    min-height: 52px !important;
+  }
+  #avatar-launcher-dock .pr-1 { padding-right: 0 !important; }
+  #launcher-sub-tip { display: none !important; }   /* 窄屏省掉副标题，防挤压 */
+
+  /* ⑫ 数字分身卡片 */
+  .lux-feature-card { padding: var(--sp-5) var(--sp-4) !important; }
+  .lux-feature-card:hover { transform: none !important; }
+  .digital-avatar-frame { width: 84px !important; height: 84px !important; }
+  .lux-feature-label { font-size: 0.625rem !important; letter-spacing: 0.14em !important; }
+  #digital-avatar-card .flex.flex-col.sm\:flex-row { gap: var(--sp-3) !important; padding: var(--sp-3) !important; }
+
+
+  /* ========================================================================
+     6. 内容节奏：区块间距统一（原 py-20 / pt-40 在窄屏过于空旷）
+     ======================================================================== */
+  #about, #skills, #experience {
+    padding-top: var(--sp-10) !important;
+    padding-bottom: var(--sp-10) !important;
+  }
+  #about { padding-top: var(--sp-12) !important; }
+  #about .flex.justify-center.mb-28 { margin-bottom: var(--sp-8) !important; }
+  #skills .flex.flex-col.items-center.mb-12 { margin-bottom: var(--sp-6) !important; }
+
+  /* 关于我：数值网格 2×2，间距收紧 */
+  #about .grid.grid-cols-2 {
+    gap: var(--sp-2) !important;
+    margin-bottom: var(--sp-5) !important;
+  }
+  #about .grid.grid-cols-2 > div { padding: var(--sp-3) var(--sp-2) !important; }
+  #about .grid.grid-cols-2 .text-xl,
+  #about .grid.grid-cols-2 .text-base { font-size: var(--fs-sm) !important; }
+  #about .p-6 {
+    padding: var(--sp-4) !important;
+    font-size: var(--fs-sm) !important;
+    line-height: var(--lh-body) !important;
+  }
+
+  /* 技能副标题注解 */
+  .skills-sub-annotation {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: var(--sp-2) !important;
+    text-align: center;
+  }
+  .skills-sub-annotation > span { font-size: var(--fs-xs) !important; }
+  .skills-sub-annotation .w-8 { display: none !important; }
+
+  /* 写作 / 视频卡片：图标条改为横向紧凑 */
+  #tab-writing .comic-card .sm\:w-36,
+  #tab-writing .comic-card .w-full.sm\:w-36 {
+    width: 100% !important;
+    padding: var(--sp-4) !important;
+  }
+  #tab-writing .comic-card .p-8 { padding: var(--sp-5) !important; }
+  #tab-video .h-64 { height: 12.5rem !important; }
+
+
+  /* ========================================================================
+     7. 懒加载图：防 CLS + 降级模糊开销
+     ======================================================================== */
+  /* blur(12px) 在大图上是逐帧滤镜开销，移动端降到 6px 并缩短时长 */
+  .lazy-img {
+    filter: blur(6px) !important;
+    transform: scale(1.015) !important;
+    transition: opacity 0.32s ease, filter 0.32s ease, transform 0.32s ease !important;
+    will-change: auto !important;         /* 不再常驻合成层 */
+    content-visibility: auto;             /* 视口外跳过渲染 */
+    contain-intrinsic-size: 320px 200px;
+  }
+  .lazy-img.is-loaded {
+    filter: none !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  /* 兜底：JS 失效时图片也必须可见，不能永远 opacity:0 */
+  img.lazy-img:not(.is-loaded) {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  /* 证书卡片：同样加 content-visibility 减少离屏绘制 */
+  #magnetic-carousel-container .mc-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 240px 180px;
+  }
+}
+
+
+/* ==========================================================================
+   8. 小屏（≤390px，iPhone SE / 12 mini / 13 mini 等）二次收紧
+   ========================================================================== */
+@media (max-width: 390px) {
+  :root {
+    --gutter: 0.875rem;   /* 14px */
+    --fs-display: clamp(2rem, 11vw, 2.5rem);
+  }
+
+  .lux-hero { padding-top: 5rem !important; }
+  .airport-sign { font-size: 1rem !important; padding: 0.55rem 0.9rem !important; }
+  .airport-sign .sign-gate { display: none !important; }  /* 极窄屏省掉角标 */
+
+  #about .grid.grid-cols-2 { grid-template-columns: 1fr 1fr !important; }
+  .card-folder { width: 88vw !important; }
+  .ppt-card { width: 80vw !important; }
+
+  /* 导航胶囊：三枚已足够，继续压缩字间距 */
+  .mobile-nav-pill { padding: 0 0.625rem !important; font-size: 0.8125rem !important; }
+
+  .music-container { min-height: 440px !important; }
+  .slider-album { width: 148px !important; height: 148px !important;
+                  margin-left: -74px !important; margin-top: -74px !important; }
+  .vinyl-record-wrapper { width: 140px !important; height: 140px !important; }
+}
+
+
+/* ==========================================================================
+   9. 无障碍：尊重系统「减少动态效果」偏好
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .glow-spot, #bg-fyl { animation: none !important; }
+  .lux-skills-portal-btn, .portal-border-beam, .portal-ping { animation: none !important; }
+}
+
+
+/* ==========================================================================
+   10. 低端设备兜底：核心数 ≤4 或内存 ≤4GB 时进一步关灯
+        （deviceRAM 由 media query 检测，Chrome/Safari 支持）
+   ========================================================================== */
+@media (max-width: 768px) and (prefers-reduced-transparency: reduce) {
+  .glow-spot { display: none !important; }
+  body::before { display: none !important; }
+}
+
+/* 横向握持（矮屏）：首屏留白进一步压缩，避免一屏装不下核心信息 */
+@media (max-width: 900px) and (max-height: 480px) and (orientation: landscape) {
+  .lux-hero { padding-top: 4rem !important; padding-bottom: 1.5rem !important; }
+  .lux-moon-window { height: 120px !important; }
+  #bg-fyl { font-size: 26vw !important; }
+}
