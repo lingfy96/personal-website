@@ -1,4 +1,4 @@
 node_modules/
 .workbuddy/
-assets/photo/ppt/ppt商业路演.zip
-assets/photo/ppt/课堂展示/
+# 课堂展示原始截图(png 较大)不入库，仅 WebP 入库供网站使用
+assets/photo/ppt/课堂展示/*.png
