@@ -584,6 +584,21 @@
   .slider-album.active.is-playing { transform: translateX(0) scale(1) !important; }
   .slider-album.active.is-playing .vinyl-record-wrapper { transform: translateX(30%) !important; }
 
+  /* ⑨ 音乐板块移动端防交叉：黑胶容器需明确高度，否则 absolute 定位的黑胶会塌陷、叠到下方播放列表上 */
+  #vinyl-slider {
+    position: relative !important;
+    min-height: 240px !important;
+    margin-bottom: 0.75rem !important;
+  }
+  /* 播放列表卡片：移动端占满宽度、正常流式排在黑胶下方，不与专辑交叉 */
+  .music-container .w-full.max-w-sm {
+    align-self: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
   /* ⑧ 飞行轨迹与飞机：窄屏收窄，避免压住内容 */
   #flight-path { right: 0.625rem !important; border-right-width: 3px !important; }
   #particles-container { display: none !important; }   /* 滚动粒子在移动端纯耗电 */
@@ -660,7 +675,6 @@
     padding: var(--sp-4) !important;
   }
   #tab-writing .comic-card .p-8 { padding: var(--sp-5) !important; }
-  #tab-video .h-64 { height: 12.5rem !important; }
 
 
   /* ========================================================================
